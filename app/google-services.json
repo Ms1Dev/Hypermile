@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "396884405916",
+    "project_id": "hypermile-c836e",
+    "storage_bucket": "hypermile-c836e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:396884405916:android:163dc686ed760df003c759",
+        "android_client_info": {
+          "package_name": "com.example.hypermile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpdR_Ee1-S3GACWeHipPt0Mi1zNGrlhF8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
