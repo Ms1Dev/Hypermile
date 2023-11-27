@@ -65,7 +65,7 @@
                     android:clickable="true"
                     android:linksClickable="false"
                     android:text="Sign up"
-                    android:textColor="#0109A5" />
+                    android:textColor="?android:attr/textColorLink" />
 
             </LinearLayout>
 
