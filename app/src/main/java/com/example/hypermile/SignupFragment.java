@@ -4,11 +4,14 @@ import android.os.Bundle;
 
 import android.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,11 +20,17 @@ import android.widget.TextView;
  */
 public class SignupFragment extends Fragment {
     View view;
+    EditText usernameField;
+    EditText passwordField;
     TextView loginLink;
+    Button signupButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_signup, container, false);
+        signupButton = (Button) view.findViewById(R.id.signupBtn);
+        usernameField = (EditText) view.findViewById(R.id.username);
+        passwordField = (EditText) view.findViewById(R.id.password);
         loginLink = (TextView) view.findViewById(R.id.loginLink);
         loginLink.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -31,6 +40,20 @@ public class SignupFragment extends Fragment {
             }
         });
 
+        signupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("debug", "Sign up clicked");
+
+                String username = usernameField.getText().toString();
+                String password = passwordField.getText().toString();
+
+                AuthenticationActivity authenticationActivity = (AuthenticationActivity) getActivity();
+                authenticationActivity.registerUser(username,password);
+            }
+        });
+
         return view;
     }
+
 }
