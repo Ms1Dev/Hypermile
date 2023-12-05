@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
 
 
@@ -24,6 +25,8 @@ public class AuthenticationActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     TextView loginLink;
     TextView signupLink;
+
+    String errorMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,7 @@ public class AuthenticationActivity extends AppCompatActivity {
         fragmentTransaction.commit(); // save the changes
     }
 
-    public void registerUser(String email, String password) {
+    public String registerUser(String email, String password) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
@@ -53,14 +56,14 @@ public class AuthenticationActivity extends AppCompatActivity {
                         Log.d("debug","Workeddd");
                     }
                     else {
-                        Log.w("debug","createUserWithEmail:failure", task.getException());
-                        // failure message
+                        errorMessage = task.getException().toString();
                     }
                 }
             });
+        return errorMessage;
     }
 
-    public void loginUser(String email, String password) {
+    public String loginUser(String email, String password) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
@@ -70,10 +73,11 @@ public class AuthenticationActivity extends AppCompatActivity {
                         startMainActivity();
                     }
                     else {
-                        // failure message
+                        errorMessage = task.getException().toString();
                     }
                 }
             });
+        return errorMessage;
     }
 
     public void startMainActivity() {
@@ -82,5 +86,9 @@ public class AuthenticationActivity extends AppCompatActivity {
             startActivity(intent);
 
         }
+    }
+
+    private String translateException(Exception exception) {
+        return "";
     }
 }

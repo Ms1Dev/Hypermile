@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.w3c.dom.Text;
@@ -30,7 +31,6 @@ public class LoginFragment extends android.app.Fragment {
         usernameField = (EditText) view.findViewById(R.id.username);
         passwordField = (EditText) view.findViewById(R.id.password);
 
-
         signupLink = (TextView) view.findViewById(R.id.signUpLink);
         signupLink.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,9 +46,11 @@ public class LoginFragment extends android.app.Fragment {
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
 
+                boolean loginSuccess = false;
+
                 if (!username.isEmpty() && !password.isEmpty()) {
                     AuthenticationActivity authenticationActivity = (AuthenticationActivity) getActivity();
-                    authenticationActivity.loginUser(username,password);
+                    showErrorMessage(authenticationActivity.loginUser(username,password));
                 }
                 else {
                     showErrorMessage("Username and password cannot be empty");
@@ -60,9 +62,11 @@ public class LoginFragment extends android.app.Fragment {
     }
 
     private void showErrorMessage(String message) {
-        LinearLayout errorMessage = (LinearLayout) view.findViewById(R.id.errorMessage);
-        TextView messageContent = (TextView) view.findViewById(R.id.errorMessageContent);
-        errorMessage.setVisibility(View.VISIBLE);
-        messageContent.setText(message);
+        if (message != null && !message.isEmpty()) {
+            LinearLayout errorMessage = (LinearLayout) view.findViewById(R.id.errorMessage);
+            TextView messageContent = (TextView) view.findViewById(R.id.errorMessageContent);
+            errorMessage.setVisibility(View.VISIBLE);
+            messageContent.setText(message);
+        }
     }
 }

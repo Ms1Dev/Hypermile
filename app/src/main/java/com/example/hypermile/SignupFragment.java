@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -48,12 +49,23 @@ public class SignupFragment extends Fragment {
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
 
-                AuthenticationActivity authenticationActivity = (AuthenticationActivity) getActivity();
-                authenticationActivity.registerUser(username,password);
+                if (!username.isEmpty() && !password.isEmpty()) {
+                    AuthenticationActivity authenticationActivity = (AuthenticationActivity) getActivity();
+                    showErrorMessage(authenticationActivity.registerUser(username,password));
+                }
+                else {
+                    showErrorMessage("Username and password cannot be empty");
+                }
             }
         });
 
         return view;
     }
 
+    private void showErrorMessage(String message) {
+        LinearLayout errorMessage = (LinearLayout) view.findViewById(R.id.errorMessage);
+        TextView messageContent = (TextView) view.findViewById(R.id.errorMessageContent);
+        errorMessage.setVisibility(View.VISIBLE);
+        messageContent.setText(message);
+    }
 }
