@@ -24,6 +24,39 @@
             android:layout_margin="20dp"
             android:orientation="vertical">
 
+            <LinearLayout
+                android:id="@+id/errorMessage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:background="@drawable/border_red"
+                android:paddingLeft="10dp"
+                android:paddingTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dp"
+                android:visibility="visible">
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:foreground="@android:drawable/stat_notify_error"
+                    android:foregroundTint="#C31010"
+                    android:src="@android:drawable/stat_notify_error" />
+
+                <TextView
+                    android:id="@+id/errorMessageContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_weight="0"
+                    android:text="Error"
+                    android:textColor="#C31010" />
+            </LinearLayout>
+
             <EditText
                 android:id="@+id/username"
                 android:layout_width="match_parent"
