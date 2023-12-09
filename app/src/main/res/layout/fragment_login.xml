@@ -28,15 +28,15 @@
                 android:id="@+id/errorMessage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/border_red"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:background="@drawable/border_red"
                 android:paddingLeft="10dp"
                 android:paddingTop="10dp"
-                android:layout_marginBottom="20dp"
                 android:paddingRight="10dp"
                 android:paddingBottom="10dp"
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/imageView2"

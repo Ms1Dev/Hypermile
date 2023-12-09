@@ -10,13 +10,22 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthEmailException;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
 
@@ -56,7 +65,7 @@ public class AuthenticationActivity extends AppCompatActivity {
                         Log.d("debug","Workeddd");
                     }
                     else {
-                        errorMessage = task.getException().toString();
+                        errorMessage = translateException(task.getException());
                     }
                 }
             });
@@ -73,7 +82,7 @@ public class AuthenticationActivity extends AppCompatActivity {
                         startMainActivity();
                     }
                     else {
-                        errorMessage = task.getException().toString();
+                        errorMessage = translateException(task.getException());
                     }
                 }
             });
@@ -88,7 +97,25 @@ public class AuthenticationActivity extends AppCompatActivity {
         }
     }
 
+
     private String translateException(Exception exception) {
-        return "";
+        try {
+            throw exception;
+        }
+        catch (FirebaseAuthEmailException ex) {
+            return "Invalid email";
+        }
+        catch (FirebaseAuthWeakPasswordException ex) {
+            return "Password must be at least 6 characters.";
+        }
+        catch (FirebaseAuthUserCollisionException ex) {
+            return "Username already exists.";
+        }
+        catch (FirebaseAuthInvalidCredentialsException ex) {
+            return "Invalid login credentials.";
+        }
+        catch (Exception ex) {
+            return ex.getMessage();
+        }
     }
 }

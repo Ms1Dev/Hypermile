@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.concurrent.TimeUnit;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,13 +46,12 @@ public class SignupFragment extends Fragment {
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("debug", "Sign up clicked");
+                AuthenticationActivity authenticationActivity = (AuthenticationActivity) getActivity();
 
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
 
                 if (!username.isEmpty() && !password.isEmpty()) {
-                    AuthenticationActivity authenticationActivity = (AuthenticationActivity) getActivity();
                     showErrorMessage(authenticationActivity.registerUser(username,password));
                 }
                 else {

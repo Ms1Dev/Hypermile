@@ -16,6 +16,8 @@ import androidx.annotation.Nullable;
 
 import org.w3c.dom.Text;
 
+import java.util.concurrent.TimeUnit;
+
 public class LoginFragment extends android.app.Fragment {
     View view;
     EditText usernameField;
@@ -43,13 +45,19 @@ public class LoginFragment extends android.app.Fragment {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                AuthenticationActivity authenticationActivity = (AuthenticationActivity) getActivity();
+
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (Exception e){}
+
+
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
 
                 boolean loginSuccess = false;
 
                 if (!username.isEmpty() && !password.isEmpty()) {
-                    AuthenticationActivity authenticationActivity = (AuthenticationActivity) getActivity();
                     showErrorMessage(authenticationActivity.loginUser(username,password));
                 }
                 else {
