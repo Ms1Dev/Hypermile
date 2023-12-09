@@ -65,6 +65,7 @@
                 app:expandedHintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    style="@style/InputTextOutline"
                     android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -80,6 +81,7 @@
                 app:expandedHintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    style="@style/InputTextOutline"
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
