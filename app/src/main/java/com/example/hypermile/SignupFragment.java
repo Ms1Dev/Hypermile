@@ -64,9 +64,11 @@ public class SignupFragment extends Fragment {
     }
 
     private void showErrorMessage(String message) {
-        LinearLayout errorMessage = (LinearLayout) view.findViewById(R.id.errorMessage);
-        TextView messageContent = (TextView) view.findViewById(R.id.errorMessageContent);
-        errorMessage.setVisibility(View.VISIBLE);
-        messageContent.setText(message);
+        if (message != null && !message.isEmpty()) {
+            LinearLayout errorMessage = (LinearLayout) view.findViewById(R.id.errorMessage);
+            TextView messageContent = (TextView) view.findViewById(R.id.errorMessageContent);
+            errorMessage.setVisibility(View.VISIBLE);
+            messageContent.setText(message);
+        }
     }
 }

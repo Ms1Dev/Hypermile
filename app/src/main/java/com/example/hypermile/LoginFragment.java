@@ -47,11 +47,6 @@ public class LoginFragment extends android.app.Fragment {
             public void onClick(View view) {
                 AuthenticationActivity authenticationActivity = (AuthenticationActivity) getActivity();
 
-                try {
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (Exception e){}
-
-
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
 

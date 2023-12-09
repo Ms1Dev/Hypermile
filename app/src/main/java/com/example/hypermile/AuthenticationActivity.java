@@ -102,17 +102,8 @@ public class AuthenticationActivity extends AppCompatActivity {
         try {
             throw exception;
         }
-        catch (FirebaseAuthEmailException ex) {
-            return "Invalid email";
-        }
-        catch (FirebaseAuthWeakPasswordException ex) {
-            return "Password must be at least 6 characters.";
-        }
-        catch (FirebaseAuthUserCollisionException ex) {
-            return "Username already exists.";
-        }
-        catch (FirebaseAuthInvalidCredentialsException ex) {
-            return "Invalid login credentials.";
+        catch (FirebaseAuthException ex) {
+            return exception.getMessage();
         }
         catch (Exception ex) {
             return ex.getMessage();

@@ -2,4 +2,16 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="primary">#2c571b</color>
+    <color name="primary_container">#b8f397</color>
+    <color name="on_primary_container">#042100</color>
+    <color name="secondary">#55624c</color>
+    <color name="secondary_container">#d9e7cb</color>
+    <color name="on_secondary_container">#131f0d</color>
+    <color name="error">#ba1a1a</color>
+    <color name="error_container">#ffdad6</color>
+    <color name="on_error_container">#ffdad6</color>
+    <color name="tertiary">#386667</color>
+    <color name="tertiary_container">#bbebeb</color>
+    <color name="on_tertiary_container">#002021</color>
 </resources>

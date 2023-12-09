@@ -8,6 +8,7 @@
     tools:context=".SignupFragment">
 
     <androidx.cardview.widget.CardView
+        style="@style/Card"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
@@ -57,22 +58,35 @@
                     android:textColor="#C31010" />
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/username"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:ems="10"
                 android:hint="Username"
-                android:inputType="text" />
+                app:expandedHintEnabled="false">
 
-            <EditText
-                android:id="@+id/password"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/username"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:inputType="textEmailAddress" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
                 android:hint="Password"
-                android:inputType="textPassword" />
+                app:expandedHintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    />
+
+            </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -98,7 +112,8 @@
                     android:clickable="true"
                     android:linksClickable="false"
                     android:text="Log in"
-                    android:textColor="?android:attr/textColorLink" />
+                    android:textColor="@color/tertiary"
+                    android:textColorLink="@color/tertiary" />
 
             </LinearLayout>
 
@@ -106,7 +121,8 @@
                 android:id="@+id/signupBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sign up" />
+                android:text="Sign up"
+                app:rippleColor="@color/tertiary" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
