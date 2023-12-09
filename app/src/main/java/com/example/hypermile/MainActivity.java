@@ -11,7 +11,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     BottomNavigationView bottomNavigationView;
-    HomeFragment homeFragment = new HomeFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +28,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         int item_id = item.getItemId();
 
         if (item_id == R.id.home) {
+            HomeFragment homeFragment = new HomeFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.mainContent, homeFragment).commit();
+            return true;
+        }
+        else if (item_id == R.id.live_data) {
+            LiveDataFragment liveDataFragment = new LiveDataFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainContent, liveDataFragment).commit();
+            return true;
+        }
+        else if (item_id == R.id.reports) {
+            ReportsFragment reportsFragment = new ReportsFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mainContent, reportsFragment).commit();
+            return true;
         }
 
         return false;
