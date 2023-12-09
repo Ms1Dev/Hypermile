@@ -7,6 +7,11 @@
         <item name="colorPrimaryVariant">@color/primary</item>
         <item name="colorPrimaryContainer">@color/primary_container</item>
         <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+
+        <item name="colorSurface">@color/primary</item>
+        <item name="colorOnSurface">@color/white</item>
+        <item name="colorOnSurfaceVariant">@color/secondary_container</item>
+
         <item name="colorSecondary">@color/secondary</item>
         <item name="colorOnSecondary">@color/white</item>
         <item name="colorSecondaryVariant">@color/secondary</item>
@@ -24,14 +29,13 @@
         <item name="colorOnErrorContainer">@color/on_error_container</item>
         <item name="android:textColor">@color/black</item>
         <item name="android:textColorPrimary">@color/white</item>
-        <item name="colorOnSurface">@color/secondary_container</item>
+
         <item name="android:textColorHint">@color/black</item>
         <item name="hintTextColor">@color/black</item>
         <item name="android:textColorLink">@color/black</item>
         <item name="boxStrokeColor">@color/black</item>
 
         <item name="rippleColor">@color/tertiary</item>
-
         <item name="android:editTextColor">@color/black</item>
 
 
@@ -44,4 +48,5 @@
     <style name="InputTextOutline" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="android:textColor">@color/on_primary_container</item>
     </style>
+
 </resources>
