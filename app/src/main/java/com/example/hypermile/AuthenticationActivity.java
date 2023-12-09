@@ -14,6 +14,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -44,6 +45,15 @@ public class AuthenticationActivity extends AppCompatActivity {
         firebaseAuth = FirebaseAuth.getInstance();
         loadFragment(new LoginFragment());
     }
+
+    public void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            startMainActivity();
+        }
+    }
+
     protected void loadFragment(Fragment fragment) {
 // create a FragmentManager
         FragmentManager fragmentManager = getFragmentManager();
