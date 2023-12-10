@@ -5,10 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
@@ -26,6 +28,24 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.overflow, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int item_id = item.getItemId();
+
+        if (item_id == R.id.signout) {
+            signOut();
+            return true;
+        }
+
+        return false;
     }
 
     @Override
@@ -50,5 +70,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         }
 
         return false;
+    }
+
+    private void signOut() {
+        FirebaseAuth.getInstance().signOut();
+        finish();
     }
 }
