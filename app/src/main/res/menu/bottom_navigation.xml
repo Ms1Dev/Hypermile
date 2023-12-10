@@ -12,7 +12,7 @@
         />
     <item
         android:id="@+id/reports"
-        android:icon="@drawable/report_icon"
+        android:icon="@drawable/analytics_icon"
         android:title="Reports"
         />
 </menu>

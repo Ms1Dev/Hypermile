@@ -59,13 +59,13 @@
             </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/InputTextOutline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Username"
                 app:expandedHintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    style="@style/InputTextOutline"
                     android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -75,13 +75,13 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                style="@style/InputTextOutline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Password"
                 app:expandedHintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    style="@style/InputTextOutline"
                     android:id="@+id/password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
