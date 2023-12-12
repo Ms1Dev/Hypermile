@@ -56,9 +56,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
         int item_id = item.getItemId();
+        return loadFragment(item_id);
+    }
 
+    public void selectFragmentProgrammatically(int item_id) {
+        loadFragment(item_id);
+        bottomNavigationView.setSelectedItemId(item_id);
+    }
+
+    private boolean loadFragment(int item_id) {
         if (item_id == R.id.home) {
             HomeFragment homeFragment = new HomeFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.mainContent, homeFragment).commit();
@@ -74,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             getSupportFragmentManager().beginTransaction().replace(R.id.mainContent, reportsFragment).commit();
             return true;
         }
-
         return false;
     }
 

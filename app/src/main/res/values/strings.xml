@@ -19,4 +19,8 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <!-- App specific -->
+    <string name="no_reports">No reports to show yet. Start the app before driving to create your first report!</string>
+
 </resources>
