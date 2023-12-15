@@ -79,4 +79,11 @@
         <item name="backgroundTint">@drawable/outline_btn</item>
     </style>
 
+    <style name="TableLayout">
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:background">@drawable/table_background</item>
+        <item name="android:divider">@color/primary</item>
+        <item name="android:showDividers">middle</item>
+    </style>
+
 </resources>

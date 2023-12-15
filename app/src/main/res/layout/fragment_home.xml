@@ -83,6 +83,7 @@
                     android:layout_width="match_parent"
                     app:singleSelection="true"
                     app:checkedButton="@id/weeklyStatBtn"
+                    android:layout_marginBottom="10dp"
                     android:layout_height="wrap_content">
 
                     <Button
@@ -116,7 +117,10 @@
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 <TableLayout
+                    style="@style/TableLayout"
                     android:layout_width="match_parent"
+                    android:stretchColumns="1"
+                    android:padding="5dp"
                     android:layout_height="match_parent">
 
                     <TableRow
@@ -129,6 +133,7 @@
                             android:text="Total Distance" />
 
                         <TextView
+                            android:gravity="right"
                             android:id="@+id/totalDistance"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -145,6 +150,7 @@
                             android:text="Fuel Used" />
 
                         <TextView
+                            android:gravity="right"
                             android:id="@+id/fuelUsage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -161,6 +167,7 @@
                             android:text="Carbon Footprint" />
 
                         <TextView
+                            android:gravity="right"
                             android:id="@+id/carbonFootprint"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -177,6 +184,7 @@
                             android:text="Average MPG" />
 
                         <TextView
+                            android:gravity="right"
                             android:id="@+id/averageMpg"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
