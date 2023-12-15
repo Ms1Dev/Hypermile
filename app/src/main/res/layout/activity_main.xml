@@ -33,12 +33,14 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
             app:layout_constraintStart_toStartOf="parent"
+            android:clipChildren="false"
             app:layout_constraintTop_toBottomOf="@+id/appbar">
+
             <FrameLayout
                 android:id="@+id/mainContent"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                >
+                android:clipChildren="false"
+                android:layout_height="0dp">
 
             </FrameLayout>
         </ScrollView>

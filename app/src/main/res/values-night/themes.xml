@@ -11,7 +11,7 @@
         <item name="colorSurface">@color/primary</item>
         <item name="colorSurfaceVariant">@color/white</item>
         <item name="colorOnSurface">@color/white</item>
-        <item name="colorOnSurfaceVariant">@color/primary_container</item>
+        <item name="colorOnSurfaceVariant">@color/secondary_container</item>
 
         <item name="colorSecondary">@color/secondary</item>
         <item name="colorOnSecondary">@color/white</item>
@@ -68,6 +68,11 @@
     <style name="SecondaryButton">
         <item name="android:textColor">@color/primary</item>
         <item name="android:backgroundTint">@color/primary_container</item>
+    </style>
+
+    <style name="Button">
+        <item name="backgroundTint">@drawable/btn_colours</item>
+        <item name="android:textColor">@drawable/btn_text_colours</item>
     </style>
 
 </resources>
