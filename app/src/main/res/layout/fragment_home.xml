@@ -75,10 +75,45 @@
 
                 <TextView
                     style="@style/Title"
-                    android:id="@+id/textView5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Statistics" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:layout_width="match_parent"
+                    app:singleSelection="true"
+                    app:checkedButton="@id/weeklyStatBtn"
+                    android:layout_height="wrap_content">
+
+                    <Button
+                        android:id="@+id/weeklyStatBtn"
+                        style="@style/OutlinedButton"
+                        android:drawableLeft="@drawable/checked_tick"
+                        android:layout_width="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:layout_weight="1"
+                        android:text="Week"
+                        android:layout_height="wrap_content"/>
+                    <Button
+                        android:id="@+id/monthlyStatBtn"
+                        style="@style/OutlinedButton"
+                        android:drawableLeft="@drawable/checked_tick"
+                        android:paddingLeft="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Month"
+                        android:layout_height="wrap_content"/>
+                    <Button
+                        android:id="@+id/yearlyStatBtn"
+                        style="@style/OutlinedButton"
+                        android:drawableLeft="@drawable/checked_tick"
+                        android:layout_width="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:layout_weight="1"
+                        android:text="Year"
+                        android:layout_height="wrap_content"/>
+
+                </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 <TableLayout
                     android:layout_width="match_parent"
@@ -89,29 +124,64 @@
                         android:layout_height="match_parent">
 
                         <TextView
-                            android:id="@+id/textView3"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TextView" />
+                            android:text="Total Distance" />
 
                         <TextView
-                            android:id="@+id/textView4"
+                            android:id="@+id/totalDistance"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="TextView" />
+                            android:text="n/a" />
                     </TableRow>
 
                     <TableRow
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Fuel Used" />
+
+                        <TextView
+                            android:id="@+id/fuelUsage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="n/a" />
+                    </TableRow>
 
                     <TableRow
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Carbon Footprint" />
+
+                        <TextView
+                            android:id="@+id/carbonFootprint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="n/a" />
+                    </TableRow>
 
                     <TableRow
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Average MPG" />
+
+                        <TextView
+                            android:id="@+id/averageMpg"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="n/a" />
+                    </TableRow>
                 </TableLayout>
 
             </LinearLayout>
