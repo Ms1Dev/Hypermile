@@ -1,5 +1,6 @@
 package com.example.hypermile.bluetoothDevices;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,24 +18,19 @@ import java.util.List;
 
 public class DiscoveredDeviceAdapter extends ArrayAdapter {
 
-    public DiscoveredDeviceAdapter(Context context, List<DiscoveredDevice> deviceList) {
+    public DiscoveredDeviceAdapter(Context context, List<DiscoveredDeviceListElement> deviceList) {
         super(context, 0, deviceList);
     }
 
     public View getView(int position, @NonNull View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.discovered_device_list_item, parent, false);
+        DiscoveredDeviceListElement element = (DiscoveredDeviceListElement) getItem(position);
+
+        if (element == null) {
+            return convertView;
         }
 
-        DiscoveredDevice device = (DiscoveredDevice) getItem(position);
-        TextView deviceName = convertView.findViewById(R.id.deviceNameView);
-        TextView deviceMac = convertView.findViewById(R.id.deviceMacView);
+        convertView = LayoutInflater.from(getContext()).inflate(element.getResource(), parent, false);
 
-        if (device != null) {
-            deviceName.setText(device.getName());
-            deviceMac.setText(device.getMacAddress());
-        }
-
-        return convertView;
+        return element.setViewContent(convertView);
     }
 }

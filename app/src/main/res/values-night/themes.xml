@@ -86,4 +86,10 @@
         <item name="android:showDividers">middle</item>
     </style>
 
+    <style name="SectionHeader">
+        <item name="android:background">@color/secondary_container</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
 </resources>

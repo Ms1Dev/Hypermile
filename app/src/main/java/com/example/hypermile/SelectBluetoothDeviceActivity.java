@@ -21,6 +21,8 @@ import android.widget.ListView;
 
 import com.example.hypermile.bluetoothDevices.DiscoveredDevice;
 import com.example.hypermile.bluetoothDevices.DiscoveredDeviceAdapter;
+import com.example.hypermile.bluetoothDevices.DiscoveredDeviceListElement;
+import com.example.hypermile.bluetoothDevices.DiscoveredDeviceSectionHeader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ import java.util.Set;
 
 public class SelectBluetoothDeviceActivity extends AppCompatActivity {
 
-    List<DiscoveredDevice> discoveredDevices = new ArrayList<>();
+    List<DiscoveredDeviceListElement> discoveredDevices = new ArrayList<>();
 
     DiscoveredDeviceAdapter discoveredDeviceAdapter;
 
@@ -42,11 +44,10 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
 
         ListView discoveredDeviceList = findViewById(R.id.discoveredDeviceList);
 
-        discoveredDevices.add(new DiscoveredDevice("Test", "Testing"));
-
         discoveredDeviceAdapter = new DiscoveredDeviceAdapter(this, discoveredDevices);
 
         discoveredDeviceList.setAdapter(discoveredDeviceAdapter);
+
 
 
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
@@ -68,19 +69,23 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
 
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
 
+        discoveredDeviceAdapter.add(new DiscoveredDeviceSectionHeader("Paired Devices"));
+
         if (pairedDevices.size() > 0) {
             // There are paired devices. Get the name and address of each paired device.
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress(); // MAC address
-                Log.d("PAIRED", "device: " + deviceName);
+                discoveredDeviceAdapter.add(new DiscoveredDevice(deviceName,deviceHardwareAddress));
             }
         }
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(receiver, filter);
 
-        bluetoothAdapter.startDiscovery();
+        discoveredDeviceAdapter.add(new DiscoveredDeviceSectionHeader("Discovered Devices"));
+
+//        bluetoothAdapter.startDiscovery();
     }
 
     private ActivityResultLauncher<String> permissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
