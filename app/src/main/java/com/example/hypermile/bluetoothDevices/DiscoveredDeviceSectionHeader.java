@@ -7,10 +7,7 @@ import com.example.hypermile.R;
 
 public class DiscoveredDeviceSectionHeader implements DiscoveredDeviceListElement {
     String title;
-
-    public DiscoveredDeviceSectionHeader(String title) {
-        this.title = title;
-    }
+    public DiscoveredDeviceSectionHeader(String title) { this.title = title; }
 
     @Override
     public int getResource() {

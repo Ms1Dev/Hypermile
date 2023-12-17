@@ -3,7 +3,10 @@ package com.example.hypermile;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -17,7 +20,10 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.example.hypermile.bluetoothDevices.DiscoveredDevice;
 import com.example.hypermile.bluetoothDevices.DiscoveredDeviceAdapter;
@@ -41,6 +47,13 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_bluetooth_device);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.selectBluetoothToolbar);
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("Bluetooth Devices");
 
         ListView discoveredDeviceList = findViewById(R.id.discoveredDeviceList);
 
@@ -72,16 +85,17 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
         discoveredDeviceAdapter.add(new DiscoveredDeviceSectionHeader("Paired Devices"));
 
         if (pairedDevices.size() > 0) {
-            // There are paired devices. Get the name and address of each paired device.
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
+                String deviceHardwareAddress = device.getAddress();
                 discoveredDeviceAdapter.add(new DiscoveredDevice(deviceName,deviceHardwareAddress));
             }
         }
 
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(receiver, filter);
+        IntentFilter found_filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(receiver, found_filter);
+        IntentFilter finished_filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        registerReceiver(receiver, finished_filter);
 
         discoveredDeviceAdapter.add(new DiscoveredDeviceSectionHeader("Discovered Devices"));
 
@@ -95,10 +109,16 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
         }
     });
 
+    private void discoveryFinishedCallback() {
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
+    }
+
     // Create a BroadcastReceiver for ACTION_FOUND.
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Discovery has found a device. Get the BluetoothDevice
                 // object and its info from the Intent.
@@ -110,8 +130,22 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
                 String deviceHardwareAddress = device.getAddress(); // MAC address
                 discoveredDeviceAdapter.add(new DiscoveredDevice(deviceName,deviceHardwareAddress));
             }
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                discoveryFinishedCallback();
+            }
         }
     };
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int item_id = item.getItemId();
+
+        if (item_id == android.R.id.home) {
+            this.finish();
+            return true;
+        }
+        return true;
+    }
 
     @Override
     protected void onDestroy() {
