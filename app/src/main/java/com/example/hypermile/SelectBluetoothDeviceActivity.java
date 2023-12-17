@@ -13,6 +13,7 @@ import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -30,16 +31,20 @@ import com.example.hypermile.bluetoothDevices.DiscoveredDeviceAdapter;
 import com.example.hypermile.bluetoothDevices.DiscoveredDeviceListElement;
 import com.example.hypermile.bluetoothDevices.DiscoveredDeviceSectionHeader;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class SelectBluetoothDeviceActivity extends AppCompatActivity {
 
     List<DiscoveredDeviceListElement> discoveredDevices = new ArrayList<>();
 
     DiscoveredDeviceAdapter discoveredDeviceAdapter;
+
+    BluetoothAdapter bluetoothAdapter;
 
 //    SOURCE: https://developer.android.com/develop/connectivity/bluetooth/setup
 
@@ -73,7 +78,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
 
 
         BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
-        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+        bluetoothAdapter = bluetoothManager.getAdapter();
 
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -88,7 +93,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress();
-                discoveredDeviceAdapter.add(new DiscoveredDevice(deviceName,deviceHardwareAddress));
+                discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName));
             }
         }
 
@@ -99,7 +104,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
 
         discoveredDeviceAdapter.add(new DiscoveredDeviceSectionHeader("Discovered Devices"));
 
-//        bluetoothAdapter.startDiscovery();
+        bluetoothAdapter.startDiscovery();
     }
 
     private ActivityResultLauncher<String> permissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
@@ -128,7 +133,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
                 }
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress(); // MAC address
-                discoveredDeviceAdapter.add(new DiscoveredDevice(deviceName,deviceHardwareAddress));
+                discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName));
             }
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 discoveryFinishedCallback();
@@ -154,5 +159,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
         // Don't forget to unregister the ACTION_FOUND receiver.
         unregisterReceiver(receiver);
     }
+
+
 
 }
