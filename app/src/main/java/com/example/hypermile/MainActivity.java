@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.hypermile.data.Poller;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         Intent selectBluetoothIntent = new Intent(MainActivity.this, SelectBluetoothDeviceActivity.class);
         startActivity(selectBluetoothIntent);
+
+        Poller poller = new Poller(1);
+        poller.start();
     }
 
     @Override

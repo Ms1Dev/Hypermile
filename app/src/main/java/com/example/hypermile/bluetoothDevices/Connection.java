@@ -3,6 +3,9 @@ package com.example.hypermile.bluetoothDevices;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,6 +19,10 @@ import java.util.UUID;
 // Singleton class since we only ever have one bluetooth device connected
 public class Connection {
     private static Connection instance;
+    private static ConnectionThread connectionThread;
+
+    private static byte[] inputBuffer;
+    private static int newDataLen = 0;
 
     public static Connection getInstance() {
         if (instance == null) {
@@ -23,9 +30,31 @@ public class Connection {
         }
         return instance;
     }
-    private Connection() {}
+    private Connection() {
+        inputBuffer = new byte[1024];
+    }
 
-    private ConnectionThread connectionThread;
+    public static boolean hasConnection() {
+        return connectionThread != null;
+    }
+
+    public static boolean hasData() {
+        return newDataLen > 0;
+    }
+
+    public static void readBuffer(ByteArrayOutputStream out) throws IOException {
+        out.write(inputBuffer);
+        out.write('\0');
+        out.flush();
+        out.close();
+        newDataLen = 0;
+    }
+
+    public static void request(byte[] command) {
+        if (hasConnection()) {
+            connectionThread.write(command);
+        }
+    }
 
     public void createConnection(BluetoothDevice bluetoothDevice) {
         if (connectionThread != null) {
@@ -60,6 +89,7 @@ public class Connection {
 
 
         public void run() {
+            Log.d("ble", "running");
             // Cancel discovery because it otherwise slows down the connection.
 //            try {
 //
@@ -109,23 +139,18 @@ public class Connection {
         }
 
         public void run() {
-            mmBuffer = new byte[1024];
-            int numBytes; // bytes returned from read()
-
             // Keep listening to the InputStream until an exception occurs.
             while (true) {
-//                try {
-//                    Log.d("Msg", "listening bluetooth connection ");
-//                    // Read from the InputStream.
-//                    numBytes = inputStream.read(mmBuffer);
+                try {
+                    newDataLen = inputStream.read(inputBuffer);
+
+//                    String response = new String(inputBuffer, StandardCharsets.UTF_8);
 //
-//                    String recv = new String(mmBuffer, StandardCharsets.UTF_8);
-//
-//                    Log.d("Msg", "run: " + recv);
-//                } catch (IOException e) {
-//                    Log.d("Err", "Input stream was disconnected", e);
-//                    break;
-//                }
+//                    Log.d("Res", response);
+                } catch (IOException e) {
+                    Log.d("Err", "Input stream was disconnected", e);
+                    break;
+                }
             }
         }
 
@@ -134,10 +159,6 @@ public class Connection {
             try {
                 Log.d("send", " try write: " + bytes);
                 outputStream.write(bytes);
-
-                String send = new String(bytes, StandardCharsets.UTF_8);
-
-                Log.d("send", "write: " + send);
             } catch (IOException e) {
                 Log.e("Err", "Error occurred when sending data", e);
             }
@@ -146,6 +167,10 @@ public class Connection {
 
         public PipedOutputStream getOutputStream() throws IOException {
             return new PipedOutputStream((PipedInputStream) inputStream);
+        }
+
+        public PipedInputStream getInputStream() throws IOException {
+            return new PipedInputStream((PipedOutputStream) outputStream);
         }
 
 

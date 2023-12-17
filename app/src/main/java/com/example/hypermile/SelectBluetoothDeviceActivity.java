@@ -92,7 +92,6 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress();
                 discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName));
             }
         }
@@ -119,7 +118,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
     }
 
-    // Create a BroadcastReceiver for ACTION_FOUND.
+    // Create a BroadcastReceiver
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -132,7 +131,6 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
                     permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
                 }
                 String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
                 discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName));
             }
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
