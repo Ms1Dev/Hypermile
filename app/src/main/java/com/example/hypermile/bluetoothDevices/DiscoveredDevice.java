@@ -2,16 +2,20 @@ package com.example.hypermile.bluetoothDevices;
 
 
 import android.bluetooth.BluetoothDevice;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.example.hypermile.MainActivity;
 import com.example.hypermile.R;
 
 public class DiscoveredDevice implements DiscoveredDeviceListElement {
     private String name;
     private String macAddress;
-    Button connectButton;
+    ImageView connectButton;
     private BluetoothDevice bluetoothDevice;
 
     public DiscoveredDevice(BluetoothDevice bluetoothDevice, String name) {
@@ -21,7 +25,7 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement {
     }
 
     public String getName() {
-        return name;
+        return name == null? "Unknown Device" : name;
     }
 
     public String getMacAddress() {
@@ -43,14 +47,41 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement {
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Connection connection = Connection.getInstance();
-                connection.createConnection(bluetoothDevice);
+
+                PopupMenu popupMenu = new PopupMenu(view.getContext(), connectButton);
+                popupMenu.getMenuInflater().inflate(R.menu.bluetooth_device_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        int item_id = menuItem.getItemId();
+
+                        if (item_id == R.id.connectThisDevice) {
+                            Connection connection = Connection.getInstance();
+                            connection.createConnection(bluetoothDevice);
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+
+                popupMenu.show();
             }
         });
 
         deviceName.setText(getName());
         deviceMac.setText(getMacAddress());
         return view;
+    }
+
+    @Override
+    public boolean cmp(DiscoveredDeviceListElement comparison) {
+        try {
+           DiscoveredDevice comparisonDevice = (DiscoveredDevice) comparison;
+           return comparisonDevice.macAddress == this.macAddress;
+        }
+        catch (Exception _) {
+            return false;
+        }
     }
 }
 

@@ -20,4 +20,9 @@ public class DiscoveredDeviceSectionHeader implements DiscoveredDeviceListElemen
         headerView.setText(title);
         return view;
     }
+
+    @Override
+    public boolean cmp(DiscoveredDeviceListElement comparison) {
+        return false;
+    }
 }

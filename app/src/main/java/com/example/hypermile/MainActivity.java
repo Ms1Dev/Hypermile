@@ -37,9 +37,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Intent selectBluetoothIntent = new Intent(MainActivity.this, SelectBluetoothDeviceActivity.class);
-        startActivity(selectBluetoothIntent);
-
         Poller poller = new Poller(1);
         poller.start();
     }
@@ -61,6 +58,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         else if (item_id == R.id.settings) {
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
+            return true;
+        }
+        else if (item_id == R.id.bluetooth) {
+            Intent selectBluetoothIntent = new Intent(MainActivity.this, SelectBluetoothDeviceActivity.class);
+            startActivity(selectBluetoothIntent);
             return true;
         }
 

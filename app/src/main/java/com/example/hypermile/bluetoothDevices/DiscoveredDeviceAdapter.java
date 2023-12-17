@@ -9,17 +9,22 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.example.hypermile.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 // SOURCE: lab 5
 
 public class DiscoveredDeviceAdapter extends ArrayAdapter {
 
+    List<DiscoveredDeviceListElement> deviceList = new ArrayList<>();
+
     public DiscoveredDeviceAdapter(Context context, List<DiscoveredDeviceListElement> deviceList) {
         super(context, 0, deviceList);
+        this.deviceList = deviceList;
     }
 
     public View getView(int position, @NonNull View convertView, ViewGroup parent) {
@@ -32,5 +37,15 @@ public class DiscoveredDeviceAdapter extends ArrayAdapter {
         convertView = LayoutInflater.from(getContext()).inflate(element.getResource(), parent, false);
 
         return element.setViewContent(convertView);
+    }
+
+    @Override
+    public void add(@Nullable Object object) {
+        for (DiscoveredDeviceListElement element : deviceList) {
+            if (((DiscoveredDeviceListElement) object).cmp(element)) {
+                return;
+            }
+        }
+        super.add(object);
     }
 }
