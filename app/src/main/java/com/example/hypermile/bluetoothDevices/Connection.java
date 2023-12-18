@@ -41,6 +41,10 @@ public class Connection {
         connectionEventListeners.add(connectionEventListener);
     }
 
+    public void removeConnectionEventListener(ConnectionEventListener connectionEventListener) {
+        connectionEventListeners.remove(connectionEventListener);
+    }
+
     private void updateEventListeners(ConnectionState connectionState) {
         this.connectionState = connectionState;
         for (ConnectionEventListener eventListener : connectionEventListeners) {

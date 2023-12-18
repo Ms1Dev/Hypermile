@@ -14,4 +14,5 @@
     <color name="tertiary">#386667</color>
     <color name="tertiary_container">#bbebeb</color>
     <color name="on_tertiary_container">#002021</color>
+    <color name="success">#1F9F3D</color>
 </resources>

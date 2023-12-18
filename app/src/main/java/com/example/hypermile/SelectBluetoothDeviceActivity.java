@@ -18,6 +18,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,8 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.example.hypermile.bluetoothDevices.Connection;
+import com.example.hypermile.bluetoothDevices.DeviceSelectedCallback;
 import com.example.hypermile.bluetoothDevices.DiscoveredDevice;
 import com.example.hypermile.bluetoothDevices.DiscoveredDeviceAdapter;
 import com.example.hypermile.bluetoothDevices.DiscoveredDeviceListElement;
@@ -38,8 +41,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class SelectBluetoothDeviceActivity extends AppCompatActivity {
-
+public class SelectBluetoothDeviceActivity extends AppCompatActivity implements DeviceSelectedCallback {
+    private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
+    private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
+    private DiscoveredDevice selectedDevice;
     List<DiscoveredDeviceListElement> discoveredDevices = new ArrayList<>();
 
     DiscoveredDeviceAdapter discoveredDeviceAdapter;
@@ -60,7 +65,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
                     permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
                 }
                 String deviceName = device.getName();
-                discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName));
+                discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName,SelectBluetoothDeviceActivity.this));
             }
 
             // discovery has finished
@@ -92,11 +97,6 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
      * Adds bluetooth devices to the list view
      */
     private void populateDeviceList() {
-        // create array adapter for bluetooth device list
-        ListView discoveredDeviceList = findViewById(R.id.discoveredDeviceList);
-        discoveredDeviceAdapter = new DiscoveredDeviceAdapter(this, discoveredDevices);
-        discoveredDeviceList.setAdapter(discoveredDeviceAdapter);
-
         // request permissions
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
@@ -115,16 +115,39 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
             startActivityForResult(enableBtIntent, 0);
         }
 
+
+        // create array adapter for bluetooth device list
+        ListView discoveredDeviceList = findViewById(R.id.discoveredDeviceList);
+        discoveredDeviceAdapter = new DiscoveredDeviceAdapter(this, discoveredDevices);
+        discoveredDeviceList.setAdapter(discoveredDeviceAdapter);
+
+
         // create list of paired devices
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         discoveredDeviceAdapter.add(new DiscoveredDeviceSectionHeader("Paired Devices"));
 
+
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains(PREFERENCE_DEVICE_MAC)) {
+            try {
+                BluetoothDevice savedDevice = bluetoothAdapter.getRemoteDevice(sharedPreferences.getString(PREFERENCE_DEVICE_MAC, null));
+                selectedDevice = new DiscoveredDevice(savedDevice,savedDevice.getName(),this);
+                selectedDevice.setSelected(true);
+                discoveredDeviceAdapter.add(selectedDevice);
+            }
+            catch (IllegalArgumentException e) {
+                Log.e("Err", "AutoConnect: Stored MAC address invalid", e);
+            }
+        }
+
+
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
-                discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName));
+                discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName,this));
             }
         }
+
 
         // create action filters for the broadcast object - listen for device found and discovery finishing
         IntentFilter found_filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
@@ -134,7 +157,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
 
         // search for devices
         discoveredDeviceAdapter.add(new DiscoveredDeviceSectionHeader("Discovered Devices"));
-//        bluetoothAdapter.startDiscovery();
+        bluetoothAdapter.startDiscovery();
     }
 
 
@@ -180,5 +203,16 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
+    }
+
+    @Override
+    public void deviceSelected(DiscoveredDevice discoveredDevice) {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString(PREFERENCE_DEVICE_MAC, discoveredDevice.getMacAddress()).apply();
+
+        selectedDevice.setSelected(false);
+        selectedDevice = discoveredDevice;
+        selectedDevice.setSelected(true);
+        Connection.getInstance().createConnection(selectedDevice.getBluetoothDevice());
     }
 }
