@@ -21,37 +21,36 @@ public class Poller extends Thread {
     }
 
     public void run() {
-        while(!Connection.hasConnection());
-
-        Log.d("Res", "has connection");
-
-
+        Connection connection = Connection.getInstance();
         while(true) {
-            try {
-                sleep(sleepDuration);
 
-                byte[] request = "010C\r".getBytes();
+            // wait for bluetooth connection
+            while (!connection.hasConnection());
 
-                byte[] responseBuffer = new byte[1024];
+            while (connection.hasConnection()) {
+                try {
+                    sleep(sleepDuration);
 
-                Connection.send(request);
+                    byte[] request = "010C\r".getBytes();
 
-                while(!Connection.hasData());
+                    byte[] responseBuffer = new byte[1024];
 
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                Connection.readBuffer(outputStream);
-                InputStream receiveStream = new ByteArrayInputStream(outputStream.toByteArray());
+                    connection.send(request);
 
-                receiveStream.read(responseBuffer);
-                receiveStream.reset();
-                receiveStream.close();
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    connection.readBuffer(outputStream);
+                    InputStream receiveStream = new ByteArrayInputStream(outputStream.toByteArray());
 
-                String response = new String(responseBuffer, StandardCharsets.UTF_8);
+                    receiveStream.read(responseBuffer);
+                    receiveStream.reset();
+                    receiveStream.close();
 
-                Log.d("Res", response);
-            }
-            catch (InterruptedException | IOException e) {
-                Log.e("Err", "run: ", e);
+                    String response = new String(responseBuffer, StandardCharsets.UTF_8);
+
+                    Log.d("Res", response);
+                } catch (InterruptedException | IOException e) {
+                    Log.e("Err", "run: ", e);
+                }
             }
         }
     }

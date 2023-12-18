@@ -56,7 +56,7 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement {
                         int item_id = menuItem.getItemId();
 
                         if (item_id == R.id.connectThisDevice) {
-                            Connection.createConnection(bluetoothDevice);
+                            Connection.getInstance().createConnection(bluetoothDevice);
                             return true;
                         }
                         return false;

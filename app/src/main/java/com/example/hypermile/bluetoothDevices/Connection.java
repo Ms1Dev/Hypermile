@@ -1,8 +1,17 @@
 package com.example.hypermile.bluetoothDevices;
 
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -13,16 +22,25 @@ import java.io.PipedOutputStream;
 import java.util.UUID;
 
 
-// Static class since we only ever have one bluetooth device connected
+// Singleton class since we only ever have one bluetooth device connected
 public class Connection {
     private static Connection instance;
-    private static ConnectionThread connectionThread;
-    private static byte[] inputBuffer = new byte[256];
-    private static int newDataLen = 0;
-    public static boolean hasConnection() {
+    private ConnectionThread connectionThread;
+    private byte[] inputBuffer = new byte[256];
+    private int newDataLen = 0;
+
+    private Connection(){}
+
+    public static Connection getInstance() {
+        if (instance == null) {
+            instance = new Connection();
+        }
+        return instance;
+    }
+    public boolean hasConnection() {
         return connectionThread != null;
     }
-    public static boolean hasData() {
+    public boolean hasData() {
         return newDataLen > 0;
     }
 
@@ -31,7 +49,7 @@ public class Connection {
      * @param out
      * @throws IOException
      */
-    public static void readBuffer(ByteArrayOutputStream out) throws IOException {
+    public void readBuffer(ByteArrayOutputStream out) throws IOException {
         out.write(inputBuffer);
         out.write('\0');
         out.flush();
@@ -43,7 +61,7 @@ public class Connection {
      * Sends the byte array to the bluetooth device
      * @param command
      */
-    public static void send(byte[] command) {
+    public void send(byte[] command) {
         if (hasConnection()) {
             connectionThread.write(command);
         }
@@ -53,7 +71,7 @@ public class Connection {
      * Attempts to create connection with a bluetooth device
      * @param bluetoothDevice
      */
-    public static void createConnection(BluetoothDevice bluetoothDevice) {
+    public void createConnection(BluetoothDevice bluetoothDevice) {
         if (connectionThread != null) {
             connectionThread.cancel();
         }
@@ -65,7 +83,7 @@ public class Connection {
      * Spawns a ConnectionThread which manages communication with the device
      * @param bluetoothSocket
      */
-    private static void manageConnection(BluetoothSocket bluetoothSocket) {
+    private void manageConnection(BluetoothSocket bluetoothSocket) {
         connectionThread = new ConnectionThread(bluetoothSocket);
         connectionThread.start();
     }
@@ -75,13 +93,10 @@ public class Connection {
      * Thread for attempting to create a connection with a bluetooth device.
      * Will call manageConnection() if successful.
      */
-    private static class InitConnThread extends Thread {
+    private class InitConnThread extends Thread {
         private final BluetoothSocket bluetoothSocket;
-        private final BluetoothDevice bluetoothDevice;
-
 
         public InitConnThread(BluetoothDevice bluetoothDevice) {
-            this.bluetoothDevice = bluetoothDevice;
             BluetoothSocket _socket = null;
             try {
                 //TODO: figure out why this UUID is used
@@ -120,12 +135,13 @@ public class Connection {
     /**
      * Manages the connection and communication with the device.
      */
-    private static class ConnectionThread extends Thread {
+    private class ConnectionThread extends Thread {
         private final BluetoothSocket bluetoothSocket;
         private final InputStream inputStream;
         private final OutputStream outputStream;
 
         public ConnectionThread(BluetoothSocket socket) {
+            Log.d("ble", "connectigfff");
             bluetoothSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -147,15 +163,17 @@ public class Connection {
 
         public void run() {
             // Keep listening to the InputStream until an exception occurs.
+            Log.d("ble", "running1111111");
             while (true) {
                 try {
                     newDataLen = inputStream.read(inputBuffer);
 
-//                    String response = new String(inputBuffer, StandardCharsets.UTF_8);
-//
-//                    Log.d("Res", response);
+                    String response = new String(inputBuffer);
+
+                    Log.d("Res", response);
                 } catch (IOException e) {
                     Log.d("Err", "Input stream was disconnected", e);
+                    cancel();
                     break;
                 }
             }
@@ -175,6 +193,9 @@ public class Connection {
         public void cancel() {
             try {
                 bluetoothSocket.close();
+//                inputStream.close();
+//                outputStream.close();
+                connectionThread = null;
             } catch (IOException e) {
                 Log.e("Err", "Could not close the connect socket", e);
             }

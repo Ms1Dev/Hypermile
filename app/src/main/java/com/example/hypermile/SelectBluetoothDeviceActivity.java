@@ -134,7 +134,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity {
 
         // search for devices
         discoveredDeviceAdapter.add(new DiscoveredDeviceSectionHeader("Discovered Devices"));
-        bluetoothAdapter.startDiscovery();
+//        bluetoothAdapter.startDiscovery();
     }
 
 
