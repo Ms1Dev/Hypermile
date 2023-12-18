@@ -27,10 +27,9 @@ import com.example.hypermile.bluetoothDevices.DiscoveredDevice;
 import java.util.zip.Inflater;
 
 
-public class HomeFragment extends Fragment implements ConnectionEventListener {
+public class HomeFragment extends Fragment {
     Button viewLatestReportBtn;
     Button goToReportsBtn;
-    TextView deviceStatus;
     View view;
 
 
@@ -62,30 +61,6 @@ public class HomeFragment extends Fragment implements ConnectionEventListener {
             }
         });
 
-        Connection.getInstance().addConnectionEventListener(this);
-
-        deviceStatus = view.findViewById(R.id.deviceStatusText);
-
         return view;
-    }
-
-    @Override
-    public void onStateChange(ConnectionState connectionState) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                switch (connectionState) {
-                    case CONNECTED:
-                        deviceStatus.setText("Connected");
-                        break;
-                    case CONNECTING:
-                        deviceStatus.setText("Connecting");
-                        break;
-                    case DISCONNECTED:
-                        deviceStatus.setText("Disconnected");
-                        break;
-                }
-            }
-        });
     }
 }

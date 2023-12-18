@@ -29,9 +29,10 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <ScrollView
+            android:id="@+id/scrollableContent"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+            app:layout_constraintBottom_toTopOf="@+id/deviceStatusBar"
             app:layout_constraintStart_toStartOf="parent"
             android:clipChildren="false"
             app:layout_constraintTop_toBottomOf="@+id/appbar">
@@ -41,9 +42,24 @@
                 android:layout_width="match_parent"
                 android:clipChildren="false"
                 android:layout_height="0dp">
-
             </FrameLayout>
         </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/deviceStatusBar"
+            android:background="@color/secondary_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigation">
+
+            <TextView
+                android:id="@+id/deviceStatusText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="" />
+        </LinearLayout>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigation"

@@ -12,7 +12,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.example.hypermile.bluetoothDevices.Connection;
+import com.example.hypermile.bluetoothDevices.ConnectionEventListener;
+import com.example.hypermile.bluetoothDevices.ConnectionState;
 import com.example.hypermile.data.Poller;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -20,10 +24,11 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ConnectionEventListener {
 
     BottomNavigationView bottomNavigationView;
     Toolbar toolbar;
+    TextView deviceStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         Poller poller = new Poller(1);
         poller.start();
+
+        Connection.getInstance().addConnectionEventListener(this);
+
+        deviceStatus = findViewById(R.id.deviceStatusText);
     }
 
     @Override
@@ -102,5 +111,25 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private void signOut() {
         FirebaseAuth.getInstance().signOut();
         finish();
+    }
+
+    @Override
+    public void onStateChange(ConnectionState connectionState) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                switch (connectionState) {
+                    case CONNECTED:
+                        deviceStatus.setText("Connected");
+                        break;
+                    case CONNECTING:
+                        deviceStatus.setText("Connecting");
+                        break;
+                    case DISCONNECTED:
+                        deviceStatus.setText("Disconnected");
+                        break;
+                }
+            }
+        });
     }
 }
