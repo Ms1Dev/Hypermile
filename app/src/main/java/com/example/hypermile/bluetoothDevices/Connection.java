@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.ArrayList;
 import java.util.UUID;
 
 
@@ -28,8 +29,19 @@ public class Connection {
     private ConnectionThread connectionThread;
     private byte[] inputBuffer = new byte[256];
     private int newDataLen = 0;
+    private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
 
     private Connection(){}
+
+    public void addConnectionEventListener(ConnectionEventListener connectionEventListener) {
+        connectionEventListeners.add(connectionEventListener);
+    }
+
+    private void updateEventListeners(ConnectionState connectionState) {
+        for (ConnectionEventListener eventListener : connectionEventListeners) {
+            eventListener.onStateChange(connectionState);
+        }
+    }
 
     public static Connection getInstance() {
         if (instance == null) {
@@ -111,6 +123,7 @@ public class Connection {
 
         public void run() {
             Log.d("ble", "running");
+            updateEventListeners(ConnectionState.CONNECTING);
             // Cancel discovery because it otherwise slows down the connection.
 //            try {
 //
@@ -163,7 +176,7 @@ public class Connection {
 
         public void run() {
             // Keep listening to the InputStream until an exception occurs.
-            Log.d("ble", "running1111111");
+            updateEventListeners(ConnectionState.CONNECTED);
             while (true) {
                 try {
                     newDataLen = inputStream.read(inputBuffer);
@@ -193,9 +206,8 @@ public class Connection {
         public void cancel() {
             try {
                 bluetoothSocket.close();
-//                inputStream.close();
-//                outputStream.close();
                 connectionThread = null;
+                updateEventListeners(ConnectionState.DISCONNECTED);
             } catch (IOException e) {
                 Log.e("Err", "Could not close the connect socket", e);
             }
