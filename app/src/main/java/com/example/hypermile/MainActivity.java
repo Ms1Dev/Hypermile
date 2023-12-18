@@ -7,13 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.hypermile.bluetoothDevices.AutoConnect;
 import com.example.hypermile.bluetoothDevices.Connection;
 import com.example.hypermile.bluetoothDevices.ConnectionEventListener;
 import com.example.hypermile.bluetoothDevices.ConnectionState;
@@ -25,7 +28,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ConnectionEventListener {
-
+    private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
+    private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
     BottomNavigationView bottomNavigationView;
     Toolbar toolbar;
     TextView deviceStatus;
@@ -39,6 +43,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.home);
 
+        deviceStatus = findViewById(R.id.deviceStatusText);
+        deviceStatus.setText("Disconnected");
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -47,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         Connection.getInstance().addConnectionEventListener(this);
 
-        deviceStatus = findViewById(R.id.deviceStatusText);
+        AutoConnect autoConnect = new AutoConnect(this);
     }
 
     @Override
@@ -113,6 +120,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         finish();
     }
 
+    private void persistBluetoothDeviceMacAddress() {
+        String macAddress = Connection.getInstance().getBluetoothDevice().getAddress();
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString(PREFERENCE_DEVICE_MAC, macAddress).apply();
+    }
+
     @Override
     public void onStateChange(ConnectionState connectionState) {
         runOnUiThread(new Runnable() {
@@ -121,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 switch (connectionState) {
                     case CONNECTED:
                         deviceStatus.setText("Connected");
+                        persistBluetoothDeviceMacAddress();
                         break;
                     case CONNECTING:
                         deviceStatus.setText("Connecting");

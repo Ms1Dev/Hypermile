@@ -8,10 +8,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
 import androidx.core.app.ActivityCompat;
+import androidx.preference.PreferenceManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -27,8 +29,10 @@ import java.util.UUID;
 public class Connection {
     private static Connection instance;
     private ConnectionThread connectionThread;
-    private byte[] inputBuffer = new byte[256];
+    private BluetoothDevice bluetoothDevice;
+    private byte[] inputBuffer = new byte[1024];
     private int newDataLen = 0;
+    private ConnectionState connectionState = ConnectionState.DISCONNECTED;
     private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
 
     private Connection(){}
@@ -38,9 +42,14 @@ public class Connection {
     }
 
     private void updateEventListeners(ConnectionState connectionState) {
+        this.connectionState = connectionState;
         for (ConnectionEventListener eventListener : connectionEventListeners) {
             eventListener.onStateChange(connectionState);
         }
+    }
+
+    public ConnectionState getConnectionState() {
+        return connectionState;
     }
 
     public static Connection getInstance() {
@@ -84,11 +93,16 @@ public class Connection {
      * @param bluetoothDevice
      */
     public void createConnection(BluetoothDevice bluetoothDevice) {
+        this.bluetoothDevice = bluetoothDevice;
         if (connectionThread != null) {
             connectionThread.cancel();
         }
         InitConnThread initConnThread = new InitConnThread(bluetoothDevice);
         initConnThread.start();
+    }
+
+    public BluetoothDevice getBluetoothDevice() {
+        return bluetoothDevice;
     }
 
     /**
@@ -137,6 +151,7 @@ public class Connection {
                 try {
                     bluetoothSocket.close();
                 } catch (IOException closeException) {
+                    updateEventListeners(ConnectionState.DISCONNECTED);
                     Log.e("Err", "Could not close the client socket", closeException);
                 }
                 return;
