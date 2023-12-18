@@ -34,7 +34,7 @@ public class Poller extends Thread {
 
                 byte[] responseBuffer = new byte[1024];
 
-                Connection.request(request);
+                Connection.send(request);
 
                 while(!Connection.hasData());
 

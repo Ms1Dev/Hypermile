@@ -4,44 +4,33 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.util.Log;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.nio.channels.Pipe;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
-// Singleton class since we only ever have one bluetooth device connected
+// Static class since we only ever have one bluetooth device connected
 public class Connection {
     private static Connection instance;
     private static ConnectionThread connectionThread;
-
-    private static byte[] inputBuffer;
+    private static byte[] inputBuffer = new byte[256];
     private static int newDataLen = 0;
-
-    public static Connection getInstance() {
-        if (instance == null) {
-            instance = new Connection();
-        }
-        return instance;
-    }
-    private Connection() {
-        inputBuffer = new byte[1024];
-    }
-
     public static boolean hasConnection() {
         return connectionThread != null;
     }
-
     public static boolean hasData() {
         return newDataLen > 0;
     }
 
+    /**
+     * Reads the input buffer into a bytestream
+     * @param out
+     * @throws IOException
+     */
     public static void readBuffer(ByteArrayOutputStream out) throws IOException {
         out.write(inputBuffer);
         out.write('\0');
@@ -50,35 +39,52 @@ public class Connection {
         newDataLen = 0;
     }
 
-    public static void request(byte[] command) {
+    /**
+     * Sends the byte array to the bluetooth device
+     * @param command
+     */
+    public static void send(byte[] command) {
         if (hasConnection()) {
             connectionThread.write(command);
         }
     }
 
-    public void createConnection(BluetoothDevice bluetoothDevice) {
+    /**
+     * Attempts to create connection with a bluetooth device
+     * @param bluetoothDevice
+     */
+    public static void createConnection(BluetoothDevice bluetoothDevice) {
         if (connectionThread != null) {
             connectionThread.cancel();
         }
-        ConnectThread connectThread = new ConnectThread(bluetoothDevice);
-        connectThread.start();
+        InitConnThread initConnThread = new InitConnThread(bluetoothDevice);
+        initConnThread.start();
     }
 
-    private void manageConnection(BluetoothSocket bluetoothSocket) {
+    /**
+     * Spawns a ConnectionThread which manages communication with the device
+     * @param bluetoothSocket
+     */
+    private static void manageConnection(BluetoothSocket bluetoothSocket) {
         connectionThread = new ConnectionThread(bluetoothSocket);
         connectionThread.start();
     }
 
-    class ConnectThread extends Thread {
+
+    /**
+     * Thread for attempting to create a connection with a bluetooth device.
+     * Will call manageConnection() if successful.
+     */
+    private static class InitConnThread extends Thread {
         private final BluetoothSocket bluetoothSocket;
         private final BluetoothDevice bluetoothDevice;
 
 
-        public ConnectThread(BluetoothDevice bluetoothDevice) {
+        public InitConnThread(BluetoothDevice bluetoothDevice) {
             this.bluetoothDevice = bluetoothDevice;
             BluetoothSocket _socket = null;
-
             try {
+                //TODO: figure out why this UUID is used
                 _socket = bluetoothDevice.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"));
             }
             catch (IOException | SecurityException e) {
@@ -111,12 +117,13 @@ public class Connection {
         }
     }
 
-
-    private class ConnectionThread extends Thread {
+    /**
+     * Manages the connection and communication with the device.
+     */
+    private static class ConnectionThread extends Thread {
         private final BluetoothSocket bluetoothSocket;
         private final InputStream inputStream;
         private final OutputStream outputStream;
-        private byte[] mmBuffer; // mmBuffer store for the stream
 
         public ConnectionThread(BluetoothSocket socket) {
             bluetoothSocket = socket;
@@ -162,15 +169,6 @@ public class Connection {
             } catch (IOException e) {
                 Log.e("Err", "Error occurred when sending data", e);
             }
-        }
-
-
-        public PipedOutputStream getOutputStream() throws IOException {
-            return new PipedOutputStream((PipedInputStream) inputStream);
-        }
-
-        public PipedInputStream getInputStream() throws IOException {
-            return new PipedInputStream((PipedOutputStream) outputStream);
         }
 
 
