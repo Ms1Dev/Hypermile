@@ -81,6 +81,9 @@ public class Connection {
         out.flush();
         out.close();
         newDataLen = 0;
+        for (int i = 0; i < 1024; i++) {
+            inputBuffer[i] = 0;
+        }
     }
 
     /**
@@ -141,7 +144,6 @@ public class Connection {
 
 
         public void run() {
-            Log.d("ble", "running");
             updateEventListeners(ConnectionState.CONNECTING);
 
             try {
@@ -168,7 +170,6 @@ public class Connection {
         private final OutputStream outputStream;
 
         public ConnectionThread(BluetoothSocket socket) {
-            Log.d("ble", "connectigfff");
             bluetoothSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -189,15 +190,14 @@ public class Connection {
         }
 
         public void run() {
-            // Keep listening to the InputStream until an exception occurs.
             updateEventListeners(ConnectionState.CONNECTED);
             while (true) {
                 try {
                     newDataLen = inputStream.read(inputBuffer);
 
-                    String response = new String(inputBuffer);
-
-                    Log.d("Res", response);
+//                    String response = new String(inputBuffer);
+//
+//                    Log.d("Res", response);
                 } catch (IOException e) {
                     Log.d("Err", "Input stream was disconnected", e);
                     cancel();
@@ -209,7 +209,6 @@ public class Connection {
 
         public void write(byte[] bytes) {
             try {
-                Log.d("send", " try write: " + bytes);
                 outputStream.write(bytes);
             } catch (IOException e) {
                 Log.e("Err", "Error occurred when sending data", e);
