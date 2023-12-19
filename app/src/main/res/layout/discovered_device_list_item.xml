@@ -6,6 +6,7 @@
     android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/deviceItemLayout"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:gravity="center_vertical"
@@ -28,23 +29,21 @@
                 android:id="@+id/deviceNameView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/deviceMacView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TextView"
                 android:textColor="@color/secondary"
                 android:textSize="14sp" />
         </LinearLayout>
 
         <FrameLayout
             android:id="@+id/statusImage"
-            android:layout_marginHorizontal="20dp"
             android:layout_width="30dp"
-            android:layout_height="30dp">
+            android:layout_height="30dp"
+            android:layout_marginHorizontal="20dp">
 
             <ImageView
                 android:id="@+id/device_connectedTick"
@@ -59,13 +58,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="invisible" />
-        </FrameLayout>
 
-        <ImageView
-            android:id="@+id/connectButton"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            app:srcCompat="@drawable/menu_dots" />
+        </FrameLayout>
 
     </LinearLayout>
 

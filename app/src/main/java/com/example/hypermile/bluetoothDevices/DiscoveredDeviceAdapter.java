@@ -16,6 +16,8 @@ import com.example.hypermile.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import kotlin.NumbersKt;
+
 // SOURCE: lab 5
 
 public class DiscoveredDeviceAdapter extends ArrayAdapter {
@@ -30,14 +32,21 @@ public class DiscoveredDeviceAdapter extends ArrayAdapter {
     public View getView(int position, @NonNull View convertView, ViewGroup parent) {
         DiscoveredDeviceListElement element = (DiscoveredDeviceListElement) getItem(position);
 
-        if (element == null) {
-            return convertView;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(element.getResource(), parent, false);
         }
 
-        convertView = LayoutInflater.from(getContext()).inflate(element.getResource(), parent, false);
+        try {
+            element.setViewContent(convertView);
+        }
+        catch (NullPointerException e) {
+            convertView = LayoutInflater.from(getContext()).inflate(element.getResource(), parent, false);
+            element.setViewContent(convertView);
+        }
 
-        return element.setViewContent(convertView);
+        return convertView;
     }
+
 
     @Override
     public void add(@Nullable Object object) {

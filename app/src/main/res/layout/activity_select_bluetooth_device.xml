@@ -16,18 +16,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/selectBluetoothToolbar"
-        android:indeterminate="true" />
-
     <ListView
         android:id="@+id/discoveredDeviceList"
         android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/progressBar"
+        app:layout_constraintTop_toBottomOf="@id/selectBluetoothToolbar"
         android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

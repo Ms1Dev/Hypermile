@@ -50,6 +50,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
     DiscoveredDeviceAdapter discoveredDeviceAdapter;
 
     BluetoothAdapter bluetoothAdapter;
+    private DiscoveredDeviceSectionHeader discoveredDevicesHeader;
 
     /**
      * This listens out for bluetooth adapter actions. Adds a device to the discovered device list when found.
@@ -65,7 +66,10 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
                     permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
                 }
                 String deviceName = device.getName();
-                discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName,SelectBluetoothDeviceActivity.this));
+                if (deviceName != null) {
+                    discoveredDeviceAdapter.add(new DiscoveredDevice(device,deviceName,SelectBluetoothDeviceActivity.this));
+                }
+
             }
 
             // discovery has finished
@@ -155,8 +159,11 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
         IntentFilter finished_filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         registerReceiver(receiver, finished_filter);
 
+        discoveredDevicesHeader = new DiscoveredDeviceSectionHeader("Discovered Devices");
         // search for devices
-        discoveredDeviceAdapter.add(new DiscoveredDeviceSectionHeader("Discovered Devices"));
+        discoveredDeviceAdapter.add(discoveredDevicesHeader);
+
+        discoveredDevicesHeader.showHideProgressBar(true);
         bluetoothAdapter.startDiscovery();
     }
 
@@ -174,8 +181,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
      *  Called when bluetooth adapter finishes looking for devices
      */
     private void discoveryFinishedCallback() {
-        ProgressBar progressBar = findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.GONE);
+        discoveredDevicesHeader.showHideProgressBar(false);
     }
 
 

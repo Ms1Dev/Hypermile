@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -23,10 +24,11 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
     private String name;
     private String macAddress;
     private View view;
-    private FrameLayout statusImageLayout;
     private DeviceSelectedCallback deviceSelectedCallback;
     ImageView connectButton;
     private BluetoothDevice bluetoothDevice;
+    private ProgressBar progressBar;
+    private ImageView connectedTick;
 
     public DiscoveredDevice(BluetoothDevice bluetoothDevice, String name, DeviceSelectedCallback deviceSelectedCallback) {
         this.deviceSelectedCallback = deviceSelectedCallback;
@@ -68,32 +70,17 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
         this.view = view;
         TextView deviceName = view.findViewById(R.id.deviceNameView);
         TextView deviceMac = view.findViewById(R.id.deviceMacView);
-        statusImageLayout = view.findViewById(R.id.statusImage);
 
-        connectButton = view.findViewById(R.id.connectButton);
+        view.findViewById(R.id.deviceItemLayout).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    deviceSelectedCallback.deviceSelected(DiscoveredDevice.this);
+                }
+            });
 
-        connectButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                PopupMenu popupMenu = new PopupMenu(view.getContext(), connectButton);
-                popupMenu.getMenuInflater().inflate(R.menu.bluetooth_device_menu, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        int item_id = menuItem.getItemId();
-
-                        if (item_id == R.id.connectThisDevice) {
-                            deviceSelectedCallback.deviceSelected(DiscoveredDevice.this);
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-
-                popupMenu.show();
-            }
-        });
+        progressBar = view.findViewById(R.id.device_connectingProgress);
+        connectedTick = view.findViewById(R.id.device_connectedTick);
+        progressBar.setVisibility(View.INVISIBLE);
 
         if (isSelected) {
             onStateChange(Connection.getInstance().getConnectionState());
@@ -110,27 +97,25 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
            DiscoveredDevice comparisonDevice = (DiscoveredDevice) comparison;
            return comparisonDevice.macAddress.equals(this.macAddress);
         }
-        catch (Exception _) {
+        catch (Exception e) {
             return false;
         }
     }
 
     @Override
     public void onStateChange(ConnectionState connectionState) {
-        if (statusImageLayout == null) return;
-
+        if (connectedTick == null || progressBar == null) return;
         ((Activity) view.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 switch (connectionState) {
                     case CONNECTED:
-                        Log.d("f", "run: Tickk");
-                        view.findViewById(R.id.device_connectedTick).setVisibility(View.VISIBLE);
-                        view.findViewById(R.id.device_connectingProgress).setVisibility(View.INVISIBLE);
+                        connectedTick.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
                         break;
                     case CONNECTING:
-                        view.findViewById(R.id.device_connectedTick).setVisibility(View.INVISIBLE);
-                        view.findViewById(R.id.device_connectingProgress).setVisibility(View.VISIBLE);
+                        connectedTick.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
                         break;
                     case DISCONNECTED:
 
