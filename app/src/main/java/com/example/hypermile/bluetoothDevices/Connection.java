@@ -3,6 +3,7 @@ package com.example.hypermile.bluetoothDevices;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -142,20 +143,14 @@ public class Connection {
         public void run() {
             Log.d("ble", "running");
             updateEventListeners(ConnectionState.CONNECTING);
-            // Cancel discovery because it otherwise slows down the connection.
-//            try {
-//
-//            }
-//            catch (SecurityException e) {
-//                Log.e("Err", "run: Failed to cancel discovery", e);
-//            }
+
             try {
                 bluetoothSocket.connect();
             } catch (IOException | SecurityException connectException) {
+                updateEventListeners(ConnectionState.DISCONNECTED);
                 try {
                     bluetoothSocket.close();
                 } catch (IOException closeException) {
-                    updateEventListeners(ConnectionState.DISCONNECTED);
                     Log.e("Err", "Could not close the client socket", closeException);
                 }
                 return;

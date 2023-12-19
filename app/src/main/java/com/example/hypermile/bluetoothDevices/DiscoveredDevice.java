@@ -29,6 +29,7 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
     private BluetoothDevice bluetoothDevice;
     private ProgressBar progressBar;
     private ImageView connectedTick;
+    private ImageView noConnection;
 
     public DiscoveredDevice(BluetoothDevice bluetoothDevice, String name, DeviceSelectedCallback deviceSelectedCallback) {
         this.deviceSelectedCallback = deviceSelectedCallback;
@@ -80,6 +81,7 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
 
         progressBar = view.findViewById(R.id.device_connectingProgress);
         connectedTick = view.findViewById(R.id.device_connectedTick);
+        noConnection = view.findViewById(R.id.device_noConnection);
         progressBar.setVisibility(View.INVISIBLE);
 
         if (isSelected) {
@@ -112,13 +114,17 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
                     case CONNECTED:
                         connectedTick.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.INVISIBLE);
+                        noConnection.setVisibility(View.INVISIBLE);
                         break;
                     case CONNECTING:
                         connectedTick.setVisibility(View.INVISIBLE);
                         progressBar.setVisibility(View.VISIBLE);
+                        noConnection.setVisibility(View.INVISIBLE);
                         break;
                     case DISCONNECTED:
-
+                        connectedTick.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
+                        noConnection.setVisibility(View.VISIBLE);
                         break;
                 }
             }

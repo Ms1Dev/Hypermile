@@ -28,6 +28,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.example.hypermile.bluetoothDevices.Connection;
+import com.example.hypermile.bluetoothDevices.ConnectionEventListener;
+import com.example.hypermile.bluetoothDevices.ConnectionState;
 import com.example.hypermile.bluetoothDevices.DeviceSelectedCallback;
 import com.example.hypermile.bluetoothDevices.DiscoveredDevice;
 import com.example.hypermile.bluetoothDevices.DiscoveredDeviceAdapter;
@@ -41,7 +43,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class SelectBluetoothDeviceActivity extends AppCompatActivity implements DeviceSelectedCallback {
+public class SelectBluetoothDeviceActivity extends AppCompatActivity implements DeviceSelectedCallback, ConnectionEventListener {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
     private DiscoveredDevice selectedDevice;
@@ -94,8 +96,21 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
         actionBar.setTitle("Bluetooth Devices");
 
         populateDeviceList();
+
+        Connection.getInstance().addConnectionEventListener(this);
     }
 
+    @Override
+    public void onStateChange(ConnectionState connectionState) {
+        if (connectionState == ConnectionState.CONNECTING) {
+            try {
+                bluetoothAdapter.cancelDiscovery();
+            }
+            catch (SecurityException e) {
+                Log.e("Err", "onStateChange: Failed to cancel discovery", e);
+            }
+        }
+    }
 
     /**
      * Adds bluetooth devices to the list view

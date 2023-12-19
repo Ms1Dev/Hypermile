@@ -8,9 +8,11 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 public class AutoConnect {
+    private static final int CONNECTION_ATTEMPTS = 5;
     private static final int MONITOR_FREQUENCY = 5000;
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
+    private int connectAttempts = 0;
     BluetoothDevice bluetoothDevice;
     Context context;
 
@@ -34,15 +36,22 @@ public class AutoConnect {
     }
 
     private void monitorConnection() {
+
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Connection connection = Connection.getInstance();
                 while(true) {
                     try {
                         Thread.sleep(MONITOR_FREQUENCY);
-                        Connection connection = Connection.getInstance();
-                        if (connection.getConnectionState() == ConnectionState.DISCONNECTED && bluetoothDevice != null) {
+                        ConnectionState connectionState = connection.getConnectionState();
+                        if (connectionState == ConnectionState.DISCONNECTED && connectAttempts < CONNECTION_ATTEMPTS &&  bluetoothDevice != null)
+                        {
+                            connectAttempts++;
                             connection.createConnection(bluetoothDevice);
+                        }
+                        else if (connectionState == ConnectionState.CONNECTED) {
+                            connectAttempts = 0;
                         }
                     } catch (InterruptedException e) {
                         //TODO:
