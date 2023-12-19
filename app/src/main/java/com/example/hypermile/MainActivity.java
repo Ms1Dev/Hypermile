@@ -10,10 +10,15 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.hypermile.bluetoothDevices.AutoConnect;
@@ -33,6 +38,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     BottomNavigationView bottomNavigationView;
     Toolbar toolbar;
     TextView deviceStatus;
+    ImageView statusConnected;
+    ImageView statusDisconnected;
+    ProgressBar statusConnecting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,16 +51,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.home);
 
-        deviceStatus = findViewById(R.id.deviceStatusText);
-        deviceStatus.setText("Disconnected");
-
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Poller poller = new Poller(1);
         poller.start();
 
-        Connection.getInstance().addConnectionEventListener(this);
+        deviceStatus = findViewById(R.id.deviceStatusText);
+        statusConnected = findViewById(R.id.statusBar_connected);
+        statusDisconnected = findViewById(R.id.statusBar_disconnected);
+        statusConnecting = findViewById(R.id.statusBar_connecting);
+
+        Connection connection = Connection.getInstance();
+        onStateChange(connection.getConnectionState());
+        connection.addConnectionEventListener(this);
 
         AutoConnect autoConnect = new AutoConnect(this);
     }
@@ -131,16 +143,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                statusConnected.setVisibility(View.INVISIBLE);
+                statusDisconnected.setVisibility(View.INVISIBLE);
+                statusConnecting.setVisibility(View.INVISIBLE);
+                LinearLayout statusBar = findViewById(R.id.deviceStatusBar);
                 switch (connectionState) {
                     case CONNECTED:
                         deviceStatus.setText("Connected");
+                        statusConnected.setVisibility(View.VISIBLE);
+                        statusBar.setBackgroundColor(getResources().getColor(R.color.secondary_container));
                         persistBluetoothDeviceMacAddress();
                         break;
                     case CONNECTING:
                         deviceStatus.setText("Connecting");
+                        statusConnecting.setVisibility(View.VISIBLE);
+                        statusBar.setBackgroundColor(getResources().getColor(R.color.tertiary_container));
                         break;
                     case DISCONNECTED:
                         deviceStatus.setText("Disconnected");
+                        statusDisconnected.setVisibility(View.VISIBLE);
+                        statusBar.setBackgroundColor(getResources().getColor(R.color.error_container));
                         break;
                 }
             }

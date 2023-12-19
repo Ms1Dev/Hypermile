@@ -29,12 +29,12 @@ import java.util.UUID;
 // Singleton class since we only ever have one bluetooth device connected
 public class Connection {
     private static Connection instance;
-    private ConnectionThread connectionThread;
-    private BluetoothDevice bluetoothDevice;
-    private byte[] inputBuffer = new byte[1024];
-    private int newDataLen = 0;
-    private ConnectionState connectionState = ConnectionState.DISCONNECTED;
-    private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
+    private static ConnectionThread connectionThread;
+    private static BluetoothDevice bluetoothDevice;
+    private static byte[] inputBuffer = new byte[1024];
+    private static int newDataLen = 0;
+    private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
+    final static private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
 
     private Connection(){}
 
