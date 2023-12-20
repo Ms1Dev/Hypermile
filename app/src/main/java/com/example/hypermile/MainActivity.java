@@ -1,8 +1,5 @@
 package com.example.hypermile;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -10,9 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.Image;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,11 +21,9 @@ import com.example.hypermile.bluetoothDevices.Connection;
 import com.example.hypermile.bluetoothDevices.ConnectionEventListener;
 import com.example.hypermile.bluetoothDevices.ConnectionState;
 import com.example.hypermile.data.Poller;
-import com.google.android.material.appbar.MaterialToolbar;
+import com.example.hypermile.data.VehicleDataLogger;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ConnectionEventListener {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
@@ -41,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     ImageView statusConnected;
     ImageView statusDisconnected;
     ProgressBar statusConnecting;
+    protected VehicleDataLogger engineSpeed;
+    VehicleDataLogger massAirFlow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +49,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        engineSpeed = new VehicleDataLogger(
+                "Engine Speed",
+                "RPM",
+                "010C\r",
+                256,
+                4,
+                2
+        );
+        massAirFlow = new VehicleDataLogger(
+                "MAF",
+                "g/s",
+                "0110\r",
+                256,
+                100,
+                2
+        );
+
         Poller poller = new Poller(1);
+        poller.addVehicleDataPoint(engineSpeed);
+        poller.addVehicleDataPoint(massAirFlow);
         poller.start();
 
         deviceStatus = findViewById(R.id.deviceStatusText);

@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.hypermile.visual.GaugeView;
+import com.example.hypermile.visual.LiveDataGauge;
 
 import java.util.Random;
 
@@ -19,7 +20,7 @@ import java.util.Random;
  */
 public class LiveDataFragment extends Fragment {
 
-    GaugeView gaugeView;
+    LiveDataGauge engineSpeedGauge;
 
     public LiveDataFragment() {
         // Required empty public constructor
@@ -43,23 +44,31 @@ public class LiveDataFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_live_data, container, false);
 
-        gaugeView = view.findViewById(R.id.gauge);
+        GaugeView gaugeView = view.findViewById(R.id.gauge);
+        gaugeView.setRange(0,8000);
+        gaugeView.setUnit("RPM");
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Random random = new Random();
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
-                        gaugeView.updateValue(random.nextInt(100));
-                    } catch (InterruptedException e) {
+        engineSpeedGauge = new LiveDataGauge(gaugeView);
 
-                    }
-                }
-            }
-        }).start();
+        ((MainActivity) getActivity()).engineSpeed.addDataInputListener( engineSpeedGauge);
+
+//
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Random random = new Random();
+//                while (true) {
+//                    try {
+//                        Thread.sleep(1000);
+//                        gaugeView.updateValue(random.nextInt(100));
+//                    } catch (InterruptedException e) {
+//
+//                    }
+//                }
+//            }
+//        }).start();
 
         return view;
     }
+
 }
