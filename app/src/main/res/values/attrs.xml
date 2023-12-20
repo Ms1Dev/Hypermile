@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GaugeView">
+        <attr name="height" format="dimension"/>
+        <attr name="width" format="dimension"/>
+        <attr name="trackThickness" format="dimension"/>
+        <attr name="dialColour" format="color"/>
+        <attr name="trackColour" format="color"/>
+        <attr name="backgroundColour" format="color"/>
+        <attr name="labelColour" format="color"/>
+        <attr name="unitLabel" format="string"/>
+        <attr name="hideDial" format="boolean"/>
+    </declare-styleable>
+</resources>
