@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     ImageView statusDisconnected;
     ProgressBar statusConnecting;
     protected VehicleDataLogger engineSpeed;
-    VehicleDataLogger massAirFlow;
+    protected VehicleDataLogger massAirFlow;
+    protected VehicleDataLogger speed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,10 +66,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 100,
                 2
         );
+        speed = new VehicleDataLogger(
+                "Speed",
+                "MPH",
+                "010D\r",
+                1,
+                1,
+                1
+        );
 
         Poller poller = new Poller(1);
         poller.addVehicleDataPoint(engineSpeed);
         poller.addVehicleDataPoint(massAirFlow);
+        poller.addVehicleDataPoint(speed);
         poller.start();
 
         deviceStatus = findViewById(R.id.deviceStatusText);

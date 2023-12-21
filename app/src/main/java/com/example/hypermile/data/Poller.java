@@ -76,17 +76,22 @@ public class Poller extends Thread {
                             data[1] = (byte) randomVal;
 
                             break;
-                        case "0110\r":
-                            bound = 200;
+                        case "010D\r":
+                            bound = 110;
                             randomVal = random.nextInt(bound);
+
+                            data[0] = (byte) randomVal;
+                            break;
+                        case "0110\r":
+                            bound = 600;
+                            randomVal = random.nextInt(bound);
+
                             randomVal *= 100;
 
                             int upperval = (int) ((randomVal / 256.0) + 0.5);
 
                             data[0] = (byte) upperval;
                             data[1] = (byte) randomVal;
-
-                            double value = (data[0] * 256.0 + data[1]) / 100.0;
                             break;
                     }
 

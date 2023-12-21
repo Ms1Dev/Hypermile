@@ -21,4 +21,5 @@ public class LiveDataGauge implements DataInputObserver {
     public void setUnits(String units) {
         gaugeView.setUnit(units);
     }
+
 }

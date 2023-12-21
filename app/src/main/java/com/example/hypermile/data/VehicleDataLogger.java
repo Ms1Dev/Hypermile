@@ -27,10 +27,10 @@ public class VehicleDataLogger extends DataPoint {
 
     public void processResponse(byte[] data) {
         try {
-            byte upperByte = data[0];
-            byte lowerByte = 0;
+            int upperByte = data[0] & 0xFF;
+            int lowerByte = 0;
             if (expectedBytes == 2) {
-                lowerByte = data[1];
+                lowerByte = data[1] & 0xFF;
             }
 
             double value = (upperByte * upperByteMultiplier + lowerByte) / divisor;
