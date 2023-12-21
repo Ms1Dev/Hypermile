@@ -16,4 +16,9 @@ public class LiveDataGauge implements DataInputObserver {
     public void incomingData(double data) {
         gaugeView.updateValue((int) data);
     }
+
+    @Override
+    public void setUnits(String units) {
+        gaugeView.setUnit(units);
+    }
 }

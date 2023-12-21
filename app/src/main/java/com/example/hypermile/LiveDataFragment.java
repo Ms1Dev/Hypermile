@@ -44,29 +44,19 @@ public class LiveDataFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_live_data, container, false);
 
-        GaugeView gaugeView = view.findViewById(R.id.gauge);
+        GaugeView gaugeView = view.findViewById(R.id.engineSpeed_gauge);
         gaugeView.setRange(0,8000);
-        gaugeView.setUnit("RPM");
 
         engineSpeedGauge = new LiveDataGauge(gaugeView);
 
         ((MainActivity) getActivity()).engineSpeed.addDataInputListener( engineSpeedGauge);
 
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Random random = new Random();
-//                while (true) {
-//                    try {
-//                        Thread.sleep(1000);
-//                        gaugeView.updateValue(random.nextInt(100));
-//                    } catch (InterruptedException e) {
-//
-//                    }
-//                }
-//            }
-//        }).start();
+        GaugeView gaugeView2 = view.findViewById(R.id.maf_gauge);
+        gaugeView2.setRange(0,200);
+
+        LiveDataGauge mafGauge = new LiveDataGauge(gaugeView2);
+
+        ((MainActivity) getActivity()).massAirFlow.addDataInputListener( mafGauge);
 
         return view;
     }

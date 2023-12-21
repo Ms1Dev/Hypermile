@@ -3,11 +3,13 @@ package com.example.hypermile.data;
 import java.util.ArrayList;
 
 abstract public class DataPoint {
-    double data;
+    protected String units;
+    protected double data;
     ArrayList<DataInputObserver> dataInputObservers = new ArrayList<>();
 
     public void addDataInputListener(DataInputObserver dataInputObserver) {
         dataInputObservers.add(dataInputObserver);
+        dataInputObserver.setUnits(units);
     }
 
     public void removeDataInputListener(DataInputObserver dataInputObserver) {

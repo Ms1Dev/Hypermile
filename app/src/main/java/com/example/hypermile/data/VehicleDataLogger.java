@@ -6,15 +6,14 @@ import java.util.Map;
 
 
 public class VehicleDataLogger extends DataPoint {
-    String unit;
     String name;
     String code;
     double upperByteMultiplier;
     double divisor;
     int expectedBytes;
 
-    public VehicleDataLogger(String name, String unit, String code, double upperByteMultiplier, int divisor, int expectedBytes) {
-        this.unit = unit;
+    public VehicleDataLogger(String name, String units, String code, double upperByteMultiplier, int divisor, int expectedBytes) {
+        this.units = units;
         this.name = name;
         this.code = code;
         this.upperByteMultiplier = upperByteMultiplier;
@@ -39,7 +38,7 @@ public class VehicleDataLogger extends DataPoint {
             notifyObservers(value);
         }
         catch (IndexOutOfBoundsException e) {
-
+            Log.e("Err", "processResponse: Incorrect bytes given", e);
         }
     }
 }
