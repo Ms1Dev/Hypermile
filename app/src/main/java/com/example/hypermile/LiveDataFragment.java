@@ -4,10 +4,12 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.hypermile.data.DataInputObserver;
 import com.example.hypermile.data.DataPoint;
 import com.example.hypermile.data.DerivedFuelRate;
 import com.example.hypermile.data.DerivedMpg;
@@ -28,10 +30,14 @@ import java.util.Random;
  * Use the {@link LiveDataFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LiveDataFragment extends Fragment {
+public class LiveDataFragment extends Fragment implements DataInputObserver {
 
-    LiveDataGauge engineSpeedGauge;
+    LineChart lineChart;
+    LineDataSet dataSet;
+    LineData lineData;
 
+    DerivedMpg derivedMpg;
+    DerivedFuelRate derivedFuelRate;
     public LiveDataFragment() {
         // Required empty public constructor
     }
@@ -47,59 +53,81 @@ public class LiveDataFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_live_data, container, false);
-
-        GaugeView gaugeView = view.findViewById(R.id.engineSpeed_gauge);
-        gaugeView.setRange(0,8000);
-        engineSpeedGauge = new LiveDataGauge(gaugeView);
-        ((MainActivity) getActivity()).engineSpeed.addDataInputListener( engineSpeedGauge);
-
-        GaugeView gaugeView2 = view.findViewById(R.id.maf_gauge);
-        gaugeView2.setRange(0,200);
-        LiveDataGauge mafGauge = new LiveDataGauge(gaugeView2);
-        ((MainActivity) getActivity()).massAirFlow.addDataInputListener( mafGauge);
-
-        GaugeView gaugeView3 = view.findViewById(R.id.speed_gauge);
-        gaugeView3.setRange(0,110);
-        LiveDataGauge speedGauge = new LiveDataGauge(gaugeView3);
-        ((MainActivity) getActivity()).speed.addDataInputListener( speedGauge);
-
-        GaugeView gaugeView4 = view.findViewById(R.id.fuelRate_gauge);
-        gaugeView4.hideDial();
-        LiveDataGauge fuelrateGauge = new LiveDataGauge(gaugeView4);
-        DerivedFuelRate fuelrate = new DerivedFuelRate(((MainActivity) getActivity()).massAirFlow);
-        fuelrate.addDataInputListener( fuelrateGauge);
-
-        GaugeView gaugeView5 = view.findViewById(R.id.mpg_gauge);
-        gaugeView5.hideDial();
-        LiveDataGauge mpgGauge = new LiveDataGauge(gaugeView5);
-        DataPoint mpg = new DerivedMpg(((MainActivity) getActivity()).speed, fuelrate);
-        mpg.addDataInputListener( mpgGauge);
-
-
-        LineChart lineChart = view.findViewById(R.id.chart);
-
-        ArrayList<Entry> entries = new ArrayList<Entry>();
-
-        Random random = new Random();
-
-        for (int i = 0; i < 20; i++) {
-            entries.add(new Entry( i, random.nextInt(50)));
-        }
-
-        LineDataSet dataSet = new LineDataSet(entries, "Random");
-
-        LineData lineData = new LineData(dataSet);
-
-        lineChart.setData(lineData);
-        lineChart.invalidate();
-
+        MainActivity mainActivity = (MainActivity) getActivity();
+        derivedFuelRate = new DerivedFuelRate(mainActivity.massAirFlow);
+        derivedMpg = new DerivedMpg(mainActivity.speed, derivedFuelRate);
+        addGauges(view);
+        addLineChart(view);
+        derivedMpg.addDataInputListener(this);
         return view;
     }
 
+    public void addLineChart(View view) {
+        lineChart = view.findViewById(R.id.chart);
+        ArrayList<Entry> entries = new ArrayList<Entry>();
+        dataSet = new LineDataSet(entries, "Random");
+        lineData = new LineData(dataSet);
+        lineChart.setData(lineData);
+        lineChart.invalidate();
+    }
+
+    private void addGauges(View view) {
+        MainActivity mainActivity = (MainActivity) getActivity();
+
+        if (mainActivity == null) return;
+
+        GaugeView engineSpeedGauge = view.findViewById(R.id.engineSpeed_gauge);
+        engineSpeedGauge.setRange(0,8000);
+        LiveDataGauge engineSpeedLiveData = new LiveDataGauge(engineSpeedGauge);
+        mainActivity.engineSpeed.addDataInputListener( engineSpeedLiveData );
+
+        GaugeView massAirFlowGauge = view.findViewById(R.id.maf_gauge);
+        massAirFlowGauge.setRange(0,200);
+        LiveDataGauge massAirFlowLiveData = new LiveDataGauge(massAirFlowGauge);
+        mainActivity.massAirFlow.addDataInputListener( massAirFlowLiveData );
+
+        GaugeView speedGauge = view.findViewById(R.id.speed_gauge);
+        speedGauge.setRange(0,110);
+        LiveDataGauge speedLiveData = new LiveDataGauge(speedGauge);
+        mainActivity.speed.addDataInputListener( speedLiveData );
+
+        GaugeView fuelRateGauge = view.findViewById(R.id.fuelRate_gauge);
+        fuelRateGauge.hideDial();
+        LiveDataGauge fuelRateLiveData = new LiveDataGauge(fuelRateGauge);
+        derivedFuelRate.addDataInputListener( fuelRateLiveData );
+
+        GaugeView mpgGauge = view.findViewById(R.id.mpg_gauge);
+        mpgGauge.hideDial();
+        LiveDataGauge mpgLiveData = new LiveDataGauge(mpgGauge);
+        derivedMpg.addDataInputListener( mpgLiveData );
+    }
+
+    @Override
+    public void incomingData(double data) {
+
+        int index = lineData.getEntryCount();
+
+        Entry entry = new Entry(dataSet.getEntryCount(),(float) data);
+
+        dataSet.addEntry(entry);
+
+        lineData.notifyDataChanged();
+        lineChart.notifyDataSetChanged();
+        lineChart.moveViewToX(dataSet.getEntryCount());
+        lineChart.invalidate();
+
+        Log.d("TAG", "incomingData: ");
+    }
+
+    @Override
+    public void setUnits(String units) {
+
+    }
 }

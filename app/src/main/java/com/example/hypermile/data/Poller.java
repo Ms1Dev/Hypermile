@@ -59,7 +59,10 @@ public class Poller extends Thread {
                         }
                     }
 
-                    pollCompleteListener.pollingComplete();
+                    if (pollCompleteListener != null) {
+                        pollCompleteListener.pollingComplete();
+                    }
+
 
                 } catch (InterruptedException e) {
                     Log.e("Err", "run: ", e);

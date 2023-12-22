@@ -4,6 +4,7 @@ import android.util.Log;
 
 public class DerivedMpg extends DataPoint {
     final static private double UK_GALLON_CONVERSION = 0.21996923465436;
+    final static private double MAX_MPG = 99.99;
     boolean newSpeedData = false;
     boolean newFuelData = false;
     double milesPerHour;
@@ -50,6 +51,8 @@ public class DerivedMpg extends DataPoint {
 
             double gallonsPerHour = litresPerHour * UK_GALLON_CONVERSION;
             double milesPerGallon = milesPerHour / gallonsPerHour;
+
+            if (milesPerGallon > MAX_MPG) milesPerGallon = MAX_MPG;
 
             notifyObservers(milesPerGallon);
         }
