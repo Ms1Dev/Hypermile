@@ -17,11 +17,17 @@ public class Poller extends Thread {
     private final static int RESPONSE_DELAY = 100;
     private int sleepDuration = 500;
 
+    private PollCompleteListener pollCompleteListener;
+
 
     ArrayList<VehicleDataLogger> vehicleDataPoints = new ArrayList<>();
 
     public void addVehicleDataPoint(VehicleDataLogger vehicleData) {
         vehicleDataPoints.add(vehicleData);
+    }
+
+    public void setPollCompleteListener(PollCompleteListener pollCompleteListener) {
+        this.pollCompleteListener = pollCompleteListener;
     }
 
     public Poller(int sampleRateHz) {
@@ -52,6 +58,8 @@ public class Poller extends Thread {
                             Log.d("TAG", "run: MISS");
                         }
                     }
+
+                    pollCompleteListener.pollingComplete();
 
                 } catch (InterruptedException e) {
                     Log.e("Err", "run: ", e);
