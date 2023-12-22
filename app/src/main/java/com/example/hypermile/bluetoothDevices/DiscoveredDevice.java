@@ -116,7 +116,8 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
                         progressBar.setVisibility(View.INVISIBLE);
                         noConnection.setVisibility(View.INVISIBLE);
                         break;
-                    case CONNECTING:
+                    case BLUETOOTH_CONNECTING:
+                    case OBD_CONNECTING:
                         connectedTick.setVisibility(View.INVISIBLE);
                         progressBar.setVisibility(View.VISIBLE);
                         noConnection.setVisibility(View.INVISIBLE);

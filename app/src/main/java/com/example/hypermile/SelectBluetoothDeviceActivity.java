@@ -102,7 +102,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
 
     @Override
     public void onStateChange(ConnectionState connectionState) {
-        if (connectionState == ConnectionState.CONNECTING) {
+        if (connectionState == ConnectionState.BLUETOOTH_CONNECTING) {
             try {
                 bluetoothAdapter.cancelDiscovery();
             }

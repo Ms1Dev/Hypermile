@@ -8,7 +8,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 public class AutoConnect {
-    private static final int CONNECTION_ATTEMPTS = 5;
+    private static final int CONNECTION_ATTEMPTS = 3;
     private static final int MONITOR_FREQUENCY = 5000;
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
@@ -52,6 +52,9 @@ public class AutoConnect {
                         }
                         else if (connectionState == ConnectionState.CONNECTED) {
                             connectAttempts = 0;
+                        }
+                        else if (connectAttempts >= CONNECTION_ATTEMPTS) {
+                            connection.autoConnectFailed();
                         }
                     } catch (InterruptedException e) {
                         //TODO:

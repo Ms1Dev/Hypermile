@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -178,13 +179,28 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         statusBar.setBackgroundColor(getResources().getColor(R.color.secondary_container));
                         persistBluetoothDeviceMacAddress();
                         break;
-                    case CONNECTING:
-                        deviceStatus.setText("Connecting");
+                    case BLUETOOTH_CONNECTING:
+                        deviceStatus.setText("Bluetooth Connecting");
+                        statusConnecting.setVisibility(View.VISIBLE);
+                        statusBar.setBackgroundColor(getResources().getColor(R.color.tertiary_container));
+                        break;
+                    case OBD_CONNECTING:
+                        deviceStatus.setText("OBD Connecting");
                         statusConnecting.setVisibility(View.VISIBLE);
                         statusBar.setBackgroundColor(getResources().getColor(R.color.tertiary_container));
                         break;
                     case DISCONNECTED:
                         deviceStatus.setText("Disconnected");
+                        statusDisconnected.setVisibility(View.VISIBLE);
+                        statusBar.setBackgroundColor(getResources().getColor(R.color.error_container));
+                        break;
+                    case OBD_FAIL:
+                        deviceStatus.setText("OBD Fail");
+                        statusDisconnected.setVisibility(View.VISIBLE);
+                        statusBar.setBackgroundColor(getResources().getColor(R.color.error_container));
+                        break;
+                    case BLUETOOTH_FAIL:
+                        deviceStatus.setText("Bluetooth Fail");
                         statusDisconnected.setVisibility(View.VISIBLE);
                         statusBar.setBackgroundColor(getResources().getColor(R.color.error_container));
                         break;

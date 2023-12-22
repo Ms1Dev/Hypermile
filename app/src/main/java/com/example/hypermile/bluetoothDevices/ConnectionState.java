@@ -1,7 +1,10 @@
 package com.example.hypermile.bluetoothDevices;
 
 public enum ConnectionState {
-    CONNECTING,
+    DISCONNECTED,
+    BLUETOOTH_CONNECTING,
+    OBD_CONNECTING,
     CONNECTED,
-    DISCONNECTED
+    BLUETOOTH_FAIL,
+    OBD_FAIL
 }
