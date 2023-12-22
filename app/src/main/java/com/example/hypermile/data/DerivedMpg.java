@@ -51,12 +51,6 @@ public class DerivedMpg extends DataPoint {
             double gallonsPerHour = litresPerHour * UK_GALLON_CONVERSION;
             double milesPerGallon = milesPerHour / gallonsPerHour;
 
-            Log.d("TAG", "gallonsPerHour: " + gallonsPerHour);
-            Log.d("TAG", "milesPerHour: " + milesPerHour);
-
-
-            Log.d("TAG", "calculateData: " + milesPerGallon);
-
             notifyObservers(milesPerGallon);
         }
     }

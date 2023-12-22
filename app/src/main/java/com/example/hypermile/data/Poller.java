@@ -3,6 +3,7 @@ package com.example.hypermile.data;
 import android.util.Log;
 
 import com.example.hypermile.bluetoothDevices.Connection;
+import com.example.hypermile.obd.ObdFrame;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,7 +14,9 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Poller extends Thread {
+    private final static int RESPONSE_DELAY = 100;
     private int sleepDuration = 500;
+
 
     ArrayList<VehicleDataLogger> vehicleDataPoints = new ArrayList<>();
 
@@ -25,83 +28,90 @@ public class Poller extends Thread {
         sleepDuration = 1000 / sampleRateHz;
     }
 
-//    public void run() {
-//        Connection connection = Connection.getInstance();
-//        while(true) {
-//
-//            // wait for bluetooth connection
-//            while (!connection.hasConnection());
-//
-//            while (connection.hasConnection()) {
-//                try {
-//                    sleep(sleepDuration);
-//
-//                    for (VehicleData vehicleData : this.vehicleData) {
-//                        connection.send(vehicleData.requestCode());
-//                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-//                        connection.readBuffer(outputStream);
-//                        InputStream receiveStream = new ByteArrayInputStream(outputStream.toByteArray());
-//                        vehicleData.passResponse(receiveStream);
-//                    }
-//
-//                } catch (InterruptedException | IOException e) {
-//                    Log.e("Err", "run: ", e);
-//                }
-//            }
-//        }
-//    }
-
     public void run() {
-        Random random = new Random(System.currentTimeMillis());
+        Connection connection = Connection.getInstance();
         while(true) {
-            try {
-                sleep(sleepDuration);
 
-                for (VehicleDataLogger vehicleData : this.vehicleDataPoints) {
+            // wait for bluetooth connection
+            while (!connection.hasConnection());
 
-                    String req = new String(vehicleData.requestCode());
+            while (connection.hasConnection()) {
+                try {
+                    sleep(sleepDuration);
 
-                    byte[] data = new byte[5];
-                    int bound;
-                    int randomVal;
+                    for (VehicleDataLogger vehicleData : this.vehicleDataPoints) {
 
-                    switch (req) {
-                        case "010C\r":
-                            bound = 7000;
-                            randomVal = random.nextInt(bound);
+                        connection.send(vehicleData.requestCode());
+                        Thread.sleep(RESPONSE_DELAY);
+                        ObdFrame obdFrame = connection.getLatestFrame();
 
-                            randomVal *= 4;
-
-                            data[0] = (byte) (randomVal / 256);
-                            data[1] = (byte) randomVal;
-
-                            break;
-                        case "010D\r":
-                            bound = 110;
-                            randomVal = random.nextInt(bound);
-
-                            data[0] = (byte) randomVal;
-                            break;
-                        case "0110\r":
-                            bound = 600;
-                            randomVal = random.nextInt(bound);
-
-                            randomVal *= 100;
-
-                            int upperval = (int) ((randomVal / 256.0) + 0.5);
-
-                            data[0] = (byte) upperval;
-                            data[1] = (byte) randomVal;
-                            break;
+                        if (obdFrame != null) {
+                            vehicleData.processResponse(obdFrame.getPayload());
+                        }
+                        else {
+                            Log.d("TAG", "run: MISS");
+                        }
                     }
 
-                    vehicleData.processResponse(data);
+                } catch (InterruptedException e) {
+                    Log.e("Err", "run: ", e);
                 }
-
-            } catch (InterruptedException e) {
-                Log.e("Err", "run: ", e);
             }
         }
-
     }
+
+
+//    public void run() {
+//        Random random = new Random(System.currentTimeMillis());
+//        while(true) {
+//            try {
+//                sleep(sleepDuration);
+//
+//                for (VehicleDataLogger vehicleData : this.vehicleDataPoints) {
+//
+//                    String req = new String(vehicleData.requestCode());
+//
+//                    byte[] data = new byte[5];
+//                    int bound;
+//                    int randomVal;
+//
+//                    switch (req) {
+//                        case "010C\r":
+//                            bound = 7000;
+//                            randomVal = random.nextInt(bound);
+//
+//                            randomVal *= 4;
+//
+//                            data[0] = (byte) (randomVal / 256);
+//                            data[1] = (byte) randomVal;
+//
+//                            break;
+//                        case "010D\r":
+//                            bound = 110;
+//                            randomVal = random.nextInt(bound);
+//
+//                            data[0] = (byte) randomVal;
+//                            break;
+//                        case "0110\r":
+//                            bound = 600;
+//                            randomVal = random.nextInt(bound);
+//
+//                            randomVal *= 100;
+//
+//                            int upperval = (int) ((randomVal / 256.0) + 0.5);
+//
+//                            data[0] = (byte) upperval;
+//                            data[1] = (byte) randomVal;
+//                            break;
+//                    }
+//
+//                    vehicleData.processResponse(data);
+//                }
+//
+//            } catch (InterruptedException e) {
+//                Log.e("Err", "run: ", e);
+//            }
+//        }
+//
+//    }
 }

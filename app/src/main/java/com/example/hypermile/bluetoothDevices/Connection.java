@@ -1,27 +1,15 @@
 package com.example.hypermile.bluetoothDevices;
 
-import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
+
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.util.Log;
 
-import androidx.core.app.ActivityCompat;
-import androidx.preference.PreferenceManager;
-
+import com.example.hypermile.obd.ObdFrame;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -32,8 +20,10 @@ public class Connection {
     private static ConnectionThread connectionThread;
     private static BluetoothDevice bluetoothDevice;
     private static byte[] inputBuffer = new byte[1024];
+    private ObdFrame latestFrame;
     private static int newDataLen = 0;
     private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
+    private boolean isConnected = false;
     final static private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
 
     private Connection(){}
@@ -64,10 +54,11 @@ public class Connection {
         return instance;
     }
     public boolean hasConnection() {
-        return connectionThread != null;
+        return isConnected;
     }
+
     public boolean hasData() {
-        return newDataLen > 0;
+        return latestFrame != null;
     }
 
     /**
@@ -77,13 +68,18 @@ public class Connection {
      */
     public void readBuffer(ByteArrayOutputStream out) throws IOException {
         out.write(inputBuffer);
-        out.write('\0');
         out.flush();
         out.close();
         newDataLen = 0;
         for (int i = 0; i < 1024; i++) {
             inputBuffer[i] = 0;
         }
+    }
+
+    public ObdFrame getLatestFrame() {
+        ObdFrame obdFrame = latestFrame;
+        latestFrame = null;
+        return obdFrame;
     }
 
     /**
@@ -120,7 +116,52 @@ public class Connection {
     private void manageConnection(BluetoothSocket bluetoothSocket) {
         connectionThread = new ConnectionThread(bluetoothSocket);
         connectionThread.start();
+
+        initialise();
+
+        isConnected = true;
     }
+
+
+    public void initialise() {
+        // elm327 documentation
+        // https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
+
+        try {
+            sendCommand("ATD\r"); // set all defaults
+            sendCommand("ATZ\r"); // reset
+            sendCommand("ATE0\r"); // echo command off
+            sendCommand("ATL1\r"); // line feeds on
+            sendCommand("ATS1\r"); // spaces between bytes on
+            sendCommand("ATH1\r"); // headers on
+
+            findProtocol();
+
+        } catch (InterruptedException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean sendCommand(String command) throws IOException, InterruptedException {
+        byte[] cmdAsBytes = command.getBytes();
+        connectionThread.write(cmdAsBytes);
+        Thread.sleep(200);
+        return true;
+    }
+
+    private void findProtocol() throws IOException, InterruptedException {
+        sendCommand("ATSP0\r");
+        //TODO:
+        while (true) {
+            sendCommand("0100\r");
+
+            while (!hasData()) {
+                Thread.sleep(100);
+            }
+            if (getLatestFrame().isReponse()) break;
+        }
+    }
+
 
 
     /**
@@ -168,9 +209,11 @@ public class Connection {
         private final BluetoothSocket bluetoothSocket;
         private final InputStream inputStream;
         private final OutputStream outputStream;
+        Connection connection;
 
         public ConnectionThread(BluetoothSocket socket) {
             bluetoothSocket = socket;
+            connection = Connection.getInstance();
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
@@ -191,13 +234,18 @@ public class Connection {
 
         public void run() {
             updateEventListeners(ConnectionState.CONNECTED);
+
             while (true) {
                 try {
                     newDataLen = inputStream.read(inputBuffer);
 
-//                    String response = new String(inputBuffer);
+//                    String res = new String(inputBuffer);
 //
-//                    Log.d("Res", response);
+//                    Log.d("TAG", "run: " + res);
+
+                    ObdFrame obdFrame = ObdFrame.createFrame(inputBuffer);
+                    if (obdFrame != null) latestFrame = obdFrame;
+
                 } catch (IOException e) {
                     Log.d("Err", "Input stream was disconnected", e);
                     cancel();
@@ -206,7 +254,6 @@ public class Connection {
             }
         }
 
-
         public void write(byte[] bytes) {
             try {
                 outputStream.write(bytes);
@@ -214,6 +261,9 @@ public class Connection {
                 Log.e("Err", "Error occurred when sending data", e);
             }
         }
+
+
+
 
 
         public void cancel() {
@@ -226,5 +276,7 @@ public class Connection {
             }
         }
     }
+
+
 
 }

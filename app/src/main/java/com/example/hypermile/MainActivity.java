@@ -47,6 +47,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.home);
 
+        deviceStatus = findViewById(R.id.deviceStatusText);
+        statusConnected = findViewById(R.id.statusBar_connected);
+        statusDisconnected = findViewById(R.id.statusBar_disconnected);
+        statusConnecting = findViewById(R.id.statusBar_connecting);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -75,22 +80,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 1
         );
 
-        Poller poller = new Poller(1);
-        poller.addVehicleDataPoint(engineSpeed);
-        poller.addVehicleDataPoint(massAirFlow);
-        poller.addVehicleDataPoint(speed);
-        poller.start();
-
-        deviceStatus = findViewById(R.id.deviceStatusText);
-        statusConnected = findViewById(R.id.statusBar_connected);
-        statusDisconnected = findViewById(R.id.statusBar_disconnected);
-        statusConnecting = findViewById(R.id.statusBar_connecting);
-
         Connection connection = Connection.getInstance();
         onStateChange(connection.getConnectionState());
         connection.addConnectionEventListener(this);
 
         AutoConnect autoConnect = new AutoConnect(this);
+
+        Poller poller = new Poller(1);
+        poller.addVehicleDataPoint(engineSpeed);
+        poller.addVehicleDataPoint(massAirFlow);
+        poller.addVehicleDataPoint(speed);
+        poller.start();
     }
 
     @Override
