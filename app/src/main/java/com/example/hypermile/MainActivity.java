@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.hypermile.bluetoothDevices.AutoConnect;
 import com.example.hypermile.bluetoothDevices.Connection;
 import com.example.hypermile.bluetoothDevices.ConnectionEventListener;
 import com.example.hypermile.bluetoothDevices.ConnectionState;
@@ -84,8 +82,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         Connection connection = Connection.getInstance();
         onStateChange(connection.getConnectionState());
         connection.addConnectionEventListener(this);
-
-        AutoConnect autoConnect = new AutoConnect(this);
+//
+//        AutoConnect autoConnect = new AutoConnect(this);
+        connection.connectToExisting(this);
 
         Poller poller = new Poller(1);
         poller.addVehicleDataPoint(engineSpeed);

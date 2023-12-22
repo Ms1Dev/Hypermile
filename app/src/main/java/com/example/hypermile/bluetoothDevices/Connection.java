@@ -1,8 +1,12 @@
 package com.example.hypermile.bluetoothDevices;
 
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 
@@ -16,15 +20,24 @@ import java.util.UUID;
 
 // Singleton class since we only ever have one bluetooth device
 public class Connection {
+
+    private static final int CONNECTION_ATTEMPTS = 3;
+    private static final int MONITOR_FREQUENCY = 5000;
+
+    private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
+    private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
+
     private final static int INPUT_BUFFER_SIZE = 1024;
     private final static int SEARCH_FOR_PROTOCOL_TIMEOUT = 20000;
     private final static int SEARCH_FOR_PROTOCOL_ATTEMPTS = 3;
     private static Connection instance;
     private ConnectionThread connectionThread;
+    private InitConnThread initConnThread;
     private BluetoothDevice bluetoothDevice;
     private ObdFrame latestFrame;
     private ConnectionState connectionState = ConnectionState.DISCONNECTED;
     private boolean isConnected = false;
+    private int autoConnectAttempts = 0;
     final static private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
 
     private Connection(){}
@@ -47,6 +60,7 @@ public class Connection {
     public static Connection getInstance() {
         if (instance == null) {
             instance = new Connection();
+            instance.autoConnect();
         }
         return instance;
     }
@@ -64,11 +78,27 @@ public class Connection {
     }
 
     public boolean hasConnection() {
-        return isConnected;
+        return isConnected && connectionThread != null;
     }
 
     public boolean hasData() {
         return latestFrame != null;
+    }
+
+
+    public void connectToExisting(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains(PREFERENCE_DEVICE_MAC)) {
+            BluetoothManager bluetoothManager = context.getSystemService(BluetoothManager.class);
+            BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+            try {
+                bluetoothDevice = bluetoothAdapter.getRemoteDevice(sharedPreferences.getString(PREFERENCE_DEVICE_MAC, null));
+                createConnection(bluetoothDevice);
+            }
+            catch (IllegalArgumentException e) {
+                Log.e("Err", "AutoConnect: Stored MAC address invalid", e);
+            }
+        }
     }
 
 
@@ -95,14 +125,21 @@ public class Connection {
      * @param bluetoothDevice
      */
     public void createConnection(BluetoothDevice bluetoothDevice) {
+        if (bluetoothDevice == null) return;
         this.bluetoothDevice = bluetoothDevice;
+        autoConnectAttempts = 0;
+
         if (connectionThread != null) {
             connectionThread.cancel();
         }
 
+        if (initConnThread != null) {
+            initConnThread.cancel();
+        }
+
         updateEventListeners(ConnectionState.BLUETOOTH_CONNECTING);
 
-        InitConnThread initConnThread = new InitConnThread(bluetoothDevice);
+        initConnThread = new InitConnThread(bluetoothDevice);
         initConnThread.start();
     }
 
@@ -120,6 +157,34 @@ public class Connection {
         updateEventListeners(initialise()? ConnectionState.CONNECTED : ConnectionState.OBD_FAIL);
 
         isConnected = true;
+    }
+
+
+    private void autoConnect() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(MONITOR_FREQUENCY);
+                        ConnectionState connectionState = getConnectionState();
+                        if (connectionState == ConnectionState.DISCONNECTED && autoConnectAttempts < CONNECTION_ATTEMPTS &&  bluetoothDevice != null)
+                        {
+                            autoConnectAttempts++;
+                            createConnection(bluetoothDevice);
+                        }
+                        else if (connectionState == ConnectionState.CONNECTED) {
+                            autoConnectAttempts = 0;
+                        }
+                        else if (autoConnectAttempts >= CONNECTION_ATTEMPTS) {
+                            autoConnectFailed();
+                        }
+                    } catch (InterruptedException e) {
+                        //TODO:
+                    }
+                }
+            }
+        }).start();
     }
 
 
@@ -145,9 +210,12 @@ public class Connection {
 
     private boolean sendCommand(String command) throws IOException, InterruptedException {
         byte[] cmdAsBytes = command.getBytes();
-        connectionThread.write(cmdAsBytes);
-        Thread.sleep(200);
-        return true;
+        if (connectionThread != null) {
+            connectionThread.write(cmdAsBytes);
+            Thread.sleep(200);
+            return true;
+        }
+        return false;
     }
 
 
@@ -210,6 +278,16 @@ public class Connection {
             }
             manageConnection(bluetoothSocket);
         }
+
+        public void cancel() {
+            try {
+                bluetoothSocket.close();
+                isConnected = false;
+            } catch (IOException closeException) {
+                Log.e("Err", "Could not close the client socket", closeException);
+            }
+            this.isInterrupted();
+        }
     }
 
     /**
@@ -261,6 +339,7 @@ public class Connection {
             }
         }
 
+
         public void write(byte[] bytes) {
             try {
                 outputStream.write(bytes);
@@ -270,20 +349,16 @@ public class Connection {
         }
 
 
-
-
-
         public void cancel() {
             try {
                 bluetoothSocket.close();
                 connectionThread = null;
+                isConnected = false;
                 updateEventListeners(ConnectionState.DISCONNECTED);
             } catch (IOException e) {
                 Log.e("Err", "Could not close the connect socket", e);
             }
         }
     }
-
-
 
 }

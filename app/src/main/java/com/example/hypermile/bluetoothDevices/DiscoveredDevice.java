@@ -53,11 +53,15 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
         isSelected = selected;
         if (isSelected) {
             Connection.getInstance().addConnectionEventListener(this);
+            if (progressBar != null) {
+                progressBar.setVisibility(View.VISIBLE);
+            }
         }
         else {
             Connection.getInstance().removeConnectionEventListener(this);
-            view.findViewById(R.id.device_connectedTick).setVisibility(View.INVISIBLE);
-            view.findViewById(R.id.device_connectingProgress).setVisibility(View.INVISIBLE);
+            noConnection.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.INVISIBLE);
+            connectedTick.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -106,8 +110,9 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
 
     @Override
     public void onStateChange(ConnectionState connectionState) {
-        if (connectedTick == null || progressBar == null) return;
+        if (connectedTick == null || progressBar == null || noConnection == null) return;
         ((Activity) view.getContext()).runOnUiThread(new Runnable() {
+
             @Override
             public void run() {
                 switch (connectionState) {
@@ -115,18 +120,22 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
                         connectedTick.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.INVISIBLE);
                         noConnection.setVisibility(View.INVISIBLE);
+
                         break;
                     case BLUETOOTH_CONNECTING:
                     case OBD_CONNECTING:
-                        connectedTick.setVisibility(View.INVISIBLE);
                         progressBar.setVisibility(View.VISIBLE);
+                        connectedTick.setVisibility(View.INVISIBLE);
                         noConnection.setVisibility(View.INVISIBLE);
+
                         break;
-                    case DISCONNECTED:
+                    case BLUETOOTH_FAIL:
+                    case OBD_FAIL:
+                        noConnection.setVisibility(View.VISIBLE);
                         connectedTick.setVisibility(View.INVISIBLE);
                         progressBar.setVisibility(View.INVISIBLE);
-                        noConnection.setVisibility(View.VISIBLE);
                         break;
+
                 }
             }
         });

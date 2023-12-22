@@ -228,12 +228,9 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
 
     @Override
     public void deviceSelected(DiscoveredDevice discoveredDevice) {
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString(PREFERENCE_DEVICE_MAC, discoveredDevice.getMacAddress()).apply();
-
+        Connection.getInstance().createConnection(discoveredDevice.getBluetoothDevice());
         selectedDevice.setSelected(false);
         selectedDevice = discoveredDevice;
         selectedDevice.setSelected(true);
-        Connection.getInstance().createConnection(selectedDevice.getBluetoothDevice());
     }
 }
