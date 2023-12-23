@@ -26,6 +26,9 @@ import com.google.firebase.auth.FirebaseAuth;
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ConnectionEventListener {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
+    LiveDataFragment liveDataFragment;
+    HomeFragment homeFragment;
+    ReportsFragment reportsFragment;
     BottomNavigationView bottomNavigationView;
     Toolbar toolbar;
     TextView deviceStatus;
@@ -40,6 +43,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        homeFragment = new HomeFragment();
+        liveDataFragment = new LiveDataFragment();
+        reportsFragment = new ReportsFragment();
+
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.mainContent, homeFragment)
+                .add(R.id.mainContent, reportsFragment)
+                .add(R.id.mainContent, liveDataFragment)
+                .commit();
 
         bottomNavigationView = findViewById(R.id.bottomNavigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
@@ -102,18 +115,27 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private boolean loadFragment(int item_id) {
         if (item_id == R.id.home) {
-            HomeFragment homeFragment = new HomeFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainContent, homeFragment).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .show(homeFragment)
+                    .hide(reportsFragment)
+                    .hide(liveDataFragment)
+                    .commit();
             return true;
         }
         else if (item_id == R.id.live_data) {
-            LiveDataFragment liveDataFragment = new LiveDataFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainContent, liveDataFragment).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .show(liveDataFragment)
+                    .hide(reportsFragment)
+                    .hide(homeFragment)
+                    .commit();
             return true;
         }
         else if (item_id == R.id.reports) {
-            ReportsFragment reportsFragment = new ReportsFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.mainContent, reportsFragment).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .show(reportsFragment)
+                    .hide(liveDataFragment)
+                    .hide(homeFragment)
+                    .commit();
             return true;
         }
         return false;

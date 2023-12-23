@@ -135,8 +135,10 @@ public class LiveDataFragment extends Fragment {
         dataSet.addEntry(entry);
         lineData.notifyDataChanged();
         lineChart.notifyDataSetChanged();
-        lineChart.setVisibleXRangeMinimum(20);
-//        lineChart.setVisibleXRangeMaximum(20);
-        lineChart.moveViewToX(dataSet.getEntryCount());
+        lineChart.setVisibleXRangeMinimum(20000);
+        lineChart.setVisibleXRangeMaximum(20000);
+        lineChart.moveViewToX(dataSet.getXMax());
+
+        currentMpg = null;
     }
 }
