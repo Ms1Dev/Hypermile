@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 
 import com.example.hypermile.data.DataInputObserver;
 
-public class LiveDataGauge implements DataInputObserver {
+public class LiveDataGauge implements DataInputObserver<Double> {
     GaugeView gaugeView;
 
     public LiveDataGauge(GaugeView gaugeView) {
@@ -13,8 +13,8 @@ public class LiveDataGauge implements DataInputObserver {
     }
 
     @Override
-    public void incomingData(double data) {
-        gaugeView.updateValue((int) data);
+    public void incomingData(Double data) {
+        gaugeView.updateValue(data);
     }
 
     @Override

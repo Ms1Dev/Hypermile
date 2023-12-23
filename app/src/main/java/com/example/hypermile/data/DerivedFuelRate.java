@@ -1,6 +1,6 @@
 package com.example.hypermile.data;
 
-public class DerivedFuelRate extends DataSource implements DataInputObserver {
+public class DerivedFuelRate extends DataSource<Double> implements DataInputObserver<Double> {
     final static private double STOICHIOMETRIC_PETROL_E10 = 14.1;
     final static private double STOICHIOMETRIC_PETROL = 14.7;
     final static private double DENSITY_PETROL_GRAM_LITRE = 750;
@@ -11,7 +11,7 @@ public class DerivedFuelRate extends DataSource implements DataInputObserver {
     }
 
     @Override
-    public void incomingData(double data) {
+    public void incomingData(Double data) {
         double fuelRate = data * 3600 / STOICHIOMETRIC_PETROL_E10 / DENSITY_PETROL_GRAM_LITRE;
         notifyObservers(fuelRate);
     }

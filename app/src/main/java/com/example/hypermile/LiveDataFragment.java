@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * Use the {@link LiveDataFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LiveDataFragment extends Fragment implements DataInputObserver {
+public class LiveDataFragment extends Fragment implements DataInputObserver<Double> {
 
     private LineChart lineChart;
     private LineDataSet dataSet;
@@ -113,8 +113,8 @@ public class LiveDataFragment extends Fragment implements DataInputObserver {
     }
 
     @Override
-    public void incomingData(double data) {
-        Entry entry = new Entry(dataSet.getEntryCount(),(float) data);
+    public void incomingData(Double data) {
+        Entry entry = new Entry(dataSet.getEntryCount(), data.floatValue());
         dataSet.addEntry(entry);
         lineData.notifyDataChanged();
         lineChart.notifyDataSetChanged();

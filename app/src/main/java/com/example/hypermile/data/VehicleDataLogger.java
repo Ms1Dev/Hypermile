@@ -6,7 +6,7 @@ import com.example.hypermile.bluetoothDevices.Connection;
 import com.example.hypermile.obd.ObdFrame;
 
 
-public class VehicleDataLogger extends DataSource implements PollingElement {
+public class VehicleDataLogger extends DataSource<Double> implements PollingElement {
     private final static int RESPONSE_DELAY = 100;
     String name;
     String code;

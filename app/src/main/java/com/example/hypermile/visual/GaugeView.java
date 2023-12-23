@@ -16,6 +16,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.hypermile.R;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
+import java.util.Locale;
+
 public class GaugeView extends RelativeLayout {
     private final static int DIAL_RANGE = 75;
     private final static int NORMAL_TEXT_SIZE = 25;
@@ -29,6 +31,7 @@ public class GaugeView extends RelativeLayout {
     int value = 0;
     int min = 0;
     int max = 100;
+    int decimalPoints = 0;
     View view;
 
     public GaugeView(Context context) {
@@ -84,6 +87,7 @@ public class GaugeView extends RelativeLayout {
             setLabelColour(labelColor);
 
             String unitLabel = attributes.getString(R.styleable.GaugeView_unitLabel);
+            decimalPoints = attributes.getInt(R.styleable.GaugeView_decimalPlaces, 0);
             setUnit(unitLabel);
 
             if (attributes.getBoolean(R.styleable.GaugeView_hideDial, false)) {
@@ -99,12 +103,13 @@ public class GaugeView extends RelativeLayout {
         return convertedValue;
     }
 
-    public void updateValue(int value) {
+    public void updateValue(Double value) {
         ((Activity) view.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                label.setText(String.valueOf(value));
-                dial.setProgress(convertToDialValue(value), true);
+                String labelValue = String.format(Locale.getDefault(),"%."+ decimalPoints +"f", value);
+                label.setText(labelValue);
+                dial.setProgress(convertToDialValue(value.intValue()), true);
             }
         });
     }
@@ -118,6 +123,10 @@ public class GaugeView extends RelativeLayout {
         if (unit != null) {
             unitLabel.setText(unit);
         }
+    }
+
+    public void setDecimalPoints(int decimalPoints) {
+        this.decimalPoints = decimalPoints;
     }
 
     public void setDialColour(int colour) {

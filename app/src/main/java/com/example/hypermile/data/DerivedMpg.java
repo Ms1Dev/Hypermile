@@ -1,6 +1,6 @@
 package com.example.hypermile.data;
 
-public class DerivedMpg extends DataSource {
+public class DerivedMpg extends DataSource<Double> {
     final static private double UK_GALLON_CONVERSION = 0.21996923465436;
     final static private double MAX_MPG = 99.99;
     boolean newSpeedData = false;
@@ -9,9 +9,9 @@ public class DerivedMpg extends DataSource {
     double litresPerHour;
 
     public DerivedMpg(VehicleDataLogger speed, DerivedFuelRate fuelRate) {
-        speed.addDataInputListener( new DataInputObserver() {
+        speed.addDataInputListener( new DataInputObserver<Double>() {
             @Override
-            public void incomingData(double data) {
+            public void incomingData(Double data) {
                 newSpeedData(data);
             }
 
@@ -19,9 +19,9 @@ public class DerivedMpg extends DataSource {
             public void setUnits(String units) {}
         });
 
-        fuelRate.addDataInputListener(new DataInputObserver() {
+        fuelRate.addDataInputListener(new DataInputObserver<Double>() {
             @Override
-            public void incomingData(double data) {
+            public void incomingData(Double data) {
                 newFuelData(data);
             }
 

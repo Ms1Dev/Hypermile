@@ -141,6 +141,7 @@
                         android:id="@+id/fuelRate_gauge"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        app:decimalPlaces="2"
                         app:height="200dp"
                         app:width="200dp">
 
@@ -173,6 +174,7 @@
                         android:id="@+id/maf_gauge"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        app:decimalPlaces="2"
                         app:height="200dp"
                         app:width="200dp">
 
