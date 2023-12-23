@@ -1,8 +1,10 @@
-package com.example.hypermile.data;
+package com.example.hypermile.data.derivatives;
 
 import android.util.Log;
 
 import com.example.hypermile.bluetoothDevices.Connection;
+import com.example.hypermile.data.DataSource;
+import com.example.hypermile.data.PollingElement;
 import com.example.hypermile.obd.ObdFrame;
 
 

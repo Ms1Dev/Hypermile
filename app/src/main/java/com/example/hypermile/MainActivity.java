@@ -19,8 +19,7 @@ import android.widget.TextView;
 import com.example.hypermile.bluetoothDevices.Connection;
 import com.example.hypermile.bluetoothDevices.ConnectionEventListener;
 import com.example.hypermile.bluetoothDevices.ConnectionState;
-import com.example.hypermile.data.Poller;
-import com.example.hypermile.data.VehicleDataLogger;
+import com.example.hypermile.data.derivatives.VehicleDataLogger;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 

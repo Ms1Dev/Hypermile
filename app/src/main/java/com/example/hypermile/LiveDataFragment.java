@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
@@ -23,12 +25,14 @@ import java.util.ArrayList;
  * Use the {@link LiveDataFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LiveDataFragment extends Fragment implements DataInputObserver<Double> {
+public class LiveDataFragment extends Fragment {
 
     private LineChart lineChart;
     private LineDataSet dataSet;
     private LineData lineData;
     private DataManager dataManager;
+    Double currentMpg;
+    long startTimeOffset;
 
     public LiveDataFragment() {
         // Required empty public constructor
@@ -45,6 +49,26 @@ public class LiveDataFragment extends Fragment implements DataInputObserver<Doub
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dataManager = DataManager.getInstance();
+
+        dataManager.getDerivedMpg().addDataInputListener(new DataInputObserver<Double>() {
+            @Override
+            public void incomingData(Double data) {
+                currentMpg = data;
+            }
+            @Override
+            public void setUnits(String units) {}
+        });
+
+        dataManager.getCurrentTimestamp().addDataInputListener(new DataInputObserver<Timestamp>() {
+            @Override
+            public void incomingData(Timestamp data) {
+                updateGraph(data);
+            }
+            @Override
+            public void setUnits(String units) {}
+        });
+
+        startTimeOffset = System.currentTimeMillis();
     }
 
     @Override
@@ -52,7 +76,6 @@ public class LiveDataFragment extends Fragment implements DataInputObserver<Doub
         View view = inflater.inflate(R.layout.fragment_live_data, container, false);
         addGauges(view);
         addLineChart(view);
-        dataManager.getDerivedMpg().addDataInputListener(this);
         return view;
     }
 
@@ -104,19 +127,16 @@ public class LiveDataFragment extends Fragment implements DataInputObserver<Doub
 //        derivedMpg.addDataInputListener( mpgLiveData );
     }
 
-    @Override
-    public void incomingData(Double data) {
-        Entry entry = new Entry(dataSet.getEntryCount(), data.floatValue());
+    public void updateGraph(Timestamp timestamp) {
+
+        if (currentMpg == null) return;
+
+        Entry entry = new Entry((float)( timestamp.getTime() - startTimeOffset), currentMpg.floatValue());
         dataSet.addEntry(entry);
         lineData.notifyDataChanged();
         lineChart.notifyDataSetChanged();
         lineChart.setVisibleXRangeMinimum(20);
-        lineChart.setVisibleXRangeMaximum(20);
+//        lineChart.setVisibleXRangeMaximum(20);
         lineChart.moveViewToX(dataSet.getEntryCount());
-    }
-
-    @Override
-    public void setUnits(String units) {
-
     }
 }

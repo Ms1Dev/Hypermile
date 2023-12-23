@@ -16,18 +16,21 @@ import java.util.Random;
 public class Poller extends Thread {
     private final static int RESPONSE_DELAY = 100;
     private int sleepDuration = 500;
-
-    private PollCompleteListener pollCompleteListener;
-
-
     ArrayList<PollingElement> pollingElements = new ArrayList<>();
+    ArrayList<PollCompleteListener> pollCompleteListeners = new ArrayList<>();
 
     public void addPollingElement(PollingElement pollingElement) {
         pollingElements.add(pollingElement);
     }
 
-    public void setPollCompleteListener(PollCompleteListener pollCompleteListener) {
-        this.pollCompleteListener = pollCompleteListener;
+    public void addPollCompleteListener(PollCompleteListener pollCompleteListener) {
+        this.pollCompleteListeners.add(pollCompleteListener);
+    }
+
+    private void pollingComplete() {
+        for (PollCompleteListener pollCompleteListener : pollCompleteListeners) {
+            pollCompleteListener.pollingComplete();
+        }
     }
 
     public Poller(int sampleRateHz) {
@@ -49,9 +52,7 @@ public class Poller extends Thread {
                         pollingElement.sampleData();
                     }
 
-                    if (pollCompleteListener != null) {
-                        pollCompleteListener.pollingComplete();
-                    }
+                    pollingComplete();
 
                 } catch (InterruptedException e) {
                     Log.e("Err", "run: ", e);
