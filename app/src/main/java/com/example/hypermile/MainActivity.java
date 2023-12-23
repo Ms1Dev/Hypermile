@@ -54,43 +54,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        engineSpeed = new VehicleDataLogger(
-                "Engine Speed",
-                "RPM",
-                "010C\r",
-                256,
-                4,
-                2
-        );
-        massAirFlow = new VehicleDataLogger(
-                "MAF",
-                "g/s",
-                "0110\r",
-                256,
-                100,
-                2
-        );
-        speed = new VehicleDataLogger(
-                "Speed",
-                "MPH",
-                "010D\r",
-                1,
-                1,
-                1
-        );
-
         Connection connection = Connection.getInstance();
         onStateChange(connection.getConnectionState());
         connection.addConnectionEventListener(this);
-//
-//        AutoConnect autoConnect = new AutoConnect(this);
         connection.connectToExisting(this);
 
-        Poller poller = new Poller(1);
-        poller.addPollingElement(engineSpeed);
-        poller.addPollingElement(massAirFlow);
-        poller.addPollingElement(speed);
-        poller.start();
+        DataManager.getInstance().initialise();
     }
 
     @Override
