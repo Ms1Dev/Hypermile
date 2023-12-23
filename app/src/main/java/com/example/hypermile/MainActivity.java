@@ -87,9 +87,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         connection.connectToExisting(this);
 
         Poller poller = new Poller(1);
-        poller.addVehicleDataPoint(engineSpeed);
-        poller.addVehicleDataPoint(massAirFlow);
-        poller.addVehicleDataPoint(speed);
+        poller.addPollingElement(engineSpeed);
+        poller.addPollingElement(massAirFlow);
+        poller.addPollingElement(speed);
         poller.start();
     }
 

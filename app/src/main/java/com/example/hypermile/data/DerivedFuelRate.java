@@ -1,6 +1,6 @@
 package com.example.hypermile.data;
 
-public class DerivedFuelRate extends DataPoint implements DataInputObserver {
+public class DerivedFuelRate extends DataSource implements DataInputObserver {
     final static private double STOICHIOMETRIC_PETROL_E10 = 14.1;
     final static private double STOICHIOMETRIC_PETROL = 14.7;
     final static private double DENSITY_PETROL_GRAM_LITRE = 750;

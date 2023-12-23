@@ -2,9 +2,10 @@ package com.example.hypermile.data;
 
 import java.util.ArrayList;
 
-abstract public class DataPoint {
+abstract public class DataSource {
     protected String units;
     protected double data;
+    protected Class<?> dataType = Double.class;
     ArrayList<DataInputObserver> dataInputObservers = new ArrayList<>();
 
     public void addDataInputListener(DataInputObserver dataInputObserver) {

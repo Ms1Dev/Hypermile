@@ -104,7 +104,7 @@ public class GaugeView extends RelativeLayout {
             @Override
             public void run() {
                 label.setText(String.valueOf(value));
-                dial.setProgress(convertToDialValue(value));
+                dial.setProgress(convertToDialValue(value), true);
             }
         });
     }

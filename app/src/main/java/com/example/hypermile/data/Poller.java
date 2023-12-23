@@ -20,10 +20,10 @@ public class Poller extends Thread {
     private PollCompleteListener pollCompleteListener;
 
 
-    ArrayList<VehicleDataLogger> vehicleDataPoints = new ArrayList<>();
+    ArrayList<PollingElement> pollingElements = new ArrayList<>();
 
-    public void addVehicleDataPoint(VehicleDataLogger vehicleData) {
-        vehicleDataPoints.add(vehicleData);
+    public void addPollingElement(PollingElement pollingElement) {
+        pollingElements.add(pollingElement);
     }
 
     public void setPollCompleteListener(PollCompleteListener pollCompleteListener) {
@@ -45,24 +45,13 @@ public class Poller extends Thread {
                 try {
                     sleep(sleepDuration);
 
-                    for (VehicleDataLogger vehicleData : this.vehicleDataPoints) {
-
-                        connection.send(vehicleData.requestCode());
-                        Thread.sleep(RESPONSE_DELAY);
-                        ObdFrame obdFrame = connection.getLatestFrame();
-
-                        if (obdFrame != null) {
-                            vehicleData.processResponse(obdFrame.getPayload());
-                        }
-                        else {
-                            Log.d("TAG", "run: MISS");
-                        }
+                    for (PollingElement pollingElement : this.pollingElements) {
+                        pollingElement.sampleData();
                     }
 
                     if (pollCompleteListener != null) {
                         pollCompleteListener.pollingComplete();
                     }
-
 
                 } catch (InterruptedException e) {
                     Log.e("Err", "run: ", e);
