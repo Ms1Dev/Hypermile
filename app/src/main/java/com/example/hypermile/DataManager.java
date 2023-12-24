@@ -1,10 +1,9 @@
 package com.example.hypermile;
 
 
-import com.example.hypermile.data.DataSource;
 import com.example.hypermile.data.derivatives.CurrentTimestamp;
-import com.example.hypermile.data.derivatives.DerivedFuelRate;
-import com.example.hypermile.data.derivatives.DerivedMpg;
+import com.example.hypermile.data.derivatives.CalculatedFuelRate;
+import com.example.hypermile.data.derivatives.CalculatedMpg;
 import com.example.hypermile.data.Poller;
 import com.example.hypermile.data.derivatives.VehicleDataLogger;
 
@@ -13,8 +12,8 @@ public class DataManager {
     private VehicleDataLogger engineSpeed;
     private VehicleDataLogger massAirFlow;
     private VehicleDataLogger speed;
-    private DerivedMpg derivedMpg;
-    private DerivedFuelRate derivedFuelRate;
+    private CalculatedMpg calculatedMpg;
+    private CalculatedFuelRate calculatedFuelRate;
     private static DataManager instance;
     private boolean initialised = false;
     private DataManager(){};
@@ -29,8 +28,8 @@ public class DataManager {
         if (!initialised) {
             createVehicleDataLoggers();
 
-            derivedFuelRate = new DerivedFuelRate(massAirFlow);
-            derivedMpg = new DerivedMpg(speed, derivedFuelRate);
+            calculatedFuelRate = new CalculatedFuelRate(massAirFlow);
+            calculatedMpg = new CalculatedMpg(speed, calculatedFuelRate);
             currentTimestamp = new CurrentTimestamp();
 
             Poller poller = new Poller(1);
@@ -90,16 +89,16 @@ public class DataManager {
         return speed;
     }
 
-    public DerivedMpg getDerivedMpg() {
-        return derivedMpg;
+    public CalculatedMpg getDerivedMpg() {
+        return calculatedMpg;
     }
 
     public CurrentTimestamp getCurrentTimestamp() {
         return currentTimestamp;
     }
 
-    public DerivedFuelRate getDerivedFuelRate() {
-        return derivedFuelRate;
+    public CalculatedFuelRate getDerivedFuelRate() {
+        return calculatedFuelRate;
     }
 
 }

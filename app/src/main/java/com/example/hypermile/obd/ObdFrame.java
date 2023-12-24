@@ -18,8 +18,15 @@ public class ObdFrame {
 
 
     public static ObdFrame createFrame(byte[] data) {
-        String _frameData = new String(data);
-        String[] frameElements = _frameData.split(" ");
+        String dataAsString = new String(data);
+        Log.d("TAG", "createFrame: " + dataAsString);
+        int idPos = dataAsString.indexOf("7E8");
+
+        if (idPos == -1) return null;
+
+        dataAsString = dataAsString.substring(idPos);
+        String[] frameElements = dataAsString.split(" ");
+
         if (frameElements[0].equals("7E8")) {
             try {
                 return new ObdFrame(frameElements);

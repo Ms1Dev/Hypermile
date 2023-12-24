@@ -5,11 +5,13 @@ import android.util.Log;
 import com.example.hypermile.bluetoothDevices.Connection;
 import com.example.hypermile.data.DataSource;
 import com.example.hypermile.data.PollingElement;
+import com.example.hypermile.obd.Obd;
 import com.example.hypermile.obd.ObdFrame;
 
 
 public class VehicleDataLogger extends DataSource<Double> implements PollingElement {
-    private final static int RESPONSE_DELAY = 100;
+    private final static int MINIMUM_RESPONSE_WAIT = 150;
+    private final static int MAXIMUM_RESPONSE_WAIT = 500;
     String name;
     String code;
     double upperByteMultiplier;
@@ -48,30 +50,31 @@ public class VehicleDataLogger extends DataSource<Double> implements PollingElem
         }
     }
 
-    private byte[] requestObdData() {
-        connection.send(requestCode());
-
-        try {
-            Thread.sleep(RESPONSE_DELAY);
-        } catch (InterruptedException e) {
-            return null;
-        }
-
-        ObdFrame obdFrame = connection.getLatestFrame();
-
-        if (obdFrame != null) {
-            return obdFrame.getPayload();
-        }
-        else {
-            Log.d("TAG", "run: MISS");
-        }
-
-        return null;
-    }
+//    private byte[] requestObdData() {
+//        connection.send(requestCode());
+//
+//        long currentMillis = System.currentTimeMillis();
+//
+//        while(!connection.hasData() && currentMillis + MAXIMUM_RESPONSE_WAIT > System.currentTimeMillis());
+//
+//        ObdFrame obdFrame = connection.getLatestFrame();
+//
+//        while(currentMillis + MINIMUM_RESPONSE_WAIT > System.currentTimeMillis());
+//
+//        if (obdFrame != null) {
+//            return obdFrame.getPayload();
+//        }
+//        else {
+//            Log.d("TAG", "run: MISS");
+//        }
+//
+//        return null;
+//    }
 
     @Override
     public void sampleData() {
-        byte[] vehicleData = requestObdData();
+        if (!Obd.isReady()) return;
+        byte[] vehicleData = Obd.requestObdData(requestCode(), connection);
         if (vehicleData != null) {
             processResponse(vehicleData);
         }

@@ -4,7 +4,7 @@ package com.example.hypermile.data.derivatives;
 import com.example.hypermile.data.DataInputObserver;
 import com.example.hypermile.data.DataSource;
 
-public class DerivedMpg extends DataSource<Double> {
+public class CalculatedMpg extends DataSource<Double> {
     final static private double UK_GALLON_CONVERSION = 0.21996923465436;
     final static private double MAX_MPG = 99.99;
     boolean newSpeedData = false;
@@ -12,7 +12,7 @@ public class DerivedMpg extends DataSource<Double> {
     double milesPerHour;
     double litresPerHour;
 
-    public DerivedMpg(VehicleDataLogger speed, DerivedFuelRate fuelRate) {
+    public CalculatedMpg(VehicleDataLogger speed, CalculatedFuelRate fuelRate) {
         speed.addDataInputListener( new DataInputObserver<Double>() {
             @Override
             public void incomingData(Double data) {

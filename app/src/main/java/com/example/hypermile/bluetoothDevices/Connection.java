@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 
+import com.example.hypermile.obd.Obd;
 import com.example.hypermile.obd.ObdFrame;
 import java.io.IOException;
 import java.io.InputStream;
@@ -151,12 +152,11 @@ public class Connection {
     private void manageConnection(BluetoothSocket bluetoothSocket) {
         connectionThread = new ConnectionThread(bluetoothSocket);
         connectionThread.start();
+        isConnected = true;
 
         updateEventListeners(ConnectionState.OBD_CONNECTING);
 
-        updateEventListeners(initialise()? ConnectionState.CONNECTED : ConnectionState.OBD_FAIL);
-
-        isConnected = true;
+        updateEventListeners(Obd.initialise(getInstance())? ConnectionState.CONNECTED : ConnectionState.OBD_FAIL);
     }
 
 
@@ -187,28 +187,7 @@ public class Connection {
         }).start();
     }
 
-
-    public boolean initialise() {
-        // elm327 documentation
-        // https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
-
-        try {
-            sendCommand("ATD\r"); // set all defaults
-            sendCommand("ATZ\r"); // reset
-            sendCommand("ATE0\r"); // echo command off
-            sendCommand("ATL1\r"); // line feeds on
-            sendCommand("ATS1\r"); // spaces between bytes on
-            sendCommand("ATH1\r"); // headers on
-
-            return findProtocol();
-
-        } catch (InterruptedException | IOException e) {
-            return false;
-        }
-    }
-
-
-    private boolean sendCommand(String command) throws IOException, InterruptedException {
+    public boolean sendCommand(String command) throws IOException, InterruptedException {
         byte[] cmdAsBytes = command.getBytes();
         if (connectionThread != null) {
             connectionThread.write(cmdAsBytes);
@@ -217,32 +196,6 @@ public class Connection {
         }
         return false;
     }
-
-
-    private boolean findProtocol() throws IOException, InterruptedException {
-
-        int attempts = 0;
-
-        do {
-            long startMillis = System.currentTimeMillis();
-            attempts++;
-
-            sendCommand("ATSP0\r"); // Auto detect protocol
-            sendCommand("0100\r"); // Request available PIDs (just to test for response)
-
-            while (!hasData()) {
-                Thread.sleep(100);
-                if(startMillis + SEARCH_FOR_PROTOCOL_TIMEOUT < System.currentTimeMillis()) {
-                   break;
-                }
-            }
-            ObdFrame obdFrame = getLatestFrame();
-            if (obdFrame != null && obdFrame.isReponse()) return true;
-
-        } while (attempts < SEARCH_FOR_PROTOCOL_ATTEMPTS);
-        return false;
-    }
-
 
     /**
      * Thread for attempting to create a connection with a bluetooth device.
@@ -325,6 +278,10 @@ public class Connection {
                 try {
                     byte[] buffer = new byte[INPUT_BUFFER_SIZE];
                     int bytesIn = inputStream.read(buffer);
+//
+//                    String res = new String(buffer);
+//
+//                    Log.d("TAG", "run: " + res);
 
                     if (bytesIn > 0) {
                         ObdFrame obdFrame = ObdFrame.createFrame(buffer);
