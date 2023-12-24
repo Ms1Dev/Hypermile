@@ -1,18 +1,22 @@
 package com.example.hypermile.data.derivatives;
 
 
+import com.example.hypermile.data.CombinedDataSource;
 import com.example.hypermile.data.DataInputObserver;
 import com.example.hypermile.data.DataSource;
+import com.example.hypermile.data.PollCompleteListener;
+import com.example.hypermile.data.Poller;
 
-public class CalculatedMpg extends DataSource<Double> {
+public class CalculatedMpg extends DataSource<Double> implements PollCompleteListener {
     final static private double UK_GALLON_CONVERSION = 0.21996923465436;
     final static private double MAX_MPG = 99.99;
     boolean newSpeedData = false;
     boolean newFuelData = false;
     double milesPerHour;
     double litresPerHour;
+    VehicleDataLogger speed;
 
-    public CalculatedMpg(VehicleDataLogger speed, CalculatedFuelRate fuelRate) {
+    public CalculatedMpg(VehicleDataLogger speed, DataSource<Double> fuelRate) {
         speed.addDataInputListener( new DataInputObserver<Double>() {
             @Override
             public void incomingData(Double data) {
@@ -58,5 +62,11 @@ public class CalculatedMpg extends DataSource<Double> {
 
             notifyObservers(milesPerGallon);
         }
+    }
+
+    @Override
+    public void pollingComplete() {
+        newFuelData = false;
+        newSpeedData = false;
     }
 }

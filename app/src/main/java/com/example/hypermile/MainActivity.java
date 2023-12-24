@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +20,9 @@ import android.widget.TextView;
 import com.example.hypermile.bluetoothDevices.Connection;
 import com.example.hypermile.bluetoothDevices.ConnectionEventListener;
 import com.example.hypermile.bluetoothDevices.ConnectionState;
+import com.example.hypermile.data.DataManager;
 import com.example.hypermile.data.derivatives.VehicleDataLogger;
+import com.example.hypermile.obd.Obd;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -71,13 +74,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         connection.addConnectionEventListener(this);
         connection.connectToExisting(this);
 
-        DataManager.getInstance().initialise();
+//        DataManager.getInstance().initialise();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!Obd.isReady());
+                obdReady();
+            }
+        }).start();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.overflow, menu);
         return true;
+    }
+
+    public void obdReady() {
+        while (!Obd.isReady());
+        DataManager.getInstance().initialise();
+        liveDataFragment.connectDataToGauges();
     }
 
     @Override

@@ -20,11 +20,15 @@ public class Poller extends Thread {
     ArrayList<PollCompleteListener> pollCompleteListeners = new ArrayList<>();
 
     public void addPollingElement(PollingElement pollingElement) {
-        pollingElements.add(pollingElement);
+        if (pollingElement != null) {
+            pollingElements.add(pollingElement);
+        }
     }
 
     public void addPollCompleteListener(PollCompleteListener pollCompleteListener) {
-        this.pollCompleteListeners.add(pollCompleteListener);
+        if (pollCompleteListener != null) {
+            this.pollCompleteListeners.add(pollCompleteListener);
+        }
     }
 
     private void pollingComplete() {

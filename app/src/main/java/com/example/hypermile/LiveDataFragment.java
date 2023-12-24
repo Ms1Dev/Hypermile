@@ -1,5 +1,6 @@
 package com.example.hypermile;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.hypermile.data.DataInputObserver;
+import com.example.hypermile.data.DataManager;
 import com.example.hypermile.visual.GaugeView;
 import com.example.hypermile.visual.LiveDataGauge;
 import com.github.mikephil.charting.charts.LineChart;
@@ -33,6 +35,7 @@ public class LiveDataFragment extends Fragment {
     private DataManager dataManager;
     Double currentMpg;
     long startTimeOffset;
+    View view;
 
     public LiveDataFragment() {
         // Required empty public constructor
@@ -48,16 +51,57 @@ public class LiveDataFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        dataManager = DataManager.getInstance();
+//
+//        dataManager.getDerivedMpg().addDataInputListener(new DataInputObserver<Double>() {
+//            @Override
+//            public void incomingData(Double data) {
+//                currentMpg = data;
+//            }
+//            @Override
+//            public void setUnits(String units) {}
+//        });
+//
+//        dataManager.getCurrentTimestamp().addDataInputListener(new DataInputObserver<Timestamp>() {
+//            @Override
+//            public void incomingData(Timestamp data) {
+//                updateGraph(data);
+//            }
+//            @Override
+//            public void setUnits(String units) {}
+//        });
+//
+//        startTimeOffset = System.currentTimeMillis();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = inflater.inflate(R.layout.fragment_live_data, container, false);
+//        addGauges(view);
+//        addLineChart(view);
+        return view;
+    }
+
+
+    public void connectDataToGauges() {
         dataManager = DataManager.getInstance();
 
-        dataManager.getDerivedMpg().addDataInputListener(new DataInputObserver<Double>() {
+        ((Activity) view.getContext()).runOnUiThread(new Runnable() {
             @Override
-            public void incomingData(Double data) {
-                currentMpg = data;
+            public void run() {
+                addGauges(view);
+                addLineChart(view);
             }
-            @Override
-            public void setUnits(String units) {}
         });
+
+//        dataManager.getDerivedMpg().addDataInputListener(new DataInputObserver<Double>() {
+//            @Override
+//            public void incomingData(Double data) {
+//                currentMpg = data;
+//            }
+//            @Override
+//            public void setUnits(String units) {}
+//        });
 
         dataManager.getCurrentTimestamp().addDataInputListener(new DataInputObserver<Timestamp>() {
             @Override
@@ -71,13 +115,6 @@ public class LiveDataFragment extends Fragment {
         startTimeOffset = System.currentTimeMillis();
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_live_data, container, false);
-        addGauges(view);
-        addLineChart(view);
-        return view;
-    }
 
     public void addLineChart(View view) {
         lineChart = view.findViewById(R.id.chart);
@@ -98,7 +135,7 @@ public class LiveDataFragment extends Fragment {
         lineChart.invalidate();
     }
 
-    private void addGauges(View view) {
+    public void addGauges(View view) {
         if (!dataManager.isInitialised()) return;
 
         GaugeView speedGauge = view.findViewById(R.id.speed_gauge);
@@ -111,15 +148,15 @@ public class LiveDataFragment extends Fragment {
         LiveDataGauge engineSpeedLiveData = new LiveDataGauge(engineSpeedGauge);
         dataManager.getEngineSpeed().addDataInputListener( engineSpeedLiveData );
 
-        GaugeView massAirFlowGauge = view.findViewById(R.id.maf_gauge);
-        massAirFlowGauge.hideDial();
-        LiveDataGauge massAirFlowLiveData = new LiveDataGauge(massAirFlowGauge);
-        dataManager.getMassAirFlow().addDataInputListener( massAirFlowLiveData );
+//        GaugeView massAirFlowGauge = view.findViewById(R.id.maf_gauge);
+//        massAirFlowGauge.hideDial();
+//        LiveDataGauge massAirFlowLiveData = new LiveDataGauge(massAirFlowGauge);
+//        dataManager.getMassAirFlow().addDataInputListener( massAirFlowLiveData );
 
         GaugeView fuelRateGauge = view.findViewById(R.id.fuelRate_gauge);
         fuelRateGauge.hideDial();
         LiveDataGauge fuelRateLiveData = new LiveDataGauge(fuelRateGauge);
-        dataManager.getDerivedFuelRate().addDataInputListener( fuelRateLiveData );
+        dataManager.getFuelRate().addDataInputListener( fuelRateLiveData );
 //
 //        GaugeView mpgGauge = view.findViewById(R.id.mpg_gauge);
 //        mpgGauge.hideDial();

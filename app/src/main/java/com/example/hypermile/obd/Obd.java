@@ -2,13 +2,16 @@ package com.example.hypermile.obd;
 
 import android.util.Log;
 
+import com.example.hypermile.MainActivity;
 import com.example.hypermile.bluetoothDevices.Connection;
+import com.example.hypermile.data.DataManager;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Obd {
     private final static int SEARCH_FOR_PROTOCOL_TIMEOUT = 20000;
@@ -17,7 +20,17 @@ public class Obd {
     private final static int MAXIMUM_RESPONSE_WAIT = 500;
     private static boolean ready = false;
 
-    private static final HashSet<Byte> supportedPids = new HashSet<>();
+    private static final TreeMap<String,Pid> supportedPids = new TreeMap<>();
+
+//    public static String getPids() {
+//        StringBuilder sb = new StringBuilder();
+//
+//        for (byte pid : supportedPids) {
+//            sb.append(String.format("%02X", pid)).append("\n");
+//        }
+//
+//        return sb.toString();
+//    }
 
     public static boolean initialise(Connection connection) {
         // elm327 documentation
@@ -33,14 +46,7 @@ public class Obd {
 
             if (findProtocol(connection)) {
                 Thread.sleep(500);
-                getSupportedPids(connection);
-
-                Log.d("TAG", "supported: +++" );
-
-                for (byte pid : supportedPids) {
-                    Log.d("TAG", "supported: " + String.format("%2x", pid));
-                }
-
+                getSupportedPids();
                 ready = true;
             }
 
@@ -50,8 +56,8 @@ public class Obd {
         return ready;
     }
 
-    public static boolean supportsPid(byte pid) {
-        return supportedPids.contains(pid);
+    public static Pid getPid(String pid) {
+        return supportedPids.get(pid);
     }
 
     private static boolean findProtocol(Connection connection) throws IOException, InterruptedException {
@@ -78,11 +84,11 @@ public class Obd {
         return false;
     }
 
-    private static void getSupportedPids(Connection connection) throws InterruptedException {
+    private static void getSupportedPids() throws InterruptedException {
         for (int i = 0x00; i <= 0xC8; i += 0x20) {
             String request = String.format("01%02x\r", i);
 
-            byte[] response = requestObdData(request.getBytes(), connection);
+            byte[] response = requestObdData(request.getBytes());
 
             if (response == null) break;
             if (response.length != 4) break;
@@ -91,7 +97,8 @@ public class Obd {
                 for (int k = 0; k < 8; k++) {
                     if ((response[j] & (1 << k)) > 0) {
                         byte supportedPid = (byte) (i + j * 8 + (8 - k));
-                        supportedPids.add(supportedPid);
+                        Pid pid = new Pid(supportedPid);
+                        supportedPids.put(pid.asString(), pid);
                     }
                 }
             }
@@ -99,7 +106,9 @@ public class Obd {
         }
     }
 
-    public static byte[] requestObdData(byte[] requestCode, Connection connection) {
+    public static byte[] requestObdData(byte[] requestCode) {
+        Connection connection = Connection.getInstance();
+
         connection.send(requestCode);
 
         long currentMillis = System.currentTimeMillis();

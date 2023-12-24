@@ -7,30 +7,48 @@ import com.example.hypermile.data.DataSource;
 import com.example.hypermile.data.PollingElement;
 import com.example.hypermile.obd.Obd;
 import com.example.hypermile.obd.ObdFrame;
+import com.example.hypermile.obd.Pid;
 
 
 public class VehicleDataLogger extends DataSource<Double> implements PollingElement {
-    private final static int MINIMUM_RESPONSE_WAIT = 150;
-    private final static int MAXIMUM_RESPONSE_WAIT = 500;
     String name;
     String code;
     double upperByteMultiplier;
     double divisor;
     int expectedBytes;
-    Connection connection;
+    int offset = 0;
+    Pid pid;
 
-    public VehicleDataLogger(String name, String units, String code, double upperByteMultiplier, int divisor, int expectedBytes) {
+    public VehicleDataLogger(Pid pid, String name, String units, int offset) {
         this.units = units;
         this.name = name;
-        this.code = code;
+        this.pid = pid;
+        this.upperByteMultiplier = 1;
+        this.divisor = 1;
+        this.expectedBytes = 1;
+        this.offset = offset;
+    }
+
+    public VehicleDataLogger(Pid pid, String name, String units) {
+        this.units = units;
+        this.name = name;
+        this.pid = pid;
+        this.upperByteMultiplier = 1;
+        this.divisor = 1;
+        this.expectedBytes = 1;
+    }
+
+    public VehicleDataLogger(Pid pid, String name, String units, double upperByteMultiplier, int divisor, int expectedBytes) {
+        this.units = units;
+        this.name = name;
+        this.pid = pid;
         this.upperByteMultiplier = upperByteMultiplier;
         this.divisor = divisor;
         this.expectedBytes = expectedBytes;
-        connection = Connection.getInstance();
     }
 
     public byte[] requestCode() {
-        return code.getBytes();
+        return pid.getRequestCode();
     }
 
     public void processResponse(byte[] data) {
@@ -41,7 +59,7 @@ public class VehicleDataLogger extends DataSource<Double> implements PollingElem
                 lowerByte = data[1] & 0xFF;
             }
 
-            double value = (upperByte * upperByteMultiplier + lowerByte) / divisor;
+            double value = (upperByte * upperByteMultiplier + lowerByte) / divisor + offset;
 
             notifyObservers(value);
         }
@@ -73,8 +91,7 @@ public class VehicleDataLogger extends DataSource<Double> implements PollingElem
 
     @Override
     public void sampleData() {
-        if (!Obd.isReady()) return;
-        byte[] vehicleData = Obd.requestObdData(requestCode(), connection);
+        byte[] vehicleData = pid.getData();
         if (vehicleData != null) {
             processResponse(vehicleData);
         }
