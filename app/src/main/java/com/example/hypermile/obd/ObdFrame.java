@@ -17,15 +17,13 @@ public class ObdFrame {
     byte[] payload;
 
 
-    public static ObdFrame createFrame(byte[] data) {
-        String dataAsString = new String(data);
-        Log.d("TAG", "createFrame: " + dataAsString);
-        int idPos = dataAsString.indexOf("7E8");
+    public static ObdFrame createFrame(String data) {
+        int idPos = data.indexOf("7E8");
 
         if (idPos == -1) return null;
 
-        dataAsString = dataAsString.substring(idPos);
-        String[] frameElements = dataAsString.split(" ");
+        data = data.substring(idPos);
+        String[] frameElements = data.split(" ");
 
         if (frameElements[0].equals("7E8")) {
             try {
@@ -43,7 +41,7 @@ public class ObdFrame {
         this.frameData = frameData;
 
         try {
-            payloadSize = (int) Integer.parseInt( frameData[PAYLOAD_SIZE_POS], 16);
+            payloadSize = Integer.parseInt( frameData[PAYLOAD_SIZE_POS], 16);
             isResponse = frameData[RESPONSE_TYPE_POS].equals("41");
             pid = (byte) Integer.parseInt( frameData[PID_POS], 16 );
             payload = new byte[payloadSize - 2];

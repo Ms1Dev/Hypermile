@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public void obdReady() {
-        while (!Obd.isReady());
         DataManager.getInstance().initialise();
         liveDataFragment.connectDataToGauges();
     }

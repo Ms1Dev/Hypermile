@@ -276,15 +276,24 @@ public class Connection {
         public void run() {
             while (true) {
                 try {
-                    byte[] buffer = new byte[INPUT_BUFFER_SIZE];
-                    int bytesIn = inputStream.read(buffer);
-//
-//                    String res = new String(buffer);
-//
-//                    Log.d("TAG", "run: " + res);
+//                    byte[] buffer = new byte[INPUT_BUFFER_SIZE];
+                    StringBuilder stringBuilder = new StringBuilder();
 
-                    if (bytesIn > 0) {
-                        ObdFrame obdFrame = ObdFrame.createFrame(buffer);
+                    int readValue;
+                    while ((readValue = inputStream.read()) != -1) {
+                        char charValue = (char) readValue;
+                        if (charValue == '>') break;
+                        stringBuilder.append(charValue);
+                    }
+
+//                    int bytesIn = inputStream.read(buffer);
+
+//                    String res = new String(buffer);
+
+                    Log.d("TAG", "read: " + stringBuilder.toString());
+
+                    if (stringBuilder.length() > 0) {
+                        ObdFrame obdFrame = ObdFrame.createFrame(stringBuilder.toString());
                         if (obdFrame != null) latestFrame = obdFrame;
                     }
 

@@ -61,7 +61,7 @@ public class VehicleDataLogger extends DataSource<Double> implements PollingElem
             notifyObservers(value);
         }
         catch (IndexOutOfBoundsException e) {
-            Log.e("Err", "processResponse: Incorrect bytes given", e);
+            Log.e("Err", "processResponse: Incorrect bytes given - " + name, e);
         }
     }
 

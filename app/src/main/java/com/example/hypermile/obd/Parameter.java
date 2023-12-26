@@ -19,8 +19,12 @@ public class Parameter {
 
     public byte[] getData() {
         if (Obd.isReady()) {
-            return Obd.requestObdData(requestCode);
+            return Obd.requestObdData(this);
         }
         return null;
+    }
+
+    public byte getId() {
+        return id;
     }
 }
