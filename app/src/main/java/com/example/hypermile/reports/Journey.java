@@ -1,7 +1,7 @@
 package com.example.hypermile.reports;
 
 
-import com.example.hypermile.data.PollCompleteListener;
+import com.example.hypermile.dataGathering.PollCompleteListener;
 
 import java.util.ArrayList;
 

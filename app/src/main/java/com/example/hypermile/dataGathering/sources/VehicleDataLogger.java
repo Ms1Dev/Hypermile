@@ -1,13 +1,10 @@
-package com.example.hypermile.data.derivatives;
+package com.example.hypermile.dataGathering.sources;
 
 import android.util.Log;
 
-import com.example.hypermile.bluetoothDevices.Connection;
-import com.example.hypermile.data.DataSource;
-import com.example.hypermile.data.PollingElement;
-import com.example.hypermile.obd.Obd;
-import com.example.hypermile.obd.ObdFrame;
-import com.example.hypermile.obd.Pid;
+import com.example.hypermile.dataGathering.DataSource;
+import com.example.hypermile.dataGathering.PollingElement;
+import com.example.hypermile.obd.Parameter;
 
 
 public class VehicleDataLogger extends DataSource<Double> implements PollingElement {
@@ -17,38 +14,38 @@ public class VehicleDataLogger extends DataSource<Double> implements PollingElem
     double divisor;
     int expectedBytes;
     int offset = 0;
-    Pid pid;
+    Parameter parameter;
 
-    public VehicleDataLogger(Pid pid, String name, String units, int offset) {
+    public VehicleDataLogger(Parameter parameter, String name, String units, int offset) {
         this.units = units;
         this.name = name;
-        this.pid = pid;
+        this.parameter = parameter;
         this.upperByteMultiplier = 1;
         this.divisor = 1;
         this.expectedBytes = 1;
         this.offset = offset;
     }
 
-    public VehicleDataLogger(Pid pid, String name, String units) {
+    public VehicleDataLogger(Parameter parameter, String name, String units) {
         this.units = units;
         this.name = name;
-        this.pid = pid;
+        this.parameter = parameter;
         this.upperByteMultiplier = 1;
         this.divisor = 1;
         this.expectedBytes = 1;
     }
 
-    public VehicleDataLogger(Pid pid, String name, String units, double upperByteMultiplier, int divisor, int expectedBytes) {
+    public VehicleDataLogger(Parameter parameter, String name, String units, double upperByteMultiplier, int divisor, int expectedBytes) {
         this.units = units;
         this.name = name;
-        this.pid = pid;
+        this.parameter = parameter;
         this.upperByteMultiplier = upperByteMultiplier;
         this.divisor = divisor;
         this.expectedBytes = expectedBytes;
     }
 
     public byte[] requestCode() {
-        return pid.getRequestCode();
+        return parameter.getRequestCode();
     }
 
     public void processResponse(byte[] data) {
@@ -91,7 +88,7 @@ public class VehicleDataLogger extends DataSource<Double> implements PollingElem
 
     @Override
     public void sampleData() {
-        byte[] vehicleData = pid.getData();
+        byte[] vehicleData = parameter.getData();
         if (vehicleData != null) {
             processResponse(vehicleData);
         }

@@ -1,9 +1,6 @@
 package com.example.hypermile.visual;
 
-import android.content.Context;
-import android.util.AttributeSet;
-
-import com.example.hypermile.data.DataInputObserver;
+import com.example.hypermile.dataGathering.DataInputObserver;
 
 public class LiveDataGauge implements DataInputObserver<Double> {
     GaugeView gaugeView;

@@ -1,4 +1,4 @@
-package com.example.hypermile.data;
+package com.example.hypermile.dataGathering;
 
 public interface PollingElement {
     public void sampleData();

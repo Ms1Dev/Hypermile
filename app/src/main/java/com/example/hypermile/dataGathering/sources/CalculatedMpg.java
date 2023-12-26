@@ -1,11 +1,9 @@
-package com.example.hypermile.data.derivatives;
+package com.example.hypermile.dataGathering.sources;
 
 
-import com.example.hypermile.data.CombinedDataSource;
-import com.example.hypermile.data.DataInputObserver;
-import com.example.hypermile.data.DataSource;
-import com.example.hypermile.data.PollCompleteListener;
-import com.example.hypermile.data.Poller;
+import com.example.hypermile.dataGathering.DataInputObserver;
+import com.example.hypermile.dataGathering.DataSource;
+import com.example.hypermile.dataGathering.PollCompleteListener;
 
 public class CalculatedMpg extends DataSource<Double> implements PollCompleteListener {
     final static private double UK_GALLON_CONVERSION = 0.21996923465436;

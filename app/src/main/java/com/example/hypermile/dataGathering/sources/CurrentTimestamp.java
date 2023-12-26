@@ -1,8 +1,7 @@
-package com.example.hypermile.data.derivatives;
+package com.example.hypermile.dataGathering.sources;
 
-import com.example.hypermile.data.DataSource;
-import com.example.hypermile.data.PollCompleteListener;
-import com.example.hypermile.data.PollingElement;
+import com.example.hypermile.dataGathering.DataSource;
+import com.example.hypermile.dataGathering.PollCompleteListener;
 
 import java.sql.Timestamp;
 

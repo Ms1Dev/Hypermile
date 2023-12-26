@@ -12,7 +12,7 @@ public class ObdFrame {
     final static int DATA_START_POS = 4;
     String[] frameData;
     int payloadSize = 0;
-    boolean isReponse;
+    boolean isResponse;
     byte pid;
     byte[] payload;
 
@@ -44,7 +44,7 @@ public class ObdFrame {
 
         try {
             payloadSize = (int) Integer.parseInt( frameData[PAYLOAD_SIZE_POS], 16);
-            isReponse = frameData[RESPONSE_TYPE_POS].equals("41");
+            isResponse = frameData[RESPONSE_TYPE_POS].equals("41");
             pid = (byte) Integer.parseInt( frameData[PID_POS], 16 );
             payload = new byte[payloadSize - 2];
             for (int i = DATA_START_POS; i <= payloadSize + PAYLOAD_SIZE_POS; i++) {
@@ -60,8 +60,8 @@ public class ObdFrame {
         return payloadSize;
     }
 
-    public boolean isReponse() {
-        return isReponse;
+    public boolean isResponse() {
+        return isResponse;
     }
 
     public byte getPid() {

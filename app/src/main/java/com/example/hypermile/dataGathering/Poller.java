@@ -1,17 +1,10 @@
-package com.example.hypermile.data;
+package com.example.hypermile.dataGathering;
 
 import android.util.Log;
 
-import com.example.hypermile.bluetoothDevices.Connection;
-import com.example.hypermile.obd.ObdFrame;
+import com.example.hypermile.bluetooth.Connection;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 
 public class Poller extends Thread {
     private final static int RESPONSE_DELAY = 100;

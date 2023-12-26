@@ -1,4 +1,4 @@
-package com.example.hypermile.data;
+package com.example.hypermile.dataGathering;
 
 import java.util.ArrayList;
 

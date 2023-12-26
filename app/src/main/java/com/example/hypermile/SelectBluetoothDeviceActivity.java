@@ -13,7 +13,6 @@ import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,25 +22,20 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 
-import com.example.hypermile.bluetoothDevices.Connection;
-import com.example.hypermile.bluetoothDevices.ConnectionEventListener;
-import com.example.hypermile.bluetoothDevices.ConnectionState;
-import com.example.hypermile.bluetoothDevices.DeviceSelectedCallback;
-import com.example.hypermile.bluetoothDevices.DiscoveredDevice;
-import com.example.hypermile.bluetoothDevices.DiscoveredDeviceAdapter;
-import com.example.hypermile.bluetoothDevices.DiscoveredDeviceListElement;
-import com.example.hypermile.bluetoothDevices.DiscoveredDeviceSectionHeader;
+import com.example.hypermile.bluetooth.Connection;
+import com.example.hypermile.bluetooth.ConnectionEventListener;
+import com.example.hypermile.bluetooth.ConnectionState;
+import com.example.hypermile.bluetooth.DeviceSelectedCallback;
+import com.example.hypermile.bluetooth.DiscoveredDevice;
+import com.example.hypermile.bluetooth.DiscoveredDeviceAdapter;
+import com.example.hypermile.bluetooth.DiscoveredDeviceListElement;
+import com.example.hypermile.bluetooth.DiscoveredDeviceSectionHeader;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 public class SelectBluetoothDeviceActivity extends AppCompatActivity implements DeviceSelectedCallback, ConnectionEventListener {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";

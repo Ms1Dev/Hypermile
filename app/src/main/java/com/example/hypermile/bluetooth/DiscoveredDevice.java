@@ -1,22 +1,13 @@
-package com.example.hypermile.bluetoothDevices;
+package com.example.hypermile.bluetooth;
 
 
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.hypermile.MainActivity;
 import com.example.hypermile.R;
 
 public class DiscoveredDevice implements DiscoveredDeviceListElement, ConnectionEventListener {

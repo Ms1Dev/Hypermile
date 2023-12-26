@@ -1,4 +1,4 @@
-package com.example.hypermile.bluetoothDevices;
+package com.example.hypermile.bluetooth;
 
 public interface ConnectionEventListener {
     public void onStateChange(ConnectionState connectionState);

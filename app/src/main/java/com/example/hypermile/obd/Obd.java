@@ -2,15 +2,9 @@ package com.example.hypermile.obd;
 
 import android.util.Log;
 
-import com.example.hypermile.MainActivity;
-import com.example.hypermile.bluetoothDevices.Connection;
-import com.example.hypermile.data.DataManager;
+import com.example.hypermile.bluetooth.Connection;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.TreeMap;
 
 public class Obd {
@@ -19,18 +13,7 @@ public class Obd {
     private final static int MINIMUM_RESPONSE_WAIT = 150;
     private final static int MAXIMUM_RESPONSE_WAIT = 500;
     private static boolean ready = false;
-
-    private static final TreeMap<String,Pid> supportedPids = new TreeMap<>();
-
-//    public static String getPids() {
-//        StringBuilder sb = new StringBuilder();
-//
-//        for (byte pid : supportedPids) {
-//            sb.append(String.format("%02X", pid)).append("\n");
-//        }
-//
-//        return sb.toString();
-//    }
+    private static final TreeMap<String, Parameter> supportedPids = new TreeMap<>();
 
     public static boolean initialise(Connection connection) {
         // elm327 documentation
@@ -56,7 +39,7 @@ public class Obd {
         return ready;
     }
 
-    public static Pid getPid(String pid) {
+    public static Parameter getPid(String pid) {
         return supportedPids.get(pid);
     }
 
@@ -78,7 +61,7 @@ public class Obd {
                 }
             }
             ObdFrame obdFrame = connection.getLatestFrame();
-            if (obdFrame != null && obdFrame.isReponse()) return true;
+            if (obdFrame != null && obdFrame.isResponse()) return true;
 
         } while (attempts < SEARCH_FOR_PROTOCOL_ATTEMPTS);
         return false;
@@ -97,8 +80,11 @@ public class Obd {
                 for (int k = 0; k < 8; k++) {
                     if ((response[j] & (1 << k)) > 0) {
                         byte supportedPid = (byte) (i + j * 8 + (8 - k));
-                        Pid pid = new Pid(supportedPid);
-                        supportedPids.put(pid.asString(), pid);
+                        Parameter parameter = new Parameter(supportedPid);
+                        supportedPids.put(parameter.asString(), parameter);
+
+                        Log.d("TAG", "Supported Pid: " + parameter.asString());
+
                     }
                 }
             }
@@ -121,9 +107,6 @@ public class Obd {
 
         if (obdFrame != null) {
             return obdFrame.getPayload();
-        }
-        else {
-            Log.d("TAG", "run: MISS");
         }
 
         return null;

@@ -1,12 +1,12 @@
-package com.example.hypermile.data.derivatives;
+package com.example.hypermile.dataGathering.sources;
 
 import android.util.Log;
 
-import com.example.hypermile.obd.Pid;
+import com.example.hypermile.obd.Parameter;
 
 public class MassAirFlowSensor extends VehicleDataLogger {
-    public MassAirFlowSensor(Pid pid, String name, String units, double upperByteMultiplier, int divisor, int expectedBytes) {
-        super(pid, name, units, upperByteMultiplier, divisor, expectedBytes);
+    public MassAirFlowSensor(Parameter parameter, String name, String units, double upperByteMultiplier, int divisor, int expectedBytes) {
+        super(parameter, name, units, upperByteMultiplier, divisor, expectedBytes);
     }
 
     public void processResponse(byte[] data) {

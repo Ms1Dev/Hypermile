@@ -1,10 +1,10 @@
 package com.example.hypermile.obd;
 
-public class Pid {
+public class Parameter {
     byte id;
     byte[] requestCode;
 
-    Pid(byte id) {
+    Parameter(byte id) {
         this.id = id;
         requestCode = String.format("01%02X\r", id).getBytes();
     }
