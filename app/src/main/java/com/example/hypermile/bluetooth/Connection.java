@@ -276,30 +276,20 @@ public class Connection {
         public void run() {
             while (true) {
                 try {
-//                    byte[] buffer = new byte[INPUT_BUFFER_SIZE];
                     StringBuilder stringBuilder = new StringBuilder();
 
                     int readValue;
                     while ((readValue = inputStream.read()) != -1) {
                         char charValue = (char) readValue;
-                        if (charValue == '>' || charValue == '\n') break;
+                        if (charValue == '>') break;
                         stringBuilder.append(charValue);
                     }
 
-//                    int bytesIn = inputStream.read(buffer);
-
-//                    String res = new String(buffer);
-
-                    Log.d("TAG", "read: " + stringBuilder.toString());
+//                    Log.d("TAG", "read: " + stringBuilder.toString());
 
                     if (stringBuilder.length() > 0) {
-                        if (latestFrame!= null && latestFrame.isExpectingMoreLines()) {
-                            latestFrame.append(stringBuilder.toString());
-                        }
-                        else {
-                            ObdFrame obdFrame = ObdFrame.createFrame(stringBuilder.toString());
-                            if (obdFrame != null) latestFrame = obdFrame;
-                        }
+                        ObdFrame obdFrame = ObdFrame.createFrame(stringBuilder.toString());
+                        if (obdFrame != null) latestFrame = obdFrame;
                     }
 
                 } catch (IOException e) {
