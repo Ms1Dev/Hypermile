@@ -9,6 +9,7 @@ import androidx.preference.PreferenceManager;
 
 import com.example.hypermile.MainActivity;
 import com.example.hypermile.UserAlert;
+import com.example.hypermile.api.VinDecode;
 import com.example.hypermile.dataGathering.sources.CalculatedMaf;
 import com.example.hypermile.dataGathering.sources.CurrentTimestamp;
 import com.example.hypermile.dataGathering.sources.CalculatedFuelRate;
@@ -133,11 +134,11 @@ public class DataManager {
                 fuelType = String.valueOf(fuelTypeParam.getData()[0]);
             }
         }
-
+        VinDecode vinDecode = new VinDecode("1FAFP53UX4A162757");
         // if fuel type still not known or engine capacity is not known and obd does not support mass air flow then request vehicle details
         if ( fuelType == null || (engineCapacity == null && ( !(Obd.supportsPid("10") || Obd.supportsPid("66")) ) ) ) {
 //            engineCapacity = 1600;
-
+//            VinDecode vinDecode = new VinDecode(vin);
             sharedPreferences.edit().putString(ENGINESIZE_PREFERENCE, String.valueOf(engineCapacity)).apply();
         }
     }

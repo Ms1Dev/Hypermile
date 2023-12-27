@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.hypermile.api.ApiRequest;
 import com.example.hypermile.bluetooth.Connection;
 import com.example.hypermile.bluetooth.ConnectionEventListener;
 import com.example.hypermile.bluetooth.ConnectionState;
@@ -73,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         onStateChange(connection.getConnectionState());
         connection.addConnectionEventListener(this);
         connection.connectToExisting(this);
+
+        ApiRequest.setContext(this);
 
 //        DataManager.getInstance().initialise();
         new Thread(new Runnable() {
