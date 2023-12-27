@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
+import androidx.preference.PreferenceManager;
+
 import com.example.hypermile.MainActivity;
 import com.example.hypermile.UserAlert;
 import com.example.hypermile.dataGathering.sources.CalculatedMaf;
@@ -21,19 +23,20 @@ import java.sql.Timestamp;
 
 public class DataManager {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
-    private static final String FUELTYPE_PREFERENCE = "fuel_type";
-    private static final String ENGINESIZE_PREFERENCE = "engine_size";
+    private static final String FUELTYPE_PREFERENCE = "fuelType";
+    private static final String ENGINESIZE_PREFERENCE = "engineSize";
     private CurrentTimestamp currentTimestamp;
     private VehicleDataLogger engineSpeed;
     private VehicleDataLogger speed;
     private DataSource<Double> massAirFlow;
     private DataSource<Double> fuelRate;
     private CalculatedMpg calculatedMpg;
-    private int fuelType = -1;
-    private int engineCapacity = -1;
+    private String fuelType;
+    private String engineCapacity;
     private static DataManager instance;
     private Context context;
     private boolean initialised = false;
+    private boolean engineCapacityRequired = true;
     private DataManager(){};
     public static DataManager getInstance() {
         if (instance == null) {
@@ -47,11 +50,6 @@ public class DataManager {
             this.context = context;
 
             getVehicleSpecs(Obd.getVin());
-
-            if (fuelType == -1 || engineCapacity == -1) {
-                ((MainActivity) context).alertUser(UserAlert.VEHICLE_SPEC_UNKNOWN);
-            }
-
 
             Poller poller = new Poller(1);
 
@@ -115,28 +113,33 @@ public class DataManager {
 
             poller.start();
 
+            if (fuelType == null || (engineCapacity == null && engineCapacityRequired)) {
+                ((MainActivity) context).alertUser(UserAlert.VEHICLE_SPEC_UNKNOWN);
+            }
+
             initialised = true;
         }
     }
 
     private void getVehicleSpecs(String vin) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences(vin, Context.MODE_PRIVATE);
-        fuelType = sharedPreferences.getInt(FUELTYPE_PREFERENCE, -1);
-        engineCapacity = sharedPreferences.getInt(ENGINESIZE_PREFERENCE, -1);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        fuelType = sharedPreferences.getString(FUELTYPE_PREFERENCE, null);
+        engineCapacity = sharedPreferences.getString(ENGINESIZE_PREFERENCE, null);
 
-        if (fuelType == -1) {
+        if (fuelType == null) {
             // try and get the fuel type from obd
             Parameter fuelTypeParam = Obd.getPid("51");
             if (fuelTypeParam != null) {
-                fuelType = (int) fuelTypeParam.getData()[0];
+                fuelType = String.valueOf(fuelTypeParam.getData()[0]);
             }
         }
 
         // if fuel type still not known or engine capacity is not known and obd does not support mass air flow then request vehicle details
-        if ( fuelType == -1 || (engineCapacity == -1 && ( !(Obd.supportsPid("10") || Obd.supportsPid("66")) ) ) ) {
+        if ( fuelType == null || (engineCapacity == null && ( !(Obd.supportsPid("10") || Obd.supportsPid("66")) ) ) ) {
+//            engineCapacity = 1600;
 
+            sharedPreferences.edit().putString(ENGINESIZE_PREFERENCE, String.valueOf(engineCapacity)).apply();
         }
-
     }
 
     private DataSource<Double> getMassAirFlowSource(Poller poller) {
@@ -151,6 +154,7 @@ public class DataManager {
                     100,
                     2
             );
+            engineCapacityRequired = false;
             poller.addPollingElement(massAirFlow);
             return massAirFlow;
         }
@@ -166,6 +170,7 @@ public class DataManager {
                     32,
                     5
             );
+            engineCapacityRequired = false;
             poller.addPollingElement(massAirFlow);
             return massAirFlow;
         }
@@ -200,6 +205,7 @@ public class DataManager {
              poller.addPollingElement(intakeAirTemperature);
              poller.addPollCompleteListener(calculatedMaf);
 
+            engineCapacityRequired = true;
             return calculatedMaf;
         }
 
@@ -232,5 +238,9 @@ public class DataManager {
 
     public DataSource<Double> getCalculatedMpg() {
         return calculatedMpg;
+    }
+
+    public boolean isEngineCapacityRequired() {
+        return engineCapacityRequired;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.hypermile;
 
 import android.os.Bundle;
+import androidx.preference.Preference;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -10,6 +11,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.example.hypermile.dataGathering.DataManager;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -46,6 +49,10 @@ public class SettingsActivity extends AppCompatActivity {
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
+
+            if (!DataManager.getInstance().isEngineCapacityRequired()) {
+                findPreference("engineSize").setVisible(false);
+            }
         }
     }
 }
