@@ -10,7 +10,7 @@ import java.util.TreeMap;
 public class Obd {
     private final static int SEARCH_FOR_PROTOCOL_TIMEOUT = 20000;
     private final static int SEARCH_FOR_PROTOCOL_ATTEMPTS = 3;
-    private final static int MINIMUM_RESPONSE_WAIT = 300;
+    private final static int MINIMUM_RESPONSE_WAIT = 150;
     private final static int MAXIMUM_RESPONSE_WAIT = 500;
     private final static int MAX_ERRORS = 5;
     private static int errors = 0;

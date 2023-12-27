@@ -13,73 +13,80 @@
         android:layout_height="match_parent">
 
         <TableRow
+            android:id="@+id/tablerow_1"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-            <androidx.cardview.widget.CardView
-                style="@style/Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
+<!--            <androidx.cardview.widget.CardView-->
+<!--                style="@style/Card"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1">-->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:orientation="vertical">-->
 
-                    <com.example.hypermile.visual.GaugeView
-                        android:id="@+id/speed_gauge"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:height="200dp"
-                        app:width="200dp">
+<!--                    <com.example.hypermile.visual.GaugeView-->
+<!--                        android:id="@+id/speed_gauge"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        app:height="200dp"-->
+<!--                        app:width="200dp">-->
 
-                    </com.example.hypermile.visual.GaugeView>
+<!--                    </com.example.hypermile.visual.GaugeView>-->
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:layout_margin="10dp"
-                        android:text="Vehicle speed" />
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:gravity="center"-->
+<!--                        android:textSize="16sp"-->
+<!--                        android:layout_margin="10dp"-->
+<!--                        android:text="Vehicle speed" />-->
 
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+<!--                </LinearLayout>-->
+<!--            </androidx.cardview.widget.CardView>-->
 
-            <androidx.cardview.widget.CardView
-                style="@style/Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1">
+<!--            <com.example.hypermile.visual.LiveDataGauge-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_width="match_parent"-->
+<!--                />-->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+<!--            <androidx.cardview.widget.CardView-->
+<!--                style="@style/Card"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1">-->
 
-                    <com.example.hypermile.visual.GaugeView
-                        android:id="@+id/engineSpeed_gauge"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:height="200dp"
-                        app:width="200dp">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:orientation="vertical">-->
 
-                    </com.example.hypermile.visual.GaugeView>
+<!--                    <com.example.hypermile.visual.GaugeView-->
+<!--                        android:id="@+id/engineSpeed_gauge"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        app:height="200dp"-->
+<!--                        app:width="200dp">-->
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:layout_margin="10dp"
-                        android:text="Engine Speed" />
+<!--                    </com.example.hypermile.visual.GaugeView>-->
 
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:gravity="center"-->
+<!--                        android:textSize="16sp"-->
+<!--                        android:layout_margin="10dp"-->
+<!--                        android:text="Engine Speed" />-->
+
+<!--                </LinearLayout>-->
+<!--            </androidx.cardview.widget.CardView>-->
         </TableRow>
 
         <TableRow
+            android:id="@+id/tablerow_2"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
@@ -122,74 +129,75 @@
         </TableRow>
 
         <TableRow
+            android:id="@+id/tablerow_3"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-            <androidx.cardview.widget.CardView
-                style="@style/Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_span="1"
-                android:layout_weight="1">
+<!--            <androidx.cardview.widget.CardView-->
+<!--                style="@style/Card"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_span="1"-->
+<!--                android:layout_weight="1">-->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:orientation="vertical">-->
 
-                    <com.example.hypermile.visual.GaugeView
-                        android:id="@+id/fuelRate_gauge"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:decimalPlaces="2"
-                        app:height="200dp"
-                        app:width="200dp">
+<!--                    <com.example.hypermile.visual.GaugeView-->
+<!--                        android:id="@+id/fuelRate_gauge"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        app:decimalPlaces="2"-->
+<!--                        app:height="200dp"-->
+<!--                        app:width="200dp">-->
 
-                    </com.example.hypermile.visual.GaugeView>
+<!--                    </com.example.hypermile.visual.GaugeView>-->
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:layout_margin="10dp"
-                        android:text="Fuel Rate" />
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:gravity="center"-->
+<!--                        android:textSize="16sp"-->
+<!--                        android:layout_margin="10dp"-->
+<!--                        android:text="Fuel Rate" />-->
 
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+<!--                </LinearLayout>-->
+<!--            </androidx.cardview.widget.CardView>-->
 
-            <androidx.cardview.widget.CardView
-                style="@style/Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_span="1"
-                android:layout_weight="1">
+<!--            <androidx.cardview.widget.CardView-->
+<!--                style="@style/Card"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_span="1"-->
+<!--                android:layout_weight="1">-->
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+<!--                <LinearLayout-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:orientation="vertical">-->
 
-                    <com.example.hypermile.visual.GaugeView
-                        android:id="@+id/maf_gauge"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:decimalPlaces="2"
-                        app:height="200dp"
-                        app:width="200dp">
+<!--                    <com.example.hypermile.visual.GaugeView-->
+<!--                        android:id="@+id/maf_gauge"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        app:decimalPlaces="2"-->
+<!--                        app:height="200dp"-->
+<!--                        app:width="200dp">-->
 
-                    </com.example.hypermile.visual.GaugeView>
+<!--                    </com.example.hypermile.visual.GaugeView>-->
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textSize="16sp"
-                        android:layout_margin="10dp"
-                        android:text="Mass Air Flow" />
+<!--                    <TextView-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:gravity="center"-->
+<!--                        android:textSize="16sp"-->
+<!--                        android:layout_margin="10dp"-->
+<!--                        android:text="Mass Air Flow" />-->
 
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+<!--                </LinearLayout>-->
+<!--            </androidx.cardview.widget.CardView>-->
         </TableRow>
 
     </TableLayout>

@@ -1,6 +1,5 @@
 package com.example.hypermile;
 
-import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -8,10 +7,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TableRow;
 
-import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataManager;
-import com.example.hypermile.visual.GaugeView;
 import com.example.hypermile.visual.LiveDataGauge;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
@@ -27,6 +25,9 @@ public class LiveDataFragment extends Fragment {
     private LineDataSet dataSet;
     private LineData lineData;
     private DataManager dataManager;
+    private TableRow row_1;
+    private TableRow row_2;
+    private TableRow row_3;
     Double currentMpg;
     long startTimeOffset;
     View view;
@@ -45,6 +46,8 @@ public class LiveDataFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 //        dataManager = DataManager.getInstance();
 //
 //        dataManager.getDerivedMpg().addDataInputListener(new DataInputObserver<Double>() {
@@ -68,11 +71,23 @@ public class LiveDataFragment extends Fragment {
         startTimeOffset = System.currentTimeMillis();
     }
 
+    LiveDataGauge liveDataGauge;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_live_data, container, false);
 //        addGauges(view);
         addLineChart(view);
+
+
+        row_1 = view.findViewById(R.id.tablerow_1);
+        row_2 = view.findViewById(R.id.tablerow_2);
+        row_3 = view.findViewById(R.id.tablerow_3);
+
+//        TableRow tableRow = view.findViewById(R.id.tablerow);
+
+
+
         return view;
     }
 
@@ -80,31 +95,45 @@ public class LiveDataFragment extends Fragment {
     public void connectDataToGauges() {
         dataManager = DataManager.getInstance();
 
-        ((Activity) view.getContext()).runOnUiThread(new Runnable() {
+        requireActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                addGauges(view);
-                addLineChart(view);
+                LiveDataGauge speedGauge = new LiveDataGauge(view.getContext());
+                row_1.addView(speedGauge);
+                speedGauge.setDataSource(dataManager.getSpeed());
+
+                LiveDataGauge engineSpeedGauge = new LiveDataGauge(view.getContext());
+                row_1.addView(engineSpeedGauge);
+                engineSpeedGauge.setDataSource(dataManager.getEngineSpeed());
             }
         });
 
-        dataManager.getCalculatedMpg().addDataInputListener(new DataInputObserver<Double>() {
-            @Override
-            public void incomingData(Double data) {
-                currentMpg = data;
-            }
-            @Override
-            public void setUnits(String units) {}
-        });
 
-        dataManager.getCurrentTimestamp().addDataInputListener(new DataInputObserver<Timestamp>() {
-            @Override
-            public void incomingData(Timestamp data) {
-                updateGraph(data);
-            }
-            @Override
-            public void setUnits(String units) {}
-        });
+//        ((Activity) view.getContext()).runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                addGauges(view);
+//                addLineChart(view);
+//            }
+//        });
+//
+//        dataManager.getCalculatedMpg().addDataInputListener(new DataInputObserver<Double>() {
+//            @Override
+//            public void incomingData(Double data) {
+//                currentMpg = data;
+//            }
+//            @Override
+//            public void setUnits(String units) {}
+//        });
+//
+//        dataManager.getCurrentTimestamp().addDataInputListener(new DataInputObserver<Timestamp>() {
+//            @Override
+//            public void incomingData(Timestamp data) {
+//                updateGraph(data);
+//            }
+//            @Override
+//            public void setUnits(String units) {}
+//        });
 
         startTimeOffset = System.currentTimeMillis();
     }
@@ -129,34 +158,36 @@ public class LiveDataFragment extends Fragment {
         lineChart.invalidate();
     }
 
-    public void addGauges(View view) {
-        if (!dataManager.isInitialised()) return;
-
-        GaugeView speedGauge = view.findViewById(R.id.speed_gauge);
-        speedGauge.setRange(0,110);
-        LiveDataGauge speedLiveData = new LiveDataGauge(speedGauge);
-        dataManager.getSpeed().addDataInputListener( speedLiveData );
-
-        GaugeView engineSpeedGauge = view.findViewById(R.id.engineSpeed_gauge);
-        engineSpeedGauge.setRange(0,8000);
-        LiveDataGauge engineSpeedLiveData = new LiveDataGauge(engineSpeedGauge);
-        dataManager.getEngineSpeed().addDataInputListener( engineSpeedLiveData );
-
-        GaugeView massAirFlowGauge = view.findViewById(R.id.maf_gauge);
-        massAirFlowGauge.hideDial();
-        LiveDataGauge massAirFlowLiveData = new LiveDataGauge(massAirFlowGauge);
-        dataManager.getMassAirFlow().addDataInputListener( massAirFlowLiveData );
-
-        GaugeView fuelRateGauge = view.findViewById(R.id.fuelRate_gauge);
-        fuelRateGauge.hideDial();
-        LiveDataGauge fuelRateLiveData = new LiveDataGauge(fuelRateGauge);
-        dataManager.getFuelRate().addDataInputListener( fuelRateLiveData );
-
-//        GaugeView mpgGauge = view.findViewById(R.id.mpg_gauge);
-//        mpgGauge.hideDial();
-//        LiveDataGauge mpgLiveData = new LiveDataGauge(mpgGauge);
-//        derivedMpg.addDataInputListener( mpgLiveData );
-    }
+//    public void addGauges(View view) {
+//        if (!dataManager.isInitialised()) return;
+//
+//        GaugeView speedGauge = view.findViewById(R.id.speed_gauge);
+//        speedGauge.setRange(0,110);
+//        LiveDataGauge speedLiveData = new LiveDataGauge(speedGauge);
+//        dataManager.getSpeed().addDataInputListener( speedLiveData );
+//
+//
+//
+////        GaugeView engineSpeedGauge = view.findViewById(R.id.engineSpeed_gauge);
+////        engineSpeedGauge.setRange(0,8000);
+////        LiveDataGauge engineSpeedLiveData = new LiveDataGauge(engineSpeedGauge);
+////        dataManager.getEngineSpeed().addDataInputListener( engineSpeedLiveData );
+//
+//        GaugeView massAirFlowGauge = view.findViewById(R.id.maf_gauge);
+//        massAirFlowGauge.hideDial();
+//        LiveDataGauge massAirFlowLiveData = new LiveDataGauge(massAirFlowGauge);
+//        dataManager.getMassAirFlow().addDataInputListener( massAirFlowLiveData );
+//
+//        GaugeView fuelRateGauge = view.findViewById(R.id.fuelRate_gauge);
+//        fuelRateGauge.hideDial();
+//        LiveDataGauge fuelRateLiveData = new LiveDataGauge(fuelRateGauge);
+//        dataManager.getFuelRate().addDataInputListener( fuelRateLiveData );
+//
+////        GaugeView mpgGauge = view.findViewById(R.id.mpg_gauge);
+////        mpgGauge.hideDial();
+////        LiveDataGauge mpgLiveData = new LiveDataGauge(mpgGauge);
+////        derivedMpg.addDataInputListener( mpgLiveData );
+//    }
 
     public void updateGraph(Timestamp timestamp) {
 

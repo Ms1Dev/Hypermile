@@ -30,7 +30,7 @@ public class GaugeView extends RelativeLayout {
     private TextView unitLabel;
     int value = 0;
     int min = 0;
-    int max = 100;
+    int max = 0;
     int decimalPoints = 0;
     View view;
 
@@ -90,13 +90,17 @@ public class GaugeView extends RelativeLayout {
             decimalPoints = attributes.getInt(R.styleable.GaugeView_decimalPlaces, 0);
             setUnit(unitLabel);
 
-            if (attributes.getBoolean(R.styleable.GaugeView_hideDial, false)) {
-                hideDial();
+            dial.setVisibility(View.GONE);
+            dialTrack.setVisibility(View.GONE);
+
+            if (attributes.getBoolean(R.styleable.GaugeView_showDial, true)) {
+                 showDial();
             }
         }
     }
 
     private int convertToDialValue(int value) {
+        if (min == max) return 0;
         int convertedValue = ((value - min) * DIAL_RANGE) / (max - min);
         if (convertedValue > DIAL_RANGE) convertedValue = DIAL_RANGE;
         else if (convertedValue < 0) convertedValue = 0;
@@ -117,11 +121,19 @@ public class GaugeView extends RelativeLayout {
     public void setRange(int min, int max) {
         this.min = min;
         this.max = max;
+        if (max > min) {
+            showDial();
+        }
     }
 
     public void setUnit(String unit) {
         if (unit != null) {
-            unitLabel.setText(unit);
+            ((Activity) view.getContext()).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    unitLabel.setText(unit);
+                }
+            });
         }
     }
 
@@ -146,9 +158,9 @@ public class GaugeView extends RelativeLayout {
         unitLabel.setTextColor(colour);
     }
 
-    public void hideDial() {
-        dial.setVisibility(View.GONE);
-        dialTrack.setVisibility(View.GONE);
+    public void showDial() {
+        dial.setVisibility(View.VISIBLE);
+        dialTrack.setVisibility(View.VISIBLE);
     }
 
 }

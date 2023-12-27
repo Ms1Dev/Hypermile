@@ -8,7 +8,6 @@ import com.example.hypermile.obd.Parameter;
 
 
 public class VehicleDataLogger extends DataSource<Double> implements PollingElement {
-    String name;
     String code;
     double upperByteMultiplier;
     double divisor;

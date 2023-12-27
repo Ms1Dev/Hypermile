@@ -10,6 +10,6 @@
         <attr name="labelColour" format="color"/>
         <attr name="unitLabel" format="string"/>
         <attr name="decimalPlaces" format="integer"/>
-        <attr name="hideDial" format="boolean"/>
+        <attr name="showDial" format="boolean"/>
     </declare-styleable>
 </resources>

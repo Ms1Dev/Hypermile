@@ -43,6 +43,7 @@ public class DataManager {
                         1,
                         1
                 );
+                speed.setMaxValue(120);
             }
 
             Parameter rpmParameter = Obd.getPid("0C");
@@ -55,6 +56,7 @@ public class DataManager {
                         4,
                         2
                 );
+                speed.setMaxValue(8000);
             }
             else {
                 // TODO: warn user no RPM data
