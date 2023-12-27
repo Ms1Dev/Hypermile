@@ -1,6 +1,12 @@
 package com.example.hypermile.dataGathering;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.example.hypermile.MainActivity;
+import com.example.hypermile.UserAlert;
 import com.example.hypermile.dataGathering.sources.CalculatedMaf;
 import com.example.hypermile.dataGathering.sources.CurrentTimestamp;
 import com.example.hypermile.dataGathering.sources.CalculatedFuelRate;
@@ -9,17 +15,24 @@ import com.example.hypermile.dataGathering.sources.MassAirFlowSensor;
 import com.example.hypermile.dataGathering.sources.VehicleDataLogger;
 import com.example.hypermile.obd.Obd;
 import com.example.hypermile.obd.Parameter;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.sql.Timestamp;
 
 public class DataManager {
+    private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
+    private static final String FUELTYPE_PREFERENCE = "fuel_type";
+    private static final String ENGINESIZE_PREFERENCE = "engine_size";
     private CurrentTimestamp currentTimestamp;
     private VehicleDataLogger engineSpeed;
     private VehicleDataLogger speed;
     private DataSource<Double> massAirFlow;
     private DataSource<Double> fuelRate;
     private CalculatedMpg calculatedMpg;
+    private int fuelType = -1;
+    private int engineCapacity = -1;
     private static DataManager instance;
+    private Context context;
     private boolean initialised = false;
     private DataManager(){};
     public static DataManager getInstance() {
@@ -29,8 +42,17 @@ public class DataManager {
         return instance;
     }
 
-    public void initialise() {
+    public void initialise(Context context) {
         if (!initialised) {
+            this.context = context;
+
+            getVehicleSpecs(Obd.getVin());
+
+            if (fuelType == -1 || engineCapacity == -1) {
+                ((MainActivity) context).alertUser(UserAlert.VEHICLE_SPEC_UNKNOWN);
+            }
+
+
             Poller poller = new Poller(1);
 
             Parameter speedParameter = Obd.getPid("0D");
@@ -95,6 +117,26 @@ public class DataManager {
 
             initialised = true;
         }
+    }
+
+    private void getVehicleSpecs(String vin) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(vin, Context.MODE_PRIVATE);
+        fuelType = sharedPreferences.getInt(FUELTYPE_PREFERENCE, -1);
+        engineCapacity = sharedPreferences.getInt(ENGINESIZE_PREFERENCE, -1);
+
+        if (fuelType == -1) {
+            // try and get the fuel type from obd
+            Parameter fuelTypeParam = Obd.getPid("51");
+            if (fuelTypeParam != null) {
+                fuelType = (int) fuelTypeParam.getData()[0];
+            }
+        }
+
+        // if fuel type still not known or engine capacity is not known and obd does not support mass air flow then request vehicle details
+        if ( fuelType == -1 || (engineCapacity == -1 && ( !(Obd.supportsPid("10") || Obd.supportsPid("66")) ) ) ) {
+
+        }
+
     }
 
     private DataSource<Double> getMassAirFlowSource(Poller poller) {

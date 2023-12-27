@@ -99,6 +99,15 @@ public class Obd {
         }
     }
 
+    public static boolean supportsPid(String pid) {
+        return supportedPids.containsKey(pid);
+    }
+
+    public static String getVin() {
+        byte[] vin = requestObdData("0902\r".getBytes());
+        return new String(vin);
+    }
+
     public static byte[] requestObdData(byte[] requestCode) {
         Connection connection = Connection.getInstance();
 

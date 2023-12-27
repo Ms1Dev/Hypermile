@@ -48,7 +48,6 @@ public class ObdFrame {
                 if (firstByte < 0x10) {
                     bytesToRead = Integer.parseInt( frameData[PAYLOAD_SIZE_POS], 16) - 2;
                     pid = (byte) Integer.parseInt( frameData[PID_POS], 16 );
-
                 }
                 // multi line response
                 else if (firstByte == 0x10) {
@@ -64,10 +63,10 @@ public class ObdFrame {
                 }
 
                 int index = dataStartPos;
-                while(bytesToRead-- > 0 && index <= 8) {
+                while(bytesToRead > 0 && index <= 8) {
                     dataIn.add((byte) Integer.parseInt(frameData[index], 16));
                     index++;
-                    if (bytesToRead == 0) {
+                    if (--bytesToRead == 0) {
                         expectingMoreLines = false;
                     }
                 }

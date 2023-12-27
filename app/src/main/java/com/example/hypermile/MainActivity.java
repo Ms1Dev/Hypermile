@@ -23,6 +23,7 @@ import com.example.hypermile.dataGathering.DataManager;
 import com.example.hypermile.dataGathering.sources.VehicleDataLogger;
 import com.example.hypermile.obd.Obd;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ConnectionEventListener {
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public void obdReady() {
-        DataManager.getInstance().initialise();
+        DataManager.getInstance().initialise(this);
         liveDataFragment.connectDataToGauges();
     }
 
@@ -114,6 +115,16 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         }
 
         return false;
+    }
+
+
+    public void alertUser(UserAlert userAlert) {
+        switch (userAlert) {
+            case VEHICLE_SPEC_UNKNOWN:
+                Snackbar snackbar = Snackbar.make(this, getWindow().getDecorView(), "Insufficient Vehicle Information", Snackbar.LENGTH_LONG);
+                snackbar.show();
+                break;
+        }
     }
 
     @Override
