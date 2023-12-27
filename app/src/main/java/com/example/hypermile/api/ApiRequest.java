@@ -16,7 +16,7 @@ public class ApiRequest {
     private static Context context;
 
     public static void setContext(Context context) {
-        ApiRequest.context = context;
+        ApiRequest.context = context.getApplicationContext();
     }
     private static RequestQueue requestQueue;
 

@@ -1,6 +1,7 @@
 package com.example.hypermile.dataGathering;
 
 
+import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -20,6 +21,16 @@ import com.example.hypermile.obd.Obd;
 import com.example.hypermile.obd.Parameter;
 import com.google.android.material.snackbar.Snackbar;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.Timestamp;
 
 public class DataManager {
@@ -34,6 +45,7 @@ public class DataManager {
     private CalculatedMpg calculatedMpg;
     private String fuelType;
     private String engineCapacity;
+    private JSONObject vehicleDetails;
     private static DataManager instance;
     private Context context;
     private boolean initialised = false;
@@ -48,7 +60,7 @@ public class DataManager {
 
     public void initialise(Context context) {
         if (!initialised) {
-            this.context = context;
+            this.context = context.getApplicationContext();
 
             getVehicleSpecs(Obd.getVin());
 
@@ -134,13 +146,76 @@ public class DataManager {
                 fuelType = String.valueOf(fuelTypeParam.getData()[0]);
             }
         }
-        VinDecode vinDecode = new VinDecode("1FAFP53UX4A162757");
-        // if fuel type still not known or engine capacity is not known and obd does not support mass air flow then request vehicle details
+
+        vehicleDetails = getVehicleDetailsJSON("1FAFP53UX4A162757");
+
         if ( fuelType == null || (engineCapacity == null && ( !(Obd.supportsPid("10") || Obd.supportsPid("66")) ) ) ) {
-//            engineCapacity = 1600;
-//            VinDecode vinDecode = new VinDecode(vin);
-            sharedPreferences.edit().putString(ENGINESIZE_PREFERENCE, String.valueOf(engineCapacity)).apply();
+            try {
+                JSONObject engineDetails = vehicleDetails.getJSONObject("engine");
+                engineCapacity = String.valueOf(engineDetails.getInt("displacement"));
+                fuelType = translateFuelType(engineDetails.getString("type"));
+            }
+            catch (JSONException e) {}
+
+            sharedPreferences.edit()
+                    .putString(ENGINESIZE_PREFERENCE, String.valueOf(engineCapacity))
+                    .putString(FUELTYPE_PREFERENCE, String.valueOf(fuelType))
+                    .apply();
         }
+    }
+
+    private String translateFuelType(String fuelType) {
+        switch (fuelType) {
+            case "gas":
+            case "petrol":
+                return "petrol";
+            case "diesel":
+                return "diesel";
+        }
+        return null;
+    }
+
+    private JSONObject getVehicleDetailsJSON(String vin) {
+        JSONObject vehicleDetails;
+        String rootPath = context.getFilesDir().getPath();
+        String filepath = rootPath + "/" + vin;
+        File file = new File(filepath);
+        if (file.exists()) {
+            try {
+                vehicleDetails = readJsonFromFile(filepath);
+            } catch (IOException | JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else {
+            VinDecode vinDecode = new VinDecode(vin);
+            vehicleDetails = vinDecode.getResponse();
+            try {
+                writeJsonToFile(filepath, vehicleDetails);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return vehicleDetails;
+    }
+
+
+    public static void writeJsonToFile(String filename, JSONObject jsonObject) throws IOException {
+        String stringifyJson = jsonObject.toString();
+        FileWriter fileWriter = new FileWriter(filename);
+        fileWriter.write(stringifyJson);
+        fileWriter.close();
+    }
+
+    public static JSONObject readJsonFromFile(String filename) throws IOException, JSONException {
+        StringBuilder stringBuilder = new StringBuilder();
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            stringBuilder.append(line);
+        }
+        bufferedReader.close();
+        return new JSONObject(stringBuilder.toString());
     }
 
     private DataSource<Double> getMassAirFlowSource(Poller poller) {
@@ -202,6 +277,11 @@ public class DataManager {
                     intakeAirTemperature,
                     engineSpeed
             );
+
+            if (engineCapacity != null) {
+                calculatedMaf.setEngineDisplacementCC(Integer.parseInt(engineCapacity));
+            }
+
              poller.addPollingElement(manifoldAbsolutePressure);
              poller.addPollingElement(intakeAirTemperature);
              poller.addPollCompleteListener(calculatedMaf);

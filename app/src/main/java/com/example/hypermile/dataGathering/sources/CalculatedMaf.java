@@ -53,6 +53,10 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
         });
     }
 
+    public void setEngineDisplacementCC(int engineDisplacementCC) {
+        this.engineDisplacementCC = engineDisplacementCC;
+    }
+
     public void newManifoldAbsolutePressureData(double data) {
         manifoldAbsolutePressure = data;
         hasManifoldAbsolutePressure = true;
