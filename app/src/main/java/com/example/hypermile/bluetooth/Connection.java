@@ -282,7 +282,7 @@ public class Connection {
                     int readValue;
                     while ((readValue = inputStream.read()) != -1) {
                         char charValue = (char) readValue;
-                        if (charValue == '>') break;
+                        if (charValue == '>' || charValue == '\n') break;
                         stringBuilder.append(charValue);
                     }
 
@@ -293,8 +293,13 @@ public class Connection {
                     Log.d("TAG", "read: " + stringBuilder.toString());
 
                     if (stringBuilder.length() > 0) {
-                        ObdFrame obdFrame = ObdFrame.createFrame(stringBuilder.toString());
-                        if (obdFrame != null) latestFrame = obdFrame;
+                        if (latestFrame!= null && latestFrame.isExpectingMoreLines()) {
+                            latestFrame.append(stringBuilder.toString());
+                        }
+                        else {
+                            ObdFrame obdFrame = ObdFrame.createFrame(stringBuilder.toString());
+                            if (obdFrame != null) latestFrame = obdFrame;
+                        }
                     }
 
                 } catch (IOException e) {
@@ -308,6 +313,7 @@ public class Connection {
 
         public void write(byte[] bytes) {
             try {
+                latestFrame = null;
                 outputStream.write(bytes);
             } catch (IOException e) {
                 Log.e("Err", "Error occurred when sending data", e);

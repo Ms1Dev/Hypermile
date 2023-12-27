@@ -23,11 +23,11 @@ public class Obd {
         
         try {
             if (reset(connection)) {
-                Thread.sleep(500);
+                Thread.sleep(200);
                 getSupportedPids();
-                Thread.sleep(500);
+                Thread.sleep(200);
                 connection.sendCommand("0902\r");
-                Thread.sleep(500);
+                Thread.sleep(200);
                 ready = true;
             }
         }
@@ -68,7 +68,7 @@ public class Obd {
                 }
             }
             ObdFrame obdFrame = connection.getLatestFrame();
-            if (obdFrame != null && obdFrame.isResponse()) return true;
+            if (obdFrame != null) return true;
 
         } while (attempts < SEARCH_FOR_PROTOCOL_ATTEMPTS);
         return false;
