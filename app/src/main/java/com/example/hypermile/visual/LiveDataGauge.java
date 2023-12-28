@@ -4,12 +4,15 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.example.hypermile.R;
 import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataSource;
+import com.example.hypermile.util.Utils;
 
 public class LiveDataGauge extends RelativeLayout implements DataInputObserver<Double> {
     DataSource<Double> dataSource;
@@ -18,12 +21,6 @@ public class LiveDataGauge extends RelativeLayout implements DataInputObserver<D
 
     public LiveDataGauge(Context context) {
         super(context);
-        initialise(context, null);
-    }
-
-    public LiveDataGauge(Context context, DataSource<Double> dataSource) {
-        super(context);
-        setDataSource(dataSource);
         initialise(context, null);
     }
 
@@ -49,6 +46,14 @@ public class LiveDataGauge extends RelativeLayout implements DataInputObserver<D
     private void initialise(Context context, AttributeSet attrs) {
         view = LayoutInflater.from(context).inflate(R.layout.live_data_gauge, this);
         gaugeView = view.findViewById(R.id.live_data_dial);
+
+        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+        layoutParams.span = 1;
+        layoutParams.weight = 1;
+
+        Utils.unclip(this);
+
+        setLayoutParams(layoutParams);
     }
 
     @Override
@@ -56,7 +61,6 @@ public class LiveDataGauge extends RelativeLayout implements DataInputObserver<D
         gaugeView.updateValue(data);
     }
 
-    @Override
     public void setUnits(String units) {
         gaugeView.setUnit(units);
     }

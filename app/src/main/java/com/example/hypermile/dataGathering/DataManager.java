@@ -89,7 +89,7 @@ public class DataManager {
                         4,
                         2
                 );
-                speed.setMaxValue(8000);
+                engineSpeed.setMaxValue(8000);
             }
             else {
                 // TODO: warn user no RPM data

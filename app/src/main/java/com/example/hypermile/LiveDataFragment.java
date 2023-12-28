@@ -1,5 +1,6 @@
 package com.example.hypermile;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -7,10 +8,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Space;
 import android.widget.TableRow;
 
 import com.example.hypermile.dataGathering.DataManager;
 import com.example.hypermile.visual.LiveDataGauge;
+import com.example.hypermile.visual.LiveDataLineChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -18,17 +21,20 @@ import com.github.mikephil.charting.data.LineDataSet;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class LiveDataFragment extends Fragment {
 
-    private LineChart lineChart;
-    private LineDataSet dataSet;
-    private LineData lineData;
     private DataManager dataManager;
     private TableRow row_1;
     private TableRow row_2;
     private TableRow row_3;
-    Double currentMpg;
+
+    LiveDataGauge speedGauge;
+    LiveDataGauge engineSpeedGauge;
+    LiveDataGauge mafGauge;
+    LiveDataLineChart liveDataLineChart;
+
     long startTimeOffset;
     View view;
 
@@ -46,51 +52,42 @@ public class LiveDataFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-//        dataManager = DataManager.getInstance();
-//
-//        dataManager.getDerivedMpg().addDataInputListener(new DataInputObserver<Double>() {
-//            @Override
-//            public void incomingData(Double data) {
-//                currentMpg = data;
-//            }
-//            @Override
-//            public void setUnits(String units) {}
-//        });
-//
-//        dataManager.getCurrentTimestamp().addDataInputListener(new DataInputObserver<Timestamp>() {
-//            @Override
-//            public void incomingData(Timestamp data) {
-//                updateGraph(data);
-//            }
-//            @Override
-//            public void setUnits(String units) {}
-//        });
-//
         startTimeOffset = System.currentTimeMillis();
     }
-
-    LiveDataGauge liveDataGauge;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_live_data, container, false);
-//        addGauges(view);
-        addLineChart(view);
-
 
         row_1 = view.findViewById(R.id.tablerow_1);
         row_2 = view.findViewById(R.id.tablerow_2);
         row_3 = view.findViewById(R.id.tablerow_3);
 
-//        TableRow tableRow = view.findViewById(R.id.tablerow);
+        speedGauge = new LiveDataGauge(getContext());
+        row_1.addView(speedGauge);
 
+        engineSpeedGauge = new LiveDataGauge(getContext());
+        row_1.addView(engineSpeedGauge);
 
+        liveDataLineChart = new LiveDataLineChart(getContext());
+        row_2.addView(liveDataLineChart);
+
+        mafGauge = new LiveDataGauge(getContext());
+        row_3.addView(mafGauge);
+
+        row_3.addView(getSpacer(getContext()));
 
         return view;
     }
 
+    private Space getSpacer(Context context) {
+        Space space = new Space(context);
+        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+        layoutParams.span = 1;
+        layoutParams.weight = 1;
+        space.setLayoutParams(layoutParams);
+        return space;
+    }
 
     public void connectDataToGauges() {
         dataManager = DataManager.getInstance();
@@ -98,109 +95,13 @@ public class LiveDataFragment extends Fragment {
         requireActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                LiveDataGauge speedGauge = new LiveDataGauge(view.getContext());
-                row_1.addView(speedGauge);
                 speedGauge.setDataSource(dataManager.getSpeed());
-
-                LiveDataGauge engineSpeedGauge = new LiveDataGauge(view.getContext());
-                row_1.addView(engineSpeedGauge);
                 engineSpeedGauge.setDataSource(dataManager.getEngineSpeed());
+                mafGauge.setDataSource(dataManager.getMassAirFlow());
+                liveDataLineChart.setAxisSources(dataManager.getCurrentTimestamp(), dataManager.getCalculatedMpg());
             }
         });
 
-
-//        ((Activity) view.getContext()).runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                addGauges(view);
-//                addLineChart(view);
-//            }
-//        });
-//
-//        dataManager.getCalculatedMpg().addDataInputListener(new DataInputObserver<Double>() {
-//            @Override
-//            public void incomingData(Double data) {
-//                currentMpg = data;
-//            }
-//            @Override
-//            public void setUnits(String units) {}
-//        });
-//
-//        dataManager.getCurrentTimestamp().addDataInputListener(new DataInputObserver<Timestamp>() {
-//            @Override
-//            public void incomingData(Timestamp data) {
-//                updateGraph(data);
-//            }
-//            @Override
-//            public void setUnits(String units) {}
-//        });
-
         startTimeOffset = System.currentTimeMillis();
-    }
-
-
-    public void addLineChart(View view) {
-        lineChart = view.findViewById(R.id.chart);
-        ArrayList<Entry> entries = new ArrayList<Entry>();
-        dataSet = new LineDataSet(entries, "");
-        lineData = new LineData(dataSet);
-        lineChart.setData(lineData);
-
-        lineChart.getAxisLeft().setAxisMinimum(0);
-        lineChart.getAxisLeft().setAxisMaximum(100);
-        lineChart.getXAxis().setDrawGridLines(false);
-        lineChart.getXAxis().setDrawLabels(false);
-        lineChart.getAxisRight().setEnabled(false);
-        lineChart.getXAxis().setDrawLabels(false);
-        lineChart.getLegend().setEnabled(false);
-        lineChart.setDescription(null);
-
-        lineChart.invalidate();
-    }
-
-//    public void addGauges(View view) {
-//        if (!dataManager.isInitialised()) return;
-//
-//        GaugeView speedGauge = view.findViewById(R.id.speed_gauge);
-//        speedGauge.setRange(0,110);
-//        LiveDataGauge speedLiveData = new LiveDataGauge(speedGauge);
-//        dataManager.getSpeed().addDataInputListener( speedLiveData );
-//
-//
-//
-////        GaugeView engineSpeedGauge = view.findViewById(R.id.engineSpeed_gauge);
-////        engineSpeedGauge.setRange(0,8000);
-////        LiveDataGauge engineSpeedLiveData = new LiveDataGauge(engineSpeedGauge);
-////        dataManager.getEngineSpeed().addDataInputListener( engineSpeedLiveData );
-//
-//        GaugeView massAirFlowGauge = view.findViewById(R.id.maf_gauge);
-//        massAirFlowGauge.hideDial();
-//        LiveDataGauge massAirFlowLiveData = new LiveDataGauge(massAirFlowGauge);
-//        dataManager.getMassAirFlow().addDataInputListener( massAirFlowLiveData );
-//
-//        GaugeView fuelRateGauge = view.findViewById(R.id.fuelRate_gauge);
-//        fuelRateGauge.hideDial();
-//        LiveDataGauge fuelRateLiveData = new LiveDataGauge(fuelRateGauge);
-//        dataManager.getFuelRate().addDataInputListener( fuelRateLiveData );
-//
-////        GaugeView mpgGauge = view.findViewById(R.id.mpg_gauge);
-////        mpgGauge.hideDial();
-////        LiveDataGauge mpgLiveData = new LiveDataGauge(mpgGauge);
-////        derivedMpg.addDataInputListener( mpgLiveData );
-//    }
-
-    public void updateGraph(Timestamp timestamp) {
-
-        if (currentMpg == null) return;
-
-        Entry entry = new Entry((float)( timestamp.getTime() - startTimeOffset), currentMpg.floatValue());
-        dataSet.addEntry(entry);
-        lineData.notifyDataChanged();
-        lineChart.notifyDataSetChanged();
-        lineChart.setVisibleXRangeMinimum(20000);
-        lineChart.setVisibleXRangeMaximum(20000);
-        lineChart.moveViewToX(dataSet.getXMax());
-
-        currentMpg = null;
     }
 }

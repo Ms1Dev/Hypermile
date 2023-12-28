@@ -21,7 +21,6 @@ public class CalculatedFuelRate extends DataSource<Double> implements DataInputO
         notifyObservers(fuelRate);
     }
 
-    @Override
     public void setUnits(String units) {
         this.units = "L/h";
     }

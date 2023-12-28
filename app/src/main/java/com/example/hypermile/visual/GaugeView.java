@@ -90,12 +90,7 @@ public class GaugeView extends RelativeLayout {
             decimalPoints = attributes.getInt(R.styleable.GaugeView_decimalPlaces, 0);
             setUnit(unitLabel);
 
-            dial.setVisibility(View.GONE);
-            dialTrack.setVisibility(View.GONE);
-
-            if (attributes.getBoolean(R.styleable.GaugeView_showDial, true)) {
-                 showDial();
-            }
+            setDialVisibility(attributes.getBoolean(R.styleable.GaugeView_showDial, true));
         }
     }
 
@@ -121,8 +116,8 @@ public class GaugeView extends RelativeLayout {
     public void setRange(int min, int max) {
         this.min = min;
         this.max = max;
-        if (max > min) {
-            showDial();
+        if (max == min) {
+            setDialVisibility(false);
         }
     }
 
@@ -158,9 +153,9 @@ public class GaugeView extends RelativeLayout {
         unitLabel.setTextColor(colour);
     }
 
-    public void showDial() {
-        dial.setVisibility(View.VISIBLE);
-        dialTrack.setVisibility(View.VISIBLE);
+    public void setDialVisibility(boolean show) {
+        dial.setVisibility(show? View.VISIBLE : View.GONE);
+        dialTrack.setVisibility(show? View.VISIBLE : View.GONE);
     }
 
 }

@@ -27,9 +27,6 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
             public void incomingData(Double data) {
                 newManifoldAbsolutePressureData(data);
             }
-
-            @Override
-            public void setUnits(String units) {}
         });
 
         intakeTemperature.addDataInputListener( new DataInputObserver<Double>() {
@@ -37,9 +34,6 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
             public void incomingData(Double data) {
                 newIntakeTemperatureData(data);
             }
-
-            @Override
-            public void setUnits(String units) {}
         });
 
         engineSpeed.addDataInputListener( new DataInputObserver<Double>() {
@@ -47,9 +41,6 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
             public void incomingData(Double data) {
                 newEngineSpeedData(data);
             }
-
-            @Override
-            public void setUnits(String units) {}
         });
     }
 

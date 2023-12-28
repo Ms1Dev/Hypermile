@@ -4,128 +4,30 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
+    android:clipToPadding="false"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".LiveDataFragment">
 
     <TableLayout
         android:layout_width="match_parent"
         android:clipChildren="false"
+        android:clipToPadding="false"
         android:layout_height="match_parent">
 
         <TableRow
             android:id="@+id/tablerow_1"
             android:layout_width="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:layout_height="match_parent" >
-
-<!--            <androidx.cardview.widget.CardView-->
-<!--                style="@style/Card"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1">-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:orientation="vertical">-->
-
-<!--                    <com.example.hypermile.visual.GaugeView-->
-<!--                        android:id="@+id/speed_gauge"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        app:height="200dp"-->
-<!--                        app:width="200dp">-->
-
-<!--                    </com.example.hypermile.visual.GaugeView>-->
-
-<!--                    <TextView-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:gravity="center"-->
-<!--                        android:textSize="16sp"-->
-<!--                        android:layout_margin="10dp"-->
-<!--                        android:text="Vehicle speed" />-->
-
-<!--                </LinearLayout>-->
-<!--            </androidx.cardview.widget.CardView>-->
-
-<!--            <com.example.hypermile.visual.LiveDataGauge-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_width="match_parent"-->
-<!--                />-->
-
-<!--            <androidx.cardview.widget.CardView-->
-<!--                style="@style/Card"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_weight="1">-->
-
-<!--                <LinearLayout-->
-<!--                    android:layout_width="match_parent"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:orientation="vertical">-->
-
-<!--                    <com.example.hypermile.visual.GaugeView-->
-<!--                        android:id="@+id/engineSpeed_gauge"-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="match_parent"-->
-<!--                        app:height="200dp"-->
-<!--                        app:width="200dp">-->
-
-<!--                    </com.example.hypermile.visual.GaugeView>-->
-
-<!--                    <TextView-->
-<!--                        android:layout_width="match_parent"-->
-<!--                        android:layout_height="wrap_content"-->
-<!--                        android:gravity="center"-->
-<!--                        android:textSize="16sp"-->
-<!--                        android:layout_margin="10dp"-->
-<!--                        android:text="Engine Speed" />-->
-
-<!--                </LinearLayout>-->
-<!--            </androidx.cardview.widget.CardView>-->
         </TableRow>
 
         <TableRow
             android:id="@+id/tablerow_2"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <androidx.cardview.widget.CardView
-                style="@style/Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_span="2"
-                android:layout_weight="1">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:padding="10dp"
-                        android:background="@color/white"
-                        android:layout_height="match_parent">
-                        <com.github.mikephil.charting.charts.LineChart
-                            android:id="@+id/chart"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@color/white"
-                            android:minHeight="200dp" />
-                    </FrameLayout>
-                    <TextView
-                        android:id="@+id/textView3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:gravity="center"
-                        android:text="MPG"
-                        android:textSize="16sp" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
         </TableRow>
 
         <TableRow

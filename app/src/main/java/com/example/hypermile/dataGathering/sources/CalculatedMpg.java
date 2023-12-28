@@ -20,9 +20,6 @@ public class CalculatedMpg extends DataSource<Double> implements PollCompleteLis
             public void incomingData(Double data) {
                 newSpeedData(data);
             }
-
-            @Override
-            public void setUnits(String units) {}
         });
 
         fuelRate.addDataInputListener(new DataInputObserver<Double>() {
@@ -30,9 +27,6 @@ public class CalculatedMpg extends DataSource<Double> implements PollCompleteLis
             public void incomingData(Double data) {
                 newFuelData(data);
             }
-
-            @Override
-            public void setUnits(String units) {}
         });
     }
 
