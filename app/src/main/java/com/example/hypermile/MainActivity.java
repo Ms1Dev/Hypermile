@@ -161,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     .hide(reportsFragment)
                     .hide(liveDataFragment)
                     .commit();
-            alertUser(UserAlert.VEHICLE_SPEC_UNKNOWN);
             return true;
         }
         else if (item_id == R.id.live_data) {

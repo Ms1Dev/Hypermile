@@ -13,6 +13,8 @@ public class CalculatedFuelRate extends DataSource<Double> implements DataInputO
     public CalculatedFuelRate(DataSource<Double> massAirFlow) {
         this.massAirFlow = massAirFlow;
         massAirFlow.addDataInputListener(this);
+        units = "L/h";
+        name = "Fuel Rate";
     }
 
     @Override
@@ -20,9 +22,4 @@ public class CalculatedFuelRate extends DataSource<Double> implements DataInputO
         double fuelRate = data * 3600 / STOICHIOMETRIC_PETROL / DENSITY_PETROL_GRAM_LITRE;
         notifyObservers(fuelRate);
     }
-
-    public void setUnits(String units) {
-        this.units = "L/h";
-    }
-
 }

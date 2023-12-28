@@ -7,6 +7,7 @@ abstract public class DataSource<T> {
     protected String units;
     protected int minValue;
     protected int maxValue;
+    protected int decimalPoints = 0;
     protected T data;
     ArrayList<DataInputObserver<T>> dataInputObservers = new ArrayList<>();
 
@@ -56,6 +57,14 @@ abstract public class DataSource<T> {
 
     public void setMaxValue(int maxValue) {
         this.maxValue = maxValue;
+    }
+
+    public int getDecimalPoints() {
+        return decimalPoints;
+    }
+
+    public void setDecimalPoints(int decimalPoints) {
+        this.decimalPoints = decimalPoints;
     }
 
     public T getData() {

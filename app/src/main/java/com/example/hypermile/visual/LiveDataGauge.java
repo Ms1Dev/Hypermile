@@ -41,6 +41,7 @@ public class LiveDataGauge extends RelativeLayout implements DataInputObserver<D
         title.setText(dataSource.getName());
         gaugeView.setUnit(dataSource.getUnits());
         gaugeView.setRange(dataSource.getMinValue(), dataSource.getMaxValue());
+        gaugeView.setDecimalPoints(dataSource.getDecimalPoints());
     }
 
     private void initialise(Context context, AttributeSet attrs) {

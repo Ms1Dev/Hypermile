@@ -99,16 +99,20 @@ public class DataManager {
 
             if (massAirFlow != null) {
                 fuelRate = new CalculatedFuelRate(massAirFlow);
+                massAirFlow.setDecimalPoints(2);
             }
             else {
                 // TODO: warn user no fuel statistics
             }
 
-            if (fuelRate != null && speed != null) {
-                calculatedMpg = new CalculatedMpg(speed, fuelRate);
-            }
-            else {
-                // TODO: warn user no MPG
+            if (fuelRate != null){
+                fuelRate.setDecimalPoints(2);
+                if(speed != null) {
+                    calculatedMpg = new CalculatedMpg(speed, fuelRate);
+                }
+                else {
+                    // TODO: warn user no MPG
+                }
             }
 
             currentTimestamp = new CurrentTimestamp();

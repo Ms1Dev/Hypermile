@@ -32,7 +32,7 @@ public class LiveDataFragment extends Fragment {
 
     LiveDataGauge speedGauge;
     LiveDataGauge engineSpeedGauge;
-    LiveDataGauge mafGauge;
+    LiveDataGauge fuelRateGauge;
     LiveDataLineChart liveDataLineChart;
 
     long startTimeOffset;
@@ -72,8 +72,8 @@ public class LiveDataFragment extends Fragment {
         liveDataLineChart = new LiveDataLineChart(getContext());
         row_2.addView(liveDataLineChart);
 
-        mafGauge = new LiveDataGauge(getContext());
-        row_3.addView(mafGauge);
+        fuelRateGauge = new LiveDataGauge(getContext());
+        row_3.addView(fuelRateGauge);
 
         row_3.addView(getSpacer(getContext()));
 
@@ -97,7 +97,7 @@ public class LiveDataFragment extends Fragment {
             public void run() {
                 speedGauge.setDataSource(dataManager.getSpeed());
                 engineSpeedGauge.setDataSource(dataManager.getEngineSpeed());
-                mafGauge.setDataSource(dataManager.getMassAirFlow());
+                fuelRateGauge.setDataSource(dataManager.getFuelRate());
                 liveDataLineChart.setAxisSources(dataManager.getCurrentTimestamp(), dataManager.getCalculatedMpg());
             }
         });

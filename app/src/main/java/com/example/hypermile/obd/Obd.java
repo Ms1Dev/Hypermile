@@ -23,11 +23,11 @@ public class Obd {
         
         try {
             if (reset(connection)) {
-                Thread.sleep(200);
+                Thread.sleep(MINIMUM_RESPONSE_WAIT);
                 getSupportedPids();
-                Thread.sleep(200);
+                Thread.sleep(MINIMUM_RESPONSE_WAIT);
                 connection.sendCommand("0902\r");
-                Thread.sleep(200);
+                Thread.sleep(MINIMUM_RESPONSE_WAIT);
                 ready = true;
             }
         }
@@ -95,7 +95,7 @@ public class Obd {
                     }
                 }
             }
-            Thread.sleep(200);
+            Thread.sleep(MINIMUM_RESPONSE_WAIT);
         }
     }
 
