@@ -116,6 +116,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             startActivity(selectBluetoothIntent);
             return true;
         }
+        else if (item_id == R.id.car_details) {
+            Intent carDetailsIntent = new Intent(MainActivity.this, CarDetailsActivity.class);
+            startActivity(carDetailsIntent);
+            return true;
+        }
 
         return false;
     }

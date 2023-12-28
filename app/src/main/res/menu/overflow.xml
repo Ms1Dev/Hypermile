@@ -9,6 +9,10 @@
         android:title="Manage Bluetooth"
         />
     <item
+        android:id="@+id/car_details"
+        android:title="Car Details"
+        />
+    <item
         android:id="@+id/signout"
         android:title="Sign out"
         />

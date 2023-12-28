@@ -309,6 +309,10 @@ public class DataManager {
         return speed;
     }
 
+    public JSONObject getVehicleDetails() {
+        return vehicleDetails;
+    }
+
     public DataSource<Timestamp> getCurrentTimestamp() {
         return currentTimestamp;
     }
