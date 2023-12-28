@@ -122,12 +122,25 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 
     public void alertUser(UserAlert userAlert) {
+
         switch (userAlert) {
             case VEHICLE_SPEC_UNKNOWN:
-                Snackbar snackbar = Snackbar.make(this, getWindow().getDecorView(), "Insufficient Vehicle Information", Snackbar.LENGTH_LONG);
+                Snackbar snackbar = Snackbar.make(this, getWindow().getDecorView(), "Vehicle details need to be manually set", Snackbar.LENGTH_INDEFINITE);
+                snackbar.setAnchorView(findViewById(R.id.deviceStatusBar));
+                snackbar.setAction("Settings", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        launchSettings();
+                    }
+                });
                 snackbar.show();
                 break;
         }
+    }
+
+    private void launchSettings() {
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -148,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     .hide(reportsFragment)
                     .hide(liveDataFragment)
                     .commit();
+            alertUser(UserAlert.VEHICLE_SPEC_UNKNOWN);
             return true;
         }
         else if (item_id == R.id.live_data) {
@@ -166,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     .commit();
             return true;
         }
+
         return false;
     }
 
