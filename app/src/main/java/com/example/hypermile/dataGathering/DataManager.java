@@ -41,10 +41,10 @@ public class DataManager {
     private VehicleDataLogger engineSpeed;
     private VehicleDataLogger speed;
     private DataSource<Double> massAirFlow;
-    private DataSource<Double> fuelRate;
+    private CalculatedFuelRate fuelRate;
     private CalculatedMpg calculatedMpg;
-    private String fuelType;
-    private String engineCapacity;
+    private int fuelType = -1;
+    private int engineCapacity = -1;
     private JSONObject vehicleDetails;
     private static DataManager instance;
     private Context context;
@@ -107,6 +107,9 @@ public class DataManager {
 
             if (fuelRate != null){
                 fuelRate.setDecimalPoints(2);
+                if (fuelType != -1) {
+                    fuelRate.setFuelType(fuelType);
+                }
                 if(speed != null) {
                     calculatedMpg = new CalculatedMpg(speed, fuelRate);
                 }
@@ -130,7 +133,7 @@ public class DataManager {
 
             poller.start();
 
-            if (fuelType == null || (engineCapacity == null && engineCapacityRequired)) {
+            if (fuelType == -1 || (engineCapacity == -1 && engineCapacityRequired)) {
                 ((MainActivity) context).alertUser(UserAlert.VEHICLE_SPEC_UNKNOWN);
             }
 
@@ -140,23 +143,32 @@ public class DataManager {
 
     private void getVehicleSpecs(String vin) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        fuelType = sharedPreferences.getString(FUELTYPE_PREFERENCE, null);
-        engineCapacity = sharedPreferences.getString(ENGINESIZE_PREFERENCE, null);
 
-        if (fuelType == null) {
+        try {
+            fuelType = Integer.parseInt( sharedPreferences.getString(FUELTYPE_PREFERENCE, "-1") );
+        }
+        catch (NumberFormatException e) {}
+
+        try {
+            engineCapacity = Integer.parseInt( sharedPreferences.getString(ENGINESIZE_PREFERENCE, "-1") );
+        }
+        catch (NumberFormatException e) {}
+
+        if (fuelType == -1) {
             // try and get the fuel type from obd
             Parameter fuelTypeParam = Obd.getPid("51");
             if (fuelTypeParam != null) {
-                fuelType = String.valueOf(fuelTypeParam.getData()[0]);
+                fuelType = fuelTypeParam.getData()[0];
             }
         }
 
         vehicleDetails = getVehicleDetailsJSON("1FAFP53UX4A162757");
 
-        if ( fuelType == null || (engineCapacity == null && ( !(Obd.supportsPid("10") || Obd.supportsPid("66")) ) ) ) {
+        if ( fuelType == -1 || (engineCapacity == -1 && ( !(Obd.supportsPid("10") || Obd.supportsPid("66")) ) ) ) {
             try {
                 JSONObject engineDetails = vehicleDetails.getJSONObject("engine");
-                engineCapacity = String.valueOf(engineDetails.getInt("displacement"));
+                engineCapacity = engineDetails.getInt("displacement");
+                Log.d("TAG", "getVehicleSpecs: " + engineCapacity);
                 fuelType = translateFuelType(engineDetails.getString("type"));
             }
             catch (JSONException e) {}
@@ -168,15 +180,15 @@ public class DataManager {
         }
     }
 
-    private String translateFuelType(String fuelType) {
+    private int translateFuelType(String fuelType) {
         switch (fuelType) {
             case "gas":
             case "petrol":
-                return "petrol";
+                return 1;
             case "diesel":
-                return "diesel";
+                return 4;
         }
-        return null;
+        return -1;
     }
 
     private JSONObject getVehicleDetailsJSON(String vin) {
@@ -282,13 +294,13 @@ public class DataManager {
                     engineSpeed
             );
 
-            if (engineCapacity != null) {
-                calculatedMaf.setEngineDisplacementCC(Integer.parseInt(engineCapacity));
+            if (engineCapacity != -1) {
+                calculatedMaf.setEngineDisplacementCC(engineCapacity);
             }
 
-             poller.addPollingElement(manifoldAbsolutePressure);
-             poller.addPollingElement(intakeAirTemperature);
-             poller.addPollCompleteListener(calculatedMaf);
+            poller.addPollingElement(manifoldAbsolutePressure);
+            poller.addPollingElement(intakeAirTemperature);
+            poller.addPollCompleteListener(calculatedMaf);
 
             engineCapacityRequired = true;
             return calculatedMaf;
