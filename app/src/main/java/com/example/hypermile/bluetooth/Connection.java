@@ -27,10 +27,6 @@ public class Connection {
 
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
-
-    private final static int INPUT_BUFFER_SIZE = 1024;
-    private final static int SEARCH_FOR_PROTOCOL_TIMEOUT = 20000;
-    private final static int SEARCH_FOR_PROTOCOL_ATTEMPTS = 3;
     private static Connection instance;
     private ConnectionThread connectionThread;
     private InitConnThread initConnThread;
@@ -67,7 +63,7 @@ public class Connection {
     }
 
     public void autoConnectFailed() {
-        updateEventListeners(ConnectionState.BLUETOOTH_FAIL);
+        updateEventListeners(ConnectionState.ERROR);
     }
 
     public ConnectionState getConnectionState() {
@@ -138,7 +134,7 @@ public class Connection {
             initConnThread.cancel();
         }
 
-        updateEventListeners(ConnectionState.BLUETOOTH_CONNECTING);
+        updateEventListeners(ConnectionState.CONNECTING);
 
         initConnThread = new InitConnThread(bluetoothDevice);
         initConnThread.start();
@@ -154,9 +150,9 @@ public class Connection {
         connectionThread.start();
         isConnected = true;
 
-        updateEventListeners(ConnectionState.OBD_CONNECTING);
+        updateEventListeners(ConnectionState.CONNECTED);
 
-        updateEventListeners(Obd.initialise(getInstance())? ConnectionState.CONNECTED : ConnectionState.OBD_FAIL);
+        Obd.initialise(getInstance());
     }
 
 

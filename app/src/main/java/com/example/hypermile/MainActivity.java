@@ -23,25 +23,20 @@ import com.example.hypermile.bluetooth.ConnectionState;
 import com.example.hypermile.dataGathering.DataManager;
 import com.example.hypermile.dataGathering.sources.VehicleDataLogger;
 import com.example.hypermile.obd.Obd;
+import com.example.hypermile.visual.ConnectionStatusBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ConnectionEventListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
     LiveDataFragment liveDataFragment;
     HomeFragment homeFragment;
     ReportsFragment reportsFragment;
+    ConnectionStatusBar connectionStatusBar;
     BottomNavigationView bottomNavigationView;
     Toolbar toolbar;
-    TextView deviceStatus;
-    ImageView statusConnected;
-    ImageView statusDisconnected;
-    ProgressBar statusConnecting;
-    protected VehicleDataLogger engineSpeed;
-    protected VehicleDataLogger massAirFlow;
-    protected VehicleDataLogger speed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,22 +57,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.home);
 
-        deviceStatus = findViewById(R.id.deviceStatusText);
-        statusConnected = findViewById(R.id.statusBar_connected);
-        statusDisconnected = findViewById(R.id.statusBar_disconnected);
-        statusConnecting = findViewById(R.id.statusBar_connecting);
-
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         Connection connection = Connection.getInstance();
-        onStateChange(connection.getConnectionState());
-        connection.addConnectionEventListener(this);
         connection.connectToExisting(this);
+
+        connectionStatusBar = findViewById(R.id.connectionStatusBar);
+        connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
+        Obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
 
         ApiRequest.setContext(this);
 
-//        DataManager.getInstance().initialise();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -131,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         switch (userAlert) {
             case VEHICLE_SPEC_UNKNOWN:
                 Snackbar snackbar = Snackbar.make(this, getWindow().getDecorView(), "Vehicle details need to be manually set", Snackbar.LENGTH_INDEFINITE);
-                snackbar.setAnchorView(findViewById(R.id.deviceStatusBar));
+                snackbar.setAnchorView(findViewById(R.id.connectionStatusBar));
                 snackbar.setAction("Settings", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -191,57 +182,5 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private void signOut() {
         FirebaseAuth.getInstance().signOut();
         finish();
-    }
-
-    private void persistBluetoothDeviceMacAddress() {
-        String macAddress = Connection.getInstance().getBluetoothDevice().getAddress();
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString(PREFERENCE_DEVICE_MAC, macAddress).apply();
-    }
-
-    @Override
-    public void onStateChange(ConnectionState connectionState) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                statusConnected.setVisibility(View.INVISIBLE);
-                statusDisconnected.setVisibility(View.INVISIBLE);
-                statusConnecting.setVisibility(View.INVISIBLE);
-                LinearLayout statusBar = findViewById(R.id.deviceStatusBar);
-                switch (connectionState) {
-                    case CONNECTED:
-                        deviceStatus.setText("Connected");
-                        statusConnected.setVisibility(View.VISIBLE);
-                        statusBar.setBackgroundColor(getResources().getColor(R.color.secondary_container));
-                        persistBluetoothDeviceMacAddress();
-                        break;
-                    case BLUETOOTH_CONNECTING:
-                        deviceStatus.setText("Bluetooth Connecting");
-                        statusConnecting.setVisibility(View.VISIBLE);
-                        statusBar.setBackgroundColor(getResources().getColor(R.color.tertiary_container));
-                        break;
-                    case OBD_CONNECTING:
-                        deviceStatus.setText("OBD Connecting");
-                        statusConnecting.setVisibility(View.VISIBLE);
-                        statusBar.setBackgroundColor(getResources().getColor(R.color.tertiary_container));
-                        break;
-                    case DISCONNECTED:
-                        deviceStatus.setText("Disconnected");
-                        statusDisconnected.setVisibility(View.VISIBLE);
-                        statusBar.setBackgroundColor(getResources().getColor(R.color.error_container));
-                        break;
-                    case OBD_FAIL:
-                        deviceStatus.setText("OBD Fail");
-                        statusDisconnected.setVisibility(View.VISIBLE);
-                        statusBar.setBackgroundColor(getResources().getColor(R.color.error_container));
-                        break;
-                    case BLUETOOTH_FAIL:
-                        deviceStatus.setText("Bluetooth Fail");
-                        statusDisconnected.setVisibility(View.VISIBLE);
-                        statusBar.setBackgroundColor(getResources().getColor(R.color.error_container));
-                        break;
-                }
-            }
-        });
     }
 }

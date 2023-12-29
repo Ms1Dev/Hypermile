@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:layout_gravity="center_horizontal">
+
+    <ProgressBar
+        android:id="@+id/statusProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|center_vertical"/>
+
+    <FrameLayout
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_horizontal|center_vertical">
+
+        <FrameLayout
+            android:id="@+id/tickImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/tickCircle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                android:backgroundTint="@color/tertiary_container"
+                app:tint="@color/tertiary_container"
+                app:srcCompat="@drawable/bordered_circle" />
+
+            <ImageView
+                android:id="@+id/tick"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tint="@color/tertiary"
+                android:layout_margin="3dp"
+                app:srcCompat="@drawable/tick" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/crossImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/crossCircle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:tint="@color/tertiary_container"
+                android:layout_margin="2dp"
+                app:srcCompat="@drawable/bordered_circle" />
+
+            <ImageView
+                android:id="@+id/cross"
+                app:tint="@color/tertiary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/cross" />
+        </FrameLayout>
+
+    </FrameLayout>
+</FrameLayout>

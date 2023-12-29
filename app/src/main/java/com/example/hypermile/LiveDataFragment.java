@@ -1,5 +1,6 @@
 package com.example.hypermile;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 
@@ -92,7 +93,7 @@ public class LiveDataFragment extends Fragment {
     public void connectDataToGauges() {
         dataManager = DataManager.getInstance();
 
-        requireActivity().runOnUiThread(new Runnable() {
+        ((Activity) view.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 speedGauge.setDataSource(dataManager.getSpeed());

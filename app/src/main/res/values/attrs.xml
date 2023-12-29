@@ -12,4 +12,5 @@
         <attr name="decimalPlaces" format="integer"/>
         <attr name="showDial" format="boolean"/>
     </declare-styleable>
+
 </resources>

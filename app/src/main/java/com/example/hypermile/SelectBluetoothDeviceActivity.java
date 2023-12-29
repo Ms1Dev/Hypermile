@@ -96,7 +96,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
 
     @Override
     public void onStateChange(ConnectionState connectionState) {
-        if (connectionState == ConnectionState.BLUETOOTH_CONNECTING) {
+        if (connectionState == ConnectionState.CONNECTING) {
             try {
                 bluetoothAdapter.cancelDiscovery();
             }
@@ -226,5 +226,9 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
         selectedDevice.setSelected(false);
         selectedDevice = discoveredDevice;
         selectedDevice.setSelected(true);
+
+        String macAddress = selectedDevice.getMacAddress();
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        sharedPreferences.edit().putString(PREFERENCE_DEVICE_MAC, macAddress).apply();
     }
 }

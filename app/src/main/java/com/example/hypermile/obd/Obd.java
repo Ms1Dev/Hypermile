@@ -3,8 +3,11 @@ package com.example.hypermile.obd;
 import android.util.Log;
 
 import com.example.hypermile.bluetooth.Connection;
+import com.example.hypermile.bluetooth.ConnectionEventListener;
+import com.example.hypermile.bluetooth.ConnectionState;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class Obd {
@@ -16,11 +19,12 @@ public class Obd {
     private static int errors = 0;
     private static boolean ready = false;
     private static final TreeMap<String, Parameter> supportedPids = new TreeMap<>();
+    final static private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
+    private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
 
     public static boolean initialise(Connection connection) {
         // elm327 documentation
         // https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
-        
         try {
             if (reset(connection)) {
                 Thread.sleep(MINIMUM_RESPONSE_WAIT);
@@ -33,11 +37,14 @@ public class Obd {
         }
         catch (InterruptedException | IOException e) {
             ready = false;
+            updateEventListeners(ConnectionState.ERROR);
         }
+        updateEventListeners(ready? ConnectionState.CONNECTED : ConnectionState.ERROR);
         return ready;
     }
 
     private static boolean reset(Connection connection) throws IOException, InterruptedException {
+        updateEventListeners(ConnectionState.CONNECTING);
         connection.sendCommand("ATD\r"); // set all defaults
         connection.sendCommand("ATWS\r"); // reset
         connection.sendCommand("ATE0\r"); // echo command off
@@ -45,6 +52,21 @@ public class Obd {
         connection.sendCommand("ATS1\r"); // spaces between bytes on
         connection.sendCommand("ATH1\r"); // headers on
         return findProtocol(connection);
+    }
+
+    public static void addConnectionEventListener(ConnectionEventListener connectionEventListener) {
+        connectionEventListeners.add(connectionEventListener);
+    }
+
+    public static void removeConnectionEventListener(ConnectionEventListener connectionEventListener) {
+        connectionEventListeners.remove(connectionEventListener);
+    }
+
+    private static void updateEventListeners(ConnectionState connectionState) {
+        Obd.connectionState = connectionState;
+        for (ConnectionEventListener eventListener : connectionEventListeners) {
+            eventListener.onStateChange(connectionState);
+        }
     }
 
     public static Parameter getPid(String pid) {
@@ -152,6 +174,7 @@ public class Obd {
                 catch (InterruptedException | IOException e) {
                     ready = false;
                 }
+                updateEventListeners(ready? ConnectionState.CONNECTED : ConnectionState.ERROR);
                 errors = 0;
             }
         }
