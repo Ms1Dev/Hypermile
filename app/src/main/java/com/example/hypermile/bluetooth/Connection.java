@@ -220,13 +220,19 @@ public class Connection {
         public void run() {
             try {
                 bluetoothSocket.connect();
-            } catch (IOException | SecurityException connectException) {
-                updateEventListeners(ConnectionState.DISCONNECTED);
+            }
+            catch (IOException | SecurityException connectException) {
+                updateEventListeners(ConnectionState.ERROR);
                 try {
                     bluetoothSocket.close();
                 } catch (IOException closeException) {
                     Log.e("Err", "Could not close the client socket", closeException);
                 }
+                return;
+            }
+            catch (NullPointerException e) {
+                Log.e("Err", "Bluetooth socket is null, bluetooth possibly turned off: ", e);
+                updateEventListeners(ConnectionState.ERROR);
                 return;
             }
             manageConnection(bluetoothSocket);
