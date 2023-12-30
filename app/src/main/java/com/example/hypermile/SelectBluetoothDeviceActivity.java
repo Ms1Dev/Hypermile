@@ -232,7 +232,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
 
     @Override
     public void deviceSelected(DiscoveredDevice discoveredDevice) {
-        Connection.getInstance().createConnection(discoveredDevice.getBluetoothDevice());
+        Connection.getInstance().manuallySelectedConnection(discoveredDevice.getBluetoothDevice());
         selectedDevice.setSelected(false);
         selectedDevice = discoveredDevice;
         selectedDevice.setSelected(true);

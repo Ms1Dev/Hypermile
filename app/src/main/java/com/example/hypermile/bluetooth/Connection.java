@@ -117,14 +117,18 @@ public class Connection {
     }
 
 
+    public void manuallySelectedConnection(BluetoothDevice bluetoothDevice) {
+        autoConnectAttempts = 0;
+        createConnection(bluetoothDevice);
+    }
+
     /**
      * Attempts to create connection with a bluetooth device
      * @param bluetoothDevice
      */
-    public void createConnection(BluetoothDevice bluetoothDevice) {
+    private void createConnection(BluetoothDevice bluetoothDevice) {
         if (bluetoothDevice == null) return;
         this.bluetoothDevice = bluetoothDevice;
-        autoConnectAttempts = 0;
 
         if (connectionThread != null) {
             connectionThread.cancel();

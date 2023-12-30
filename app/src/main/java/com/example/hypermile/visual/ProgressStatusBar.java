@@ -19,6 +19,7 @@ public class ProgressStatusBar extends RelativeLayout implements ConnectionEvent
     ProgressBar progressStatusBar;
     FrameLayout tickImage;
     FrameLayout crossImage;
+    FrameLayout errorImage;
 
     public ProgressStatusBar(Context context) {
         super(context);
@@ -40,6 +41,7 @@ public class ProgressStatusBar extends RelativeLayout implements ConnectionEvent
         progressStatusBar = view.findViewById(R.id.statusProgressBar);
         tickImage = view.findViewById(R.id.tickImage);
         crossImage = view.findViewById(R.id.crossImage);
+        errorImage = view.findViewById(R.id.errorImage);
 
         stateDisconnected();
     }
@@ -71,6 +73,7 @@ public class ProgressStatusBar extends RelativeLayout implements ConnectionEvent
                 progressStatusBar.setProgress(0);
                 tickImage.setVisibility(View.INVISIBLE);
                 crossImage.setVisibility(View.VISIBLE);
+                errorImage.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -84,6 +87,7 @@ public class ProgressStatusBar extends RelativeLayout implements ConnectionEvent
                 progressStatusBar.setProgress(100);
                 tickImage.setVisibility(View.VISIBLE);
                 crossImage.setVisibility(View.INVISIBLE);
+                errorImage.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -96,6 +100,7 @@ public class ProgressStatusBar extends RelativeLayout implements ConnectionEvent
                 progressStatusBar.setScaleY((float)0.75);
                 tickImage.setVisibility(View.INVISIBLE);
                 crossImage.setVisibility(View.INVISIBLE);
+                errorImage.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -109,8 +114,8 @@ public class ProgressStatusBar extends RelativeLayout implements ConnectionEvent
                 progressStatusBar.setProgress(0);
                 tickImage.setVisibility(View.INVISIBLE);
                 crossImage.setVisibility(View.INVISIBLE);
+                errorImage.setVisibility(View.VISIBLE);
             }
         });
     }
-
 }

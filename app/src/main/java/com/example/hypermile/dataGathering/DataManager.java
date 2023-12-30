@@ -62,7 +62,10 @@ public class DataManager {
         if (!initialised) {
             this.context = context.getApplicationContext();
 
-            getVehicleSpecs(Obd.getVin());
+            String vin = Obd.getVin();
+            if (vin != null) {
+                getVehicleSpecs(Obd.getVin());
+            }
 
             Poller poller = new Poller(1);
 

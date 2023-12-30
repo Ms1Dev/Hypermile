@@ -63,5 +63,27 @@
                 app:srcCompat="@drawable/cross" />
         </FrameLayout>
 
+        <FrameLayout
+            android:id="@+id/errorImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/errorCircle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:tint="@color/tertiary_container"
+                android:layout_margin="2dp"
+                app:srcCompat="@drawable/bordered_circle" />
+
+            <ImageView
+                android:id="@+id/error"
+                app:tint="@color/tertiary"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/exclamation" />
+        </FrameLayout>
+
     </FrameLayout>
 </FrameLayout>

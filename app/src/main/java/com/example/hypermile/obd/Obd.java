@@ -127,7 +127,10 @@ public class Obd {
 
     public static String getVin() {
         byte[] vin = requestObdData("0902\r".getBytes());
-        return new String(vin);
+        if (vin != null) {
+            return new String(vin);
+        }
+        return null;
     }
 
     public static byte[] requestObdData(byte[] requestCode) {
