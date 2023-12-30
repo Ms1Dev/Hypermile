@@ -48,6 +48,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
 
     BluetoothAdapter bluetoothAdapter;
     private DiscoveredDeviceSectionHeader discoveredDevicesHeader;
+    boolean permissionsGranted = false;
 
     /**
      * This listens out for bluetooth adapter actions. Adds a device to the discovered device list when found.
@@ -117,6 +118,18 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             permissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN);
+        }
+
+        if (
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
+        ){
+            permissionsGranted = false;
+            finish();
+            return;
+        }
+        else {
+            permissionsGranted = true;
         }
 
         // get the bluetooth adapter
@@ -216,7 +229,13 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
         ConnectionState currentState = Connection.getInstance().getConnectionState();
         Intent returnIntent = new Intent();
         returnIntent.putExtra(MainActivity.CONNECTION_STATE, currentState);
-        setResult(Activity.RESULT_OK, returnIntent);
+        if (permissionsGranted) {
+            setResult(Activity.RESULT_OK, returnIntent);
+        }
+        else {
+            setResult(Activity.RESULT_CANCELED);
+        }
+
         super.finish();
     }
 
@@ -226,8 +245,12 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(receiver);
+        try {
+            unregisterReceiver(receiver);
+        }
+        catch (IllegalArgumentException e) {
 
+        }
     }
 
     @Override

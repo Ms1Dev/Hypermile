@@ -8,11 +8,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -69,27 +72,36 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Connection connection = Connection.getInstance();
-        connection.connectToExisting(this);
 
-        connectionStatusBar = findViewById(R.id.connectionStatusBar);
-        connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
-        Obd obd = Obd.getInstance();
-        connection.addConnectionEventListener(obd);
-        obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
+        if (
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
+        ){
+            Connection connection = Connection.getInstance();
+            connection.connectToExisting(this);
 
-        connection.addConnectionEventListener(this);
+            connectionStatusBar = findViewById(R.id.connectionStatusBar);
+            connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
+            Obd obd = Obd.getInstance();
+            connection.addConnectionEventListener(obd);
+            obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
 
-        ApiRequest.setContext(this);
+            connection.addConnectionEventListener(this);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Obd obd = Obd.getInstance();
-                while (!obd.isReady());
-                obdReady();
-            }
-        }).start();
+            ApiRequest.setContext(this);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Obd obd = Obd.getInstance();
+                    while (!obd.isReady());
+                    obdReady();
+                }
+            }).start();
+        }
+        else {
+            alertUser(UserAlert.BLUETOOTH_PERMISSION_NOT_GRANTED);
+        }
     }
 
     @Override
@@ -141,6 +153,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             if (resultCode == Activity.RESULT_OK && intent != null) {
                 return (ConnectionState) intent.getSerializableExtra(CONNECTION_STATE);
             }
+            else if (resultCode == Activity.RESULT_CANCELED) {
+                alertUser(UserAlert.BLUETOOTH_PERMISSION_NOT_GRANTED);
+            }
             return null;
         }
     }, new ActivityResultCallback<ConnectionState>() {
@@ -154,20 +169,30 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
 
     public void alertUser(UserAlert userAlert) {
-
+        Snackbar snackbar = null;
         switch (userAlert) {
             case VEHICLE_SPEC_UNKNOWN:
-                Snackbar snackbar = Snackbar.make(this, getWindow().getDecorView(), "Vehicle details need to be manually set", Snackbar.LENGTH_INDEFINITE);
-                snackbar.setAnchorView(findViewById(R.id.connectionStatusBar));
+                snackbar = Snackbar.make(this, getWindow().getDecorView(), "Vehicle details need to be manually set", Snackbar.LENGTH_INDEFINITE);
                 snackbar.setAction("Settings", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         launchSettings();
                     }
                 });
-                snackbar.show();
+                break;
+            case BLUETOOTH_PERMISSION_NOT_GRANTED:
+                snackbar = Snackbar.make(this, getWindow().getDecorView(), "Bluetooth permissions required", Snackbar.LENGTH_INDEFINITE);
+                Snackbar finalSnackbar = snackbar;
+                snackbar.setAction("OK", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        finalSnackbar.dismiss();
+                    }
+                });
                 break;
         }
+        snackbar.setAnchorView(findViewById(R.id.connectionStatusBar));
+        snackbar.show();
     }
 
     private void launchSettings() {
