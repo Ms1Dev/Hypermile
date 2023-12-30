@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-public class Obd {
+public class Obd implements ConnectionEventListener {
     private final static int SEARCH_FOR_PROTOCOL_TIMEOUT = 20000;
     private final static int SEARCH_FOR_PROTOCOL_ATTEMPTS = 3;
     private final static int MINIMUM_RESPONSE_WAIT = 150;
@@ -21,8 +21,16 @@ public class Obd {
     private static final TreeMap<String, Parameter> supportedPids = new TreeMap<>();
     final static private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
     private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
+    private static Obd instance;
+    public static Obd getInstance() {
+        if (instance == null) {
+            instance = new Obd();
+        }
+        return instance;
+    }
+    private Obd() {}
 
-    public static boolean initialise(Connection connection) {
+    public boolean initialise(Connection connection) {
         // elm327 documentation
         // https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
         try {
@@ -43,8 +51,8 @@ public class Obd {
         return ready;
     }
 
-    private static boolean reset(Connection connection) throws IOException, InterruptedException {
-        updateEventListeners(ConnectionState.CONNECTING);
+    private boolean reset(Connection connection) throws IOException, InterruptedException {
+            updateEventListeners(ConnectionState.CONNECTING);
         connection.sendCommand("ATD\r"); // set all defaults
         connection.sendCommand("ATWS\r"); // reset
         connection.sendCommand("ATE0\r"); // echo command off
@@ -54,26 +62,26 @@ public class Obd {
         return findProtocol(connection);
     }
 
-    public static void addConnectionEventListener(ConnectionEventListener connectionEventListener) {
+    public void addConnectionEventListener(ConnectionEventListener connectionEventListener) {
         connectionEventListeners.add(connectionEventListener);
     }
 
-    public static void removeConnectionEventListener(ConnectionEventListener connectionEventListener) {
+    public void removeConnectionEventListener(ConnectionEventListener connectionEventListener) {
         connectionEventListeners.remove(connectionEventListener);
     }
 
-    private static void updateEventListeners(ConnectionState connectionState) {
+    private void updateEventListeners(ConnectionState connectionState) {
         Obd.connectionState = connectionState;
         for (ConnectionEventListener eventListener : connectionEventListeners) {
             eventListener.onStateChange(connectionState);
         }
     }
 
-    public static Parameter getPid(String pid) {
+    public Parameter getPid(String pid) {
         return supportedPids.get(pid);
     }
 
-    private static boolean findProtocol(Connection connection) throws IOException, InterruptedException {
+    private boolean findProtocol(Connection connection) throws IOException, InterruptedException {
 
         int attempts = 0;
 
@@ -96,11 +104,11 @@ public class Obd {
         return false;
     }
 
-    private static void getSupportedPids() throws InterruptedException {
+    private void getSupportedPids() throws InterruptedException {
         for (int i = 0x00; i <= 0xC8; i += 0x20) {
             String request = String.format("01%02x\r", i);
 
-            byte[] response = requestObdData(request.getBytes());
+            byte[] response = requestData(request.getBytes());
 
             if (response == null) break;
             if (response.length != 4) break;
@@ -111,9 +119,6 @@ public class Obd {
                         byte supportedPid = (byte) (i + j * 8 + (8 - k));
                         Parameter parameter = new Parameter(supportedPid);
                         supportedPids.put(parameter.asString(), parameter);
-
-                        Log.d("TAG", "Supported Pid: " + parameter.asString());
-
                     }
                 }
             }
@@ -121,19 +126,24 @@ public class Obd {
         }
     }
 
-    public static boolean supportsPid(String pid) {
+    public boolean supportsPid(String pid) {
         return supportedPids.containsKey(pid);
     }
 
-    public static String getVin() {
-        byte[] vin = requestObdData("0902\r".getBytes());
+    public String getVin() {
+        byte[] vin = requestData("0902\r".getBytes());
         if (vin != null) {
             return new String(vin);
         }
         return null;
     }
 
-    public static byte[] requestObdData(byte[] requestCode) {
+    public byte[] requestObdData(byte[] requestCode) {
+        if (!ready) return null;
+        return requestData(requestCode);
+    }
+
+    private byte[] requestData(byte[] requestCode) {
         Connection connection = Connection.getInstance();
 
         connection.send(requestCode);
@@ -152,7 +162,12 @@ public class Obd {
         return null;
     }
 
-    public static byte[] requestObdData(Parameter parameter) {
+    public byte[] requestObdData(Parameter parameter) {
+        if (!ready) return null;
+        return requestData(parameter);
+    }
+
+    private byte[] requestData(Parameter parameter) {
         Connection connection = Connection.getInstance();
 
         connection.send(parameter.getRequestCode());
@@ -185,7 +200,23 @@ public class Obd {
         return null;
     }
 
-    public static boolean isReady() {
+    public boolean isReady() {
         return ready;
+    }
+
+    @Override
+    public void onStateChange(ConnectionState connectionState) {
+        if (connectionState != ConnectionState.CONNECTED) {
+            ready = false;
+            updateEventListeners(ConnectionState.DISCONNECTED);
+        }
+        else if (connectionState == ConnectionState.CONNECTED && !ready) {
+            Connection connection = Connection.getInstance();
+            try {
+                reset(connection);
+            } catch (IOException | InterruptedException e) {
+                updateEventListeners(ConnectionState.ERROR);
+            }
+        }
     }
 }

@@ -156,7 +156,7 @@ public class Connection {
 
         updateEventListeners(ConnectionState.CONNECTED);
 
-        Obd.initialise(getInstance());
+        Obd.getInstance().initialise(getInstance());
     }
 
 

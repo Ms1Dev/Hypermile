@@ -18,8 +18,9 @@ public class Parameter {
     }
 
     public byte[] getData() {
-        if (Obd.isReady()) {
-            return Obd.requestObdData(this);
+        Obd obd = Obd.getInstance();
+        if (obd.isReady()) {
+            return obd.requestObdData(this);
         }
         return null;
     }

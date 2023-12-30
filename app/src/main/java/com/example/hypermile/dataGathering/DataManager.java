@@ -49,6 +49,7 @@ public class DataManager {
     private static DataManager instance;
     private Context context;
     private boolean initialised = false;
+    Obd obd;
     private boolean engineCapacityRequired = true;
     private DataManager(){};
     public static DataManager getInstance() {
@@ -61,15 +62,16 @@ public class DataManager {
     public void initialise(Context context) {
         if (!initialised) {
             this.context = context.getApplicationContext();
+            obd = Obd.getInstance();
 
-            String vin = Obd.getVin();
+            String vin = obd.getVin();
             if (vin != null) {
-                getVehicleSpecs(Obd.getVin());
+                getVehicleSpecs(obd.getVin());
             }
 
             Poller poller = new Poller(1);
 
-            Parameter speedParameter = Obd.getPid("0D");
+            Parameter speedParameter = obd.getPid("0D");
             if (speedParameter != null) {
                 speed = new VehicleDataLogger(
                         speedParameter,
@@ -82,7 +84,7 @@ public class DataManager {
                 speed.setMaxValue(120);
             }
 
-            Parameter rpmParameter = Obd.getPid("0C");
+            Parameter rpmParameter = obd.getPid("0C");
             if (rpmParameter != null) {
                 engineSpeed = new VehicleDataLogger(
                         rpmParameter,
@@ -159,7 +161,7 @@ public class DataManager {
 
         if (fuelType == -1) {
             // try and get the fuel type from obd
-            Parameter fuelTypeParam = Obd.getPid("51");
+            Parameter fuelTypeParam = obd.getPid("51");
             if (fuelTypeParam != null) {
                 fuelType = fuelTypeParam.getData()[0];
             }
@@ -167,7 +169,7 @@ public class DataManager {
 
         vehicleDetails = getVehicleDetailsJSON("1FAFP53UX4A162757");
 
-        if ( fuelType == -1 || (engineCapacity == -1 && ( !(Obd.supportsPid("10") || Obd.supportsPid("66")) ) ) ) {
+        if ( fuelType == -1 || (engineCapacity == -1 && ( !(obd.supportsPid("10") || obd.supportsPid("66")) ) ) ) {
             try {
                 JSONObject engineDetails = vehicleDetails.getJSONObject("engine");
                 engineCapacity = engineDetails.getInt("displacement");
@@ -239,7 +241,7 @@ public class DataManager {
 
     private DataSource<Double> getMassAirFlowSource(Poller poller) {
 
-        Parameter maf = Obd.getPid("10");
+        Parameter maf = obd.getPid("10");
         if (maf != null) {
             VehicleDataLogger massAirFlow = new VehicleDataLogger(
                     maf,
@@ -255,7 +257,7 @@ public class DataManager {
         }
 
         // this is an alternative MAF sensor
-        Parameter mafSensor = Obd.getPid("66");
+        Parameter mafSensor = obd.getPid("66");
         if (mafSensor != null) {
             VehicleDataLogger massAirFlow = new MassAirFlowSensor(
                     mafSensor,
@@ -271,8 +273,8 @@ public class DataManager {
         }
 
         // if no MAF sensors then do it the hard way
-        Parameter manifoldPressure = Obd.getPid("0B");
-        Parameter intakeTemperature = Obd.getPid("0F");
+        Parameter manifoldPressure = obd.getPid("0B");
+        Parameter intakeTemperature = obd.getPid("0F");
 
         if (manifoldPressure != null && intakeTemperature != null && engineSpeed != null) {
             VehicleDataLogger manifoldAbsolutePressure = new VehicleDataLogger(

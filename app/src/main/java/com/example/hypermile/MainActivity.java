@@ -74,7 +74,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         connectionStatusBar = findViewById(R.id.connectionStatusBar);
         connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
-        Obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
+        Obd obd = Obd.getInstance();
+        connection.addConnectionEventListener(obd);
+        obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
 
         connection.addConnectionEventListener(this);
 
@@ -83,7 +85,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!Obd.isReady());
+                Obd obd = Obd.getInstance();
+                while (!obd.isReady());
                 obdReady();
             }
         }).start();
