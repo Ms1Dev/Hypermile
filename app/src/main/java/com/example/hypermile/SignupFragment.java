@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
  * Use the {@link SignupFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SignupFragment extends Fragment {
+public class SignupFragment extends Fragment implements AuthRequester {
     View view;
     EditText usernameField;
     EditText passwordField;
@@ -52,7 +52,7 @@ public class SignupFragment extends Fragment {
                 String password = passwordField.getText().toString();
 
                 if (!username.isEmpty() && !password.isEmpty()) {
-                    showErrorMessage(authenticationActivity.registerUser(username,password));
+                    showErrorMessage(authenticationActivity.registerUser(username,password, SignupFragment.this));
                 }
                 else {
                     showErrorMessage("Username and password cannot be empty");
@@ -65,10 +65,15 @@ public class SignupFragment extends Fragment {
 
     private void showErrorMessage(String message) {
         if (message != null && !message.isEmpty()) {
-            LinearLayout errorMessage = (LinearLayout) view.findViewById(R.id.errorMessage);
-            TextView messageContent = (TextView) view.findViewById(R.id.errorMessageContent);
+            LinearLayout errorMessage = view.findViewById(R.id.errorMessage);
+            TextView messageContent = view.findViewById(R.id.errorMessageContent);
             errorMessage.setVisibility(View.VISIBLE);
             messageContent.setText(message);
         }
+    }
+
+    @Override
+    public void authError(String errorMessage) {
+        showErrorMessage(errorMessage);
     }
 }

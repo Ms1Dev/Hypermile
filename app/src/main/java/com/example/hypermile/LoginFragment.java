@@ -10,7 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class LoginFragment extends android.app.Fragment {
+public class LoginFragment extends android.app.Fragment implements AuthRequester {
     View view;
     EditText usernameField;
     EditText passwordField;
@@ -42,10 +42,8 @@ public class LoginFragment extends android.app.Fragment {
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
 
-                boolean loginSuccess = false;
-
                 if (!username.isEmpty() && !password.isEmpty()) {
-                    showErrorMessage(authenticationActivity.loginUser(username,password));
+                    showErrorMessage(authenticationActivity.loginUser(username,password,LoginFragment.this));
                 }
                 else {
                     showErrorMessage("Username and password cannot be empty");
@@ -58,10 +56,15 @@ public class LoginFragment extends android.app.Fragment {
 
     private void showErrorMessage(String message) {
         if (message != null && !message.isEmpty()) {
-            LinearLayout errorMessage = (LinearLayout) view.findViewById(R.id.errorMessage);
-            TextView messageContent = (TextView) view.findViewById(R.id.errorMessageContent);
+            LinearLayout errorMessage = view.findViewById(R.id.errorMessage);
+            TextView messageContent = view.findViewById(R.id.errorMessageContent);
             errorMessage.setVisibility(View.VISIBLE);
             messageContent.setText(message);
         }
+    }
+
+    @Override
+    public void authError(String errorMessage) {
+        showErrorMessage(errorMessage);
     }
 }

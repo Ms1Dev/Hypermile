@@ -29,6 +29,8 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.Objects;
+
 
 public class AuthenticationActivity extends AppCompatActivity {
 
@@ -64,7 +66,8 @@ public class AuthenticationActivity extends AppCompatActivity {
         fragmentTransaction.commit(); // save the changes
     }
 
-    public String registerUser(String email, String password) {
+
+    public String registerUser(String email, String password, AuthRequester authRequester) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
@@ -75,14 +78,14 @@ public class AuthenticationActivity extends AppCompatActivity {
                         Log.d("debug","Workeddd");
                     }
                     else {
-                        errorMessage = translateException(task.getException());
+                        authRequester.authError(translateException(task.getException()));
                     }
                 }
             });
         return errorMessage;
     }
 
-    public String loginUser(String email, String password) {
+    public String loginUser(String email, String password, AuthRequester authRequester) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
@@ -92,7 +95,7 @@ public class AuthenticationActivity extends AppCompatActivity {
                         startMainActivity();
                     }
                     else {
-                        errorMessage = translateException(task.getException());
+                        authRequester.authError(translateException(task.getException()));
                     }
                 }
             });
@@ -107,16 +110,20 @@ public class AuthenticationActivity extends AppCompatActivity {
         }
     }
 
-
     private String translateException(Exception exception) {
         try {
             throw exception;
         }
         catch (FirebaseAuthException ex) {
-            return exception.getMessage();
+            return ex.getMessage();
         }
         catch (Exception ex) {
-            return ex.getMessage();
+            if (Objects.requireNonNull(ex.getMessage()).contains("INVALID_LOGIN_CREDENTIALS")) {
+                return "Invalid username or password.";
+            }
+            else {
+                return ex.getMessage();
+            }
         }
     }
 }
