@@ -101,35 +101,31 @@ public class DiscoveredDevice implements DiscoveredDeviceListElement, Connection
 
     @Override
     public void onStateChange(ConnectionState connectionState) {
+
         if (connectedTick == null || progressBar == null || noConnection == null) return;
-//        ((Activity) view.getContext()).runOnUiThread(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                switch (connectionState) {
-//                    case CONNECTED:
-//                        connectedTick.setVisibility(View.VISIBLE);
-//                        progressBar.setVisibility(View.INVISIBLE);
-//                        noConnection.setVisibility(View.INVISIBLE);
-//
-//                        break;
-//                    case BLUETOOTH_CONNECTING:
-//                    case OBD_CONNECTING:
-//                        progressBar.setVisibility(View.VISIBLE);
-//                        connectedTick.setVisibility(View.INVISIBLE);
-//                        noConnection.setVisibility(View.INVISIBLE);
-//
-//                        break;
-//                    case BLUETOOTH_FAIL:
-//                    case OBD_FAIL:
-//                        noConnection.setVisibility(View.VISIBLE);
-//                        connectedTick.setVisibility(View.INVISIBLE);
-//                        progressBar.setVisibility(View.INVISIBLE);
-//                        break;
-//
-//                }
-//            }
-//        });
+        ((Activity) view.getContext()).runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                switch (connectionState) {
+                    case CONNECTED:
+                        connectedTick.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
+                        noConnection.setVisibility(View.INVISIBLE);
+                        break;
+                    case CONNECTING:
+                        progressBar.setVisibility(View.VISIBLE);
+                        connectedTick.setVisibility(View.INVISIBLE);
+                        noConnection.setVisibility(View.INVISIBLE);
+                        break;
+                    case DISCONNECTED:
+                        noConnection.setVisibility(View.VISIBLE);
+                        connectedTick.setVisibility(View.INVISIBLE);
+                        progressBar.setVisibility(View.INVISIBLE);
+                        break;
+                }
+            }
+        });
 
 
     }

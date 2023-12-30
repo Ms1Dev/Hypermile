@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -210,6 +211,14 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
         return true;
     }
 
+    @Override
+    public void finish() {
+        ConnectionState currentState = Connection.getInstance().getConnectionState();
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra(MainActivity.CONNECTION_STATE, currentState);
+        setResult(Activity.RESULT_OK, returnIntent);
+        super.finish();
+    }
 
     /**
      * Unregisters the broadcast receiver on destroy
@@ -218,6 +227,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(receiver);
+
     }
 
     @Override
@@ -226,9 +236,5 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
         selectedDevice.setSelected(false);
         selectedDevice = discoveredDevice;
         selectedDevice.setSelected(true);
-
-        String macAddress = selectedDevice.getMacAddress();
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
-        sharedPreferences.edit().putString(PREFERENCE_DEVICE_MAC, macAddress).apply();
     }
 }

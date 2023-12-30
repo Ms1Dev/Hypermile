@@ -1,13 +1,21 @@
 package com.example.hypermile;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,9 +36,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ConnectionEventListener {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
+    public final static String CONNECTION_STATE = "com.example.hypermile.CONNECTION_STATE";
     LiveDataFragment liveDataFragment;
     HomeFragment homeFragment;
     ReportsFragment reportsFragment;
@@ -66,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         connectionStatusBar = findViewById(R.id.connectionStatusBar);
         connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
         Obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
+
+        connection.addConnectionEventListener(this);
 
         ApiRequest.setContext(this);
 
@@ -103,8 +114,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             return true;
         }
         else if (item_id == R.id.bluetooth) {
-            Intent selectBluetoothIntent = new Intent(MainActivity.this, SelectBluetoothDeviceActivity.class);
-            startActivity(selectBluetoothIntent);
+            selectBluetoothActivityLauncher.launch(null);
             return true;
         }
         else if (item_id == R.id.car_details) {
@@ -115,6 +125,29 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         return false;
     }
+
+
+    ActivityResultLauncher<Void> selectBluetoothActivityLauncher = registerForActivityResult(new ActivityResultContract<Void, ConnectionState>() {
+        @NonNull
+        @Override
+        public Intent createIntent(@NonNull Context context, Void unused) {
+            return new Intent(MainActivity.this, SelectBluetoothDeviceActivity.class);
+        }
+        @Override
+        public ConnectionState parseResult(int resultCode, @Nullable Intent intent) {
+            if (resultCode == Activity.RESULT_OK && intent != null) {
+                return (ConnectionState) intent.getSerializableExtra(CONNECTION_STATE);
+            }
+            return null;
+        }
+    }, new ActivityResultCallback<ConnectionState>() {
+        @Override
+        public void onActivityResult(ConnectionState result) {
+            if (result != null) {
+                connectionStatusBar.getBlueToothConnectionListener().onStateChange(result);
+            }
+        }
+    });
 
 
     public void alertUser(UserAlert userAlert) {
@@ -182,5 +215,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private void signOut() {
         FirebaseAuth.getInstance().signOut();
         finish();
+    }
+
+    @Override
+    public void onStateChange(ConnectionState connectionState) {
+        if (connectionState == ConnectionState.CONNECTED) {
+            String macAddress = Connection.getInstance().getBluetoothDevice().getAddress();
+            SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+            sharedPreferences.edit().putString(PREFERENCE_DEVICE_MAC, macAddress).apply();
+        }
     }
 }
