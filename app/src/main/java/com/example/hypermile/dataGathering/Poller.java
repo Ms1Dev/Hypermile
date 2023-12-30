@@ -2,8 +2,6 @@ package com.example.hypermile.dataGathering;
 
 import android.util.Log;
 
-import com.example.hypermile.bluetooth.Connection;
-
 import java.util.ArrayList;
 
 public class Poller extends Thread {
@@ -35,25 +33,18 @@ public class Poller extends Thread {
     }
 
     public void run() {
-        Connection connection = Connection.getInstance();
         while(true) {
+            try {
+                sleep(sleepDuration);
 
-            // wait for bluetooth connection
-            while (!connection.hasConnection());
-
-            while (connection.hasConnection()) {
-                try {
-                    sleep(sleepDuration);
-
-                    for (PollingElement pollingElement : this.pollingElements) {
-                        pollingElement.sampleData();
-                    }
-
-                    pollingComplete();
-
-                } catch (InterruptedException e) {
-                    Log.e("Err", "run: ", e);
+                for (PollingElement pollingElement : this.pollingElements) {
+                    pollingElement.sampleData();
                 }
+
+                pollingComplete();
+
+            } catch (InterruptedException e) {
+                Log.e("Err", "run: ", e);
             }
         }
     }

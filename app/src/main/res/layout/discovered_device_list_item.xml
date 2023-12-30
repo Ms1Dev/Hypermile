@@ -39,35 +39,6 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/statusImage"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginHorizontal="20dp">
-
-            <ImageView
-                android:id="@+id/device_connectedTick"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/tick" />
-
-            <ProgressBar
-                android:id="@+id/device_connectingProgress"
-                style="?android:attr/progressBarStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="invisible" />
-
-            <ImageView
-                android:id="@+id/device_noConnection"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:visibility="invisible"
-                app:srcCompat="@drawable/bluetooth_off" />
-
-        </FrameLayout>
-
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

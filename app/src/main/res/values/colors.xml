@@ -15,4 +15,8 @@
     <color name="tertiary_container">#bbebeb</color>
     <color name="on_tertiary_container">#002021</color>
     <color name="success">#1F9F3D</color>
+    <color name="on_surface">#1a1c18</color>
+    <color name="on_surface_variant">#43483e</color>
+    <color name="outline">#74796d</color>
+    <color name="outline_variant">#c3c8bb</color>
 </resources>

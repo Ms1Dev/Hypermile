@@ -35,7 +35,8 @@ public class Connection {
     private ConnectionState connectionState = ConnectionState.DISCONNECTED;
     private boolean isConnected = false;
     private int autoConnectAttempts = 0;
-    final static private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
+    private Thread autoConnectThread;
+    final private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
 
     private Connection(){}
 
@@ -60,6 +61,19 @@ public class Connection {
             instance.autoConnect();
         }
         return instance;
+    }
+
+    public void disconnect() {
+        if (initConnThread != null) {
+            initConnThread.cancel();
+        }
+        if (connectionThread != null) {
+            connectionThread.cancel();
+        }
+        if (autoConnectThread != null) {
+            autoConnectThread.interrupt();
+        }
+        instance = null;
     }
 
     public void autoConnectFailed() {
@@ -130,13 +144,13 @@ public class Connection {
         if (bluetoothDevice == null) return;
         this.bluetoothDevice = bluetoothDevice;
 
-        if (connectionThread != null) {
-            connectionThread.cancel();
-        }
-
-        if (initConnThread != null) {
-            initConnThread.cancel();
-        }
+//        if (initConnThread != null) {
+//            initConnThread.cancel();
+//        }
+//
+//        if (connectionThread != null) {
+//            connectionThread.interrupt();
+//        }
 
         updateEventListeners(ConnectionState.CONNECTING);
 
@@ -161,10 +175,10 @@ public class Connection {
 
 
     private void autoConnect() {
-        new Thread(new Runnable() {
+        autoConnectThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true) {
+                while(!autoConnectThread.isInterrupted()) {
                     try {
                         Thread.sleep(MONITOR_FREQUENCY);
                         ConnectionState connectionState = getConnectionState();
@@ -184,7 +198,9 @@ public class Connection {
                     }
                 }
             }
-        }).start();
+        });
+        autoConnectThread.setDaemon(true);
+        autoConnectThread.start();
     }
 
     public boolean sendCommand(String command) throws IOException, InterruptedException {
@@ -245,7 +261,7 @@ public class Connection {
             } catch (IOException closeException) {
                 Log.e("Err", "Could not close the client socket", closeException);
             }
-            this.isInterrupted();
+            this.interrupt();
         }
     }
 
@@ -280,7 +296,7 @@ public class Connection {
         }
 
         public void run() {
-            while (true) {
+            while (!isInterrupted()) {
                 try {
                     StringBuilder stringBuilder = new StringBuilder();
 
@@ -320,6 +336,7 @@ public class Connection {
         public void cancel() {
             try {
                 bluetoothSocket.close();
+                interrupt();
                 connectionThread = null;
                 isConnected = false;
                 updateEventListeners(ConnectionState.DISCONNECTED);

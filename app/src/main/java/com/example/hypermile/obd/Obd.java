@@ -52,7 +52,7 @@ public class Obd implements ConnectionEventListener {
     }
 
     private boolean reset(Connection connection) throws IOException, InterruptedException {
-            updateEventListeners(ConnectionState.CONNECTING);
+        updateEventListeners(ConnectionState.CONNECTING);
         connection.sendCommand("ATD\r"); // set all defaults
         connection.sendCommand("ATWS\r"); // reset
         connection.sendCommand("ATE0\r"); // echo command off

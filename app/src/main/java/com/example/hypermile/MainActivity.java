@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -78,15 +79,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
         ){
             Connection connection = Connection.getInstance();
-            connection.connectToExisting(this);
-
             connectionStatusBar = findViewById(R.id.connectionStatusBar);
             connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
             Obd obd = Obd.getInstance();
             connection.addConnectionEventListener(obd);
             obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
-
             connection.addConnectionEventListener(this);
+
+            connection.connectToExisting(this);
 
             ApiRequest.setContext(this);
 
@@ -142,27 +142,31 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
 
-    ActivityResultLauncher<Void> selectBluetoothActivityLauncher = registerForActivityResult(new ActivityResultContract<Void, ConnectionState>() {
+    ActivityResultLauncher<Void> selectBluetoothActivityLauncher = registerForActivityResult(new ActivityResultContract<Void, BluetoothDevice>() {
         @NonNull
         @Override
         public Intent createIntent(@NonNull Context context, Void unused) {
             return new Intent(MainActivity.this, SelectBluetoothDeviceActivity.class);
         }
         @Override
-        public ConnectionState parseResult(int resultCode, @Nullable Intent intent) {
+        public BluetoothDevice parseResult(int resultCode, @Nullable Intent intent) {
             if (resultCode == Activity.RESULT_OK && intent != null) {
-                return (ConnectionState) intent.getSerializableExtra(CONNECTION_STATE);
+                Log.d("TAG", "onActivityResult() returned: " + intent);
+                return intent.getParcelableExtra("device");
             }
-            else if (resultCode == Activity.RESULT_CANCELED) {
+            else if (resultCode == 999) {
                 alertUser(UserAlert.BLUETOOTH_PERMISSION_NOT_GRANTED);
             }
             return null;
         }
-    }, new ActivityResultCallback<ConnectionState>() {
+    }, new ActivityResultCallback<BluetoothDevice>() {
         @Override
-        public void onActivityResult(ConnectionState result) {
+        public void onActivityResult(BluetoothDevice result) {
             if (result != null) {
-                connectionStatusBar.getBlueToothConnectionListener().onStateChange(result);
+                Log.d("TAG", "onActivityResult() returned: " + result);
+                Connection connection = Connection.getInstance();
+                connection.manuallySelectedConnection(result);
+                connectionStatusBar.getBlueToothConnectionListener().onStateChange(connection.getConnectionState());
             }
         }
     });
@@ -242,6 +246,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private void signOut() {
         FirebaseAuth.getInstance().signOut();
+        Connection.getInstance().disconnect();
+        Intent intent = new Intent(MainActivity.this, AuthenticationActivity.class);
+        startActivity(intent);
         finish();
     }
 

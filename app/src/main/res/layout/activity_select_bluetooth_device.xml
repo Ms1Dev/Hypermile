@@ -14,12 +14,24 @@
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/progressBar"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        app:layout_constraintTop_toBottomOf="@+id/selectBluetoothToolbar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:indeterminate="true"
+        android:layout_height="wrap_content" />
 
     <ListView
         android:id="@+id/discoveredDeviceList"
         android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@id/selectBluetoothToolbar"
+        app:layout_constraintTop_toBottomOf="@id/progressBar"
+        android:divider="@color/outline_variant"
+        android:dividerHeight="1dp"
+        android:layout_marginHorizontal="10dp"
         android:layout_height="wrap_content" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

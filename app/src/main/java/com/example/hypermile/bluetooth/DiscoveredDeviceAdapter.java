@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.hypermile.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,39 +18,28 @@ import java.util.List;
 
 public class DiscoveredDeviceAdapter extends ArrayAdapter {
 
-    List<DiscoveredDeviceListElement> deviceList = new ArrayList<>();
+    List<DiscoveredDevice> deviceList = new ArrayList<>();
 
-    public DiscoveredDeviceAdapter(Context context, List<DiscoveredDeviceListElement> deviceList) {
+    public DiscoveredDeviceAdapter(Context context, List<DiscoveredDevice> deviceList) {
         super(context, 0, deviceList);
         this.deviceList = deviceList;
     }
 
-    public View getView(int position, @NonNull View convertView, ViewGroup parent) {
-        DiscoveredDeviceListElement element = (DiscoveredDeviceListElement) getItem(position);
+    public View getView(int position, View convertView, ViewGroup parent) {
+        DiscoveredDevice element = (DiscoveredDevice) getItem(position);
 
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(element.getResource(), parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.discovered_device_list_item, parent, false);
         }
 
         try {
             element.setViewContent(convertView);
         }
         catch (NullPointerException e) {
-            convertView = LayoutInflater.from(getContext()).inflate(element.getResource(), parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.discovered_device_list_item, parent, false);
             element.setViewContent(convertView);
         }
 
         return convertView;
-    }
-
-
-    @Override
-    public void add(@Nullable Object object) {
-        for (DiscoveredDeviceListElement element : deviceList) {
-            if (((DiscoveredDeviceListElement) object).cmp(element)) {
-                return;
-            }
-        }
-        super.add(object);
     }
 }
