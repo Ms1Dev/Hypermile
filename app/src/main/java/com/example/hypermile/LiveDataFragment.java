@@ -90,9 +90,7 @@ public class LiveDataFragment extends Fragment {
         return space;
     }
 
-    public void connectDataToGauges() {
-        dataManager = DataManager.getInstance();
-
+    public void connectDataToGauges(DataManager dataManager) {
         ((Activity) view.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {

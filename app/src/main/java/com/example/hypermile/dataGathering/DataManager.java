@@ -45,19 +45,19 @@ public class DataManager {
     private CalculatedMpg calculatedMpg;
     private int fuelType = -1;
     private int engineCapacity = -1;
-    private JSONObject vehicleDetails;
-    private static DataManager instance;
+    private static JSONObject vehicleDetails;
+//    private static DataManager instance;
     private Context context;
     private boolean initialised = false;
     Obd obd;
-    private boolean engineCapacityRequired = true;
-    private DataManager(){};
-    public static DataManager getInstance() {
-        if (instance == null) {
-            instance = new DataManager();
-        }
-        return instance;
-    }
+    private static boolean engineCapacityRequired = true;
+    public DataManager(){};
+//    public static DataManager getInstance() {
+//        if (instance == null) {
+//            instance = new DataManager();
+//        }
+//        return instance;
+//    }
 
     public void initialise(Context context, Obd obd) {
         if (!initialised) {
@@ -326,7 +326,7 @@ public class DataManager {
         return speed;
     }
 
-    public JSONObject getVehicleDetails() {
+    public static JSONObject getVehicleDetails() {
         return vehicleDetails;
     }
 
@@ -346,7 +346,7 @@ public class DataManager {
         return calculatedMpg;
     }
 
-    public boolean isEngineCapacityRequired() {
+    public static boolean isEngineCapacityRequired() {
         return engineCapacityRequired;
     }
 }

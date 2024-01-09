@@ -26,7 +26,7 @@ public class CarDetailsActivity extends AppCompatActivity {
 
         content = findViewById(R.id.carDetailsContent);
 
-        JSONObject carDetailsJSON = DataManager.getInstance().getVehicleDetails();
+        JSONObject carDetailsJSON = DataManager.getVehicleDetails();
 
         if (carDetailsJSON != null) {
             populateContent(carDetailsJSON, content, 1);

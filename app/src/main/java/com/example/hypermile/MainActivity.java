@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private Toolbar toolbar;
     private Obd obd;
     private Connection connection;
+    private DataManager dataManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,8 +115,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public void obdReady() {
-        DataManager.getInstance().initialise(this, obd);
-        liveDataFragment.connectDataToGauges();
+        dataManager = new DataManager();
+        dataManager.initialise(this, obd);
+        liveDataFragment.connectDataToGauges(dataManager);
     }
 
     @Override
