@@ -170,7 +170,7 @@ public class Connection {
 
         updateEventListeners(ConnectionState.CONNECTED);
 
-        Obd.getInstance().initialise(getInstance());
+//        Obd.getInstance().initialise(getInstance());
     }
 
 

@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     ConnectionStatusBar connectionStatusBar;
     BottomNavigationView bottomNavigationView;
     Toolbar toolbar;
+    Obd obd;
+    Connection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +80,11 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
         ){
+
             Connection connection = Connection.getInstance();
             connectionStatusBar = findViewById(R.id.connectionStatusBar);
             connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
-            Obd obd = Obd.getInstance();
+            obd = new Obd();
             connection.addConnectionEventListener(obd);
             obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
             connection.addConnectionEventListener(this);
@@ -93,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Obd obd = Obd.getInstance();
+                    obd.initialise(connection);
                     while (!obd.isReady());
                     obdReady();
                 }
@@ -111,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public void obdReady() {
-        DataManager.getInstance().initialise(this);
+        DataManager.getInstance().initialise(this, obd);
         liveDataFragment.connectDataToGauges();
     }
 

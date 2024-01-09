@@ -59,10 +59,10 @@ public class DataManager {
         return instance;
     }
 
-    public void initialise(Context context) {
+    public void initialise(Context context, Obd obd) {
         if (!initialised) {
             this.context = context.getApplicationContext();
-            obd = Obd.getInstance();
+            this.obd = obd;
 
             String vin = obd.getVin();
             if (vin != null) {

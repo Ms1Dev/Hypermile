@@ -16,23 +16,19 @@ public class Obd implements ConnectionEventListener {
     private final static int MINIMUM_RESPONSE_WAIT = 150;
     private final static int MAXIMUM_RESPONSE_WAIT = 500;
     private final static int MAX_ERRORS = 5;
-    private static int errors = 0;
-    private static boolean ready = false;
-    private static final TreeMap<String, Parameter> supportedPids = new TreeMap<>();
-    final static private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
-    private static ConnectionState connectionState = ConnectionState.DISCONNECTED;
-    private static Obd instance;
-    public static Obd getInstance() {
-        if (instance == null) {
-            instance = new Obd();
-        }
-        return instance;
-    }
-    private Obd() {}
+    private int errors = 0;
+    private boolean ready = false;
+    private final TreeMap<String, Parameter> supportedPids = new TreeMap<>();
+    final private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
+    private ConnectionState connectionState = ConnectionState.DISCONNECTED;
+    public Obd() {}
 
     public boolean initialise(Connection connection) {
         // elm327 documentation
         // https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
+
+        while(!connection.hasConnection());
+
         try {
             if (reset(connection)) {
                 Thread.sleep(MINIMUM_RESPONSE_WAIT);
@@ -71,7 +67,7 @@ public class Obd implements ConnectionEventListener {
     }
 
     private void updateEventListeners(ConnectionState connectionState) {
-        Obd.connectionState = connectionState;
+        this.connectionState = connectionState;
         for (ConnectionEventListener eventListener : connectionEventListeners) {
             eventListener.onStateChange(connectionState);
         }
@@ -117,7 +113,7 @@ public class Obd implements ConnectionEventListener {
                 for (int k = 0; k < 8; k++) {
                     if ((response[j] & (1 << k)) > 0) {
                         byte supportedPid = (byte) (i + j * 8 + (8 - k));
-                        Parameter parameter = new Parameter(supportedPid);
+                        Parameter parameter = new Parameter(supportedPid, this);
                         supportedPids.put(parameter.asString(), parameter);
                     }
                 }
