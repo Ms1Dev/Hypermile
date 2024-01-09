@@ -44,14 +44,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
     public final static String CONNECTION_STATE = "com.example.hypermile.CONNECTION_STATE";
-    LiveDataFragment liveDataFragment;
-    HomeFragment homeFragment;
-    ReportsFragment reportsFragment;
-    ConnectionStatusBar connectionStatusBar;
-    BottomNavigationView bottomNavigationView;
-    Toolbar toolbar;
-    Obd obd;
-    Connection connection;
+    private LiveDataFragment liveDataFragment;
+    private HomeFragment homeFragment;
+    private ReportsFragment reportsFragment;
+    private ConnectionStatusBar connectionStatusBar;
+    private BottomNavigationView bottomNavigationView;
+    private Toolbar toolbar;
+    private Obd obd;
+    private Connection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
         ){
 
-            Connection connection = Connection.getInstance();
+            connection = new Connection();
             connectionStatusBar = findViewById(R.id.connectionStatusBar);
             connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
             obd = new Obd();
@@ -167,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         public void onActivityResult(BluetoothDevice result) {
             if (result != null) {
                 Log.d("TAG", "onActivityResult() returned: " + result);
-                Connection connection = Connection.getInstance();
                 connection.manuallySelectedConnection(result);
                 connectionStatusBar.getBlueToothConnectionListener().onStateChange(connection.getConnectionState());
             }
@@ -249,7 +248,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private void signOut() {
         FirebaseAuth.getInstance().signOut();
-        Connection.getInstance().disconnect();
+        connection.disconnect();
         Intent intent = new Intent(MainActivity.this, AuthenticationActivity.class);
         startActivity(intent);
         finish();
@@ -258,7 +257,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     @Override
     public void onStateChange(ConnectionState connectionState) {
         if (connectionState == ConnectionState.CONNECTED) {
-            String macAddress = Connection.getInstance().getBluetoothDevice().getAddress();
+            String macAddress = connection.getBluetoothDevice().getAddress();
             SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
             sharedPreferences.edit().putString(PREFERENCE_DEVICE_MAC, macAddress).apply();
         }

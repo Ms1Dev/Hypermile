@@ -21,16 +21,19 @@ public class Obd implements ConnectionEventListener {
     private final TreeMap<String, Parameter> supportedPids = new TreeMap<>();
     final private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
     private ConnectionState connectionState = ConnectionState.DISCONNECTED;
+    private Connection connection;
     public Obd() {}
 
     public boolean initialise(Connection connection) {
         // elm327 documentation
         // https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
 
+        this.connection = connection;
+
         while(!connection.hasConnection());
 
         try {
-            if (reset(connection)) {
+            if (reset()) {
                 Thread.sleep(MINIMUM_RESPONSE_WAIT);
                 getSupportedPids();
                 Thread.sleep(MINIMUM_RESPONSE_WAIT);
@@ -47,7 +50,7 @@ public class Obd implements ConnectionEventListener {
         return ready;
     }
 
-    private boolean reset(Connection connection) throws IOException, InterruptedException {
+    private boolean reset() throws IOException, InterruptedException {
         updateEventListeners(ConnectionState.CONNECTING);
         connection.sendCommand("ATD\r"); // set all defaults
         connection.sendCommand("ATWS\r"); // reset
@@ -55,7 +58,7 @@ public class Obd implements ConnectionEventListener {
         connection.sendCommand("ATL1\r"); // line feeds on
         connection.sendCommand("ATS1\r"); // spaces between bytes on
         connection.sendCommand("ATH1\r"); // headers on
-        return findProtocol(connection);
+        return findProtocol();
     }
 
     public void addConnectionEventListener(ConnectionEventListener connectionEventListener) {
@@ -77,7 +80,7 @@ public class Obd implements ConnectionEventListener {
         return supportedPids.get(pid);
     }
 
-    private boolean findProtocol(Connection connection) throws IOException, InterruptedException {
+    private boolean findProtocol() throws IOException, InterruptedException {
 
         int attempts = 0;
 
@@ -140,8 +143,6 @@ public class Obd implements ConnectionEventListener {
     }
 
     private byte[] requestData(byte[] requestCode) {
-        Connection connection = Connection.getInstance();
-
         connection.send(requestCode);
 
         long currentMillis = System.currentTimeMillis();
@@ -164,8 +165,6 @@ public class Obd implements ConnectionEventListener {
     }
 
     private byte[] requestData(Parameter parameter) {
-        Connection connection = Connection.getInstance();
-
         connection.send(parameter.getRequestCode());
 
         long currentMillis = System.currentTimeMillis();
@@ -183,7 +182,7 @@ public class Obd implements ConnectionEventListener {
             if (++errors > MAX_ERRORS) {
                 ready = false;
                 try {
-                    ready = reset(connection);
+                    ready = reset();
                 }
                 catch (InterruptedException | IOException e) {
                     ready = false;
@@ -207,9 +206,8 @@ public class Obd implements ConnectionEventListener {
             updateEventListeners(ConnectionState.DISCONNECTED);
         }
         else if (connectionState == ConnectionState.CONNECTED && !ready) {
-            Connection connection = Connection.getInstance();
             try {
-                reset(connection);
+                reset();
             } catch (IOException | InterruptedException e) {
                 updateEventListeners(ConnectionState.ERROR);
             }

@@ -19,15 +19,11 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 
-// Singleton class since we only ever have one bluetooth device
 public class Connection {
-
     private static final int CONNECTION_ATTEMPTS = 3;
     private static final int MONITOR_FREQUENCY = 5000;
-
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
-    private static Connection instance;
     private ConnectionThread connectionThread;
     private InitConnThread initConnThread;
     private BluetoothDevice bluetoothDevice;
@@ -38,7 +34,7 @@ public class Connection {
     private Thread autoConnectThread;
     final private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
 
-    private Connection(){}
+    public Connection(){}
 
     public void addConnectionEventListener(ConnectionEventListener connectionEventListener) {
         connectionEventListeners.add(connectionEventListener);
@@ -55,14 +51,6 @@ public class Connection {
         }
     }
 
-    public static Connection getInstance() {
-        if (instance == null) {
-            instance = new Connection();
-            instance.autoConnect();
-        }
-        return instance;
-    }
-
     public void disconnect() {
         if (initConnThread != null) {
             initConnThread.cancel();
@@ -73,7 +61,6 @@ public class Connection {
         if (autoConnectThread != null) {
             autoConnectThread.interrupt();
         }
-        instance = null;
     }
 
     public void autoConnectFailed() {
@@ -144,13 +131,13 @@ public class Connection {
         if (bluetoothDevice == null) return;
         this.bluetoothDevice = bluetoothDevice;
 
-//        if (initConnThread != null) {
-//            initConnThread.cancel();
-//        }
-//
-//        if (connectionThread != null) {
-//            connectionThread.interrupt();
-//        }
+        if (initConnThread != null) {
+            initConnThread.cancel();
+        }
+
+        if (connectionThread != null) {
+            connectionThread.interrupt();
+        }
 
         updateEventListeners(ConnectionState.CONNECTING);
 
@@ -276,7 +263,6 @@ public class Connection {
 
         public ConnectionThread(BluetoothSocket socket) {
             bluetoothSocket = socket;
-            connection = Connection.getInstance();
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
