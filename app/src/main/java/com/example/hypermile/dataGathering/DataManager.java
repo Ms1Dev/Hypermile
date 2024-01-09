@@ -76,7 +76,7 @@ public class DataManager {
                 speed = new VehicleDataLogger(
                         speedParameter,
                         "Speed",
-                        "MPH",
+                        "KPH",
                         1,
                         1,
                         1
