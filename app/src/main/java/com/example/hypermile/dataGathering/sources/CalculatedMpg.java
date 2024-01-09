@@ -8,6 +8,7 @@ import com.example.hypermile.dataGathering.PollCompleteListener;
 public class CalculatedMpg extends DataSource<Double> implements PollCompleteListener {
     final static private double UK_GALLON_CONVERSION = 0.21996923465436;
     final static private double MAX_MPG = 99.99;
+    final static private double KPH_MPH_CONVERSION = 0.621371;
     boolean newSpeedData = false;
     boolean newFuelData = false;
     double milesPerHour;
@@ -31,7 +32,7 @@ public class CalculatedMpg extends DataSource<Double> implements PollCompleteLis
     }
 
     public void newSpeedData(double data) {
-        milesPerHour = data;
+        milesPerHour = data * KPH_MPH_CONVERSION;
         newSpeedData = true;
         calculateData();
     }
@@ -47,13 +48,17 @@ public class CalculatedMpg extends DataSource<Double> implements PollCompleteLis
             newFuelData = false;
             newSpeedData = false;
 
-            double gallonsPerHour = litresPerHour * UK_GALLON_CONVERSION;
-            double milesPerGallon = milesPerHour / gallonsPerHour;
+            double milesPerGallon = calcMpg(litresPerHour,milesPerHour);
 
             if (milesPerGallon > MAX_MPG) milesPerGallon = MAX_MPG;
 
             notifyObservers(milesPerGallon);
         }
+    }
+
+    public static double calcMpg(double litresPerHour, double milesPerHour) {
+        double gallonsPerHour = litresPerHour * UK_GALLON_CONVERSION;
+        return milesPerHour / gallonsPerHour;
     }
 
     @Override

@@ -167,7 +167,7 @@ public class DataManager {
             }
         }
 
-        vehicleDetails = getVehicleDetailsJSON("1FAFP53UX4A162757");
+        vehicleDetails = getVehicleDetailsJSON(vin);
 
         if ( fuelType == -1 || (engineCapacity == -1 && ( !(obd.supportsPid("10") || obd.supportsPid("66")) ) ) ) {
             try {

@@ -5,6 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import com.example.hypermile.dataGathering.sources.CalculatedMaf;
+import com.example.hypermile.dataGathering.sources.CalculatedMpg;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -49,6 +50,12 @@ public class UnitTests {
         double gasDensity = CalculatedMaf.gasDensity(0.7845566247224, 2);
 
         assertEquals(0.00100649, gasDensity, 0.00001);
+    }
+
+    @Test
+    public void calculateMpg() {
+        double mpg = CalculatedMpg.calcMpg(5, 62.1371);
+        assertEquals(56.4962, mpg, 0.001);
     }
 
 }
