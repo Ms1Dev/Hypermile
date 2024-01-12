@@ -132,7 +132,9 @@ public class Obd implements ConnectionEventListener {
     public String getVin() {
         byte[] vin = requestData("0902\r".getBytes());
         if (vin != null) {
-            return new String(vin);
+            String vinStr = new String(vin);
+            vinStr = vinStr.replaceAll("[^a-zA-Z\\d]", "");
+            return vinStr;
         }
         return null;
     }

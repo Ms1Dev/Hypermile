@@ -3,37 +3,30 @@ package com.example.hypermile;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
+
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
-import com.example.hypermile.api.ApiRequest;
+
 import com.example.hypermile.bluetooth.Connection;
 import com.example.hypermile.bluetooth.ConnectionEventListener;
 import com.example.hypermile.bluetooth.ConnectionState;
 import com.example.hypermile.dataGathering.DataManager;
-import com.example.hypermile.dataGathering.sources.VehicleDataLogger;
 import com.example.hypermile.obd.Obd;
 import com.example.hypermile.visual.ConnectionStatusBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -43,7 +36,6 @@ import com.google.firebase.auth.FirebaseAuth;
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ConnectionEventListener {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String PREFERENCE_DEVICE_MAC = "ConnectedDeviceMAC";
-    public final static String CONNECTION_STATE = "com.example.hypermile.CONNECTION_STATE";
     private LiveDataFragment liveDataFragment;
     private HomeFragment homeFragment;
     private ReportsFragment reportsFragment;
@@ -92,8 +84,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
             connection.connectToExisting(this);
 
-            ApiRequest.setContext(this);
-
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -135,11 +125,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         }
         else if (item_id == R.id.bluetooth) {
             selectBluetoothActivityLauncher.launch(null);
-            return true;
-        }
-        else if (item_id == R.id.car_details) {
-            Intent carDetailsIntent = new Intent(MainActivity.this, CarDetailsActivity.class);
-            startActivity(carDetailsIntent);
             return true;
         }
 

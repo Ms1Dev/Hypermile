@@ -1,16 +1,13 @@
 package com.example.hypermile.dataGathering;
 
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import androidx.preference.PreferenceManager;
 
 import com.example.hypermile.MainActivity;
 import com.example.hypermile.UserAlert;
-import com.example.hypermile.api.VinDecode;
 import com.example.hypermile.dataGathering.sources.CalculatedMaf;
 import com.example.hypermile.dataGathering.sources.CurrentTimestamp;
 import com.example.hypermile.dataGathering.sources.CalculatedFuelRate;
@@ -19,24 +16,14 @@ import com.example.hypermile.dataGathering.sources.MassAirFlowSensor;
 import com.example.hypermile.dataGathering.sources.VehicleDataLogger;
 import com.example.hypermile.obd.Obd;
 import com.example.hypermile.obd.Parameter;
-import com.google.android.material.snackbar.Snackbar;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.sql.Timestamp;
 
-public class DataManager {
+public class DataManager implements EngineSpec {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String FUELTYPE_PREFERENCE = "fuelType";
     private static final String ENGINESIZE_PREFERENCE = "engineSize";
+    final static int DEFAULT_DISPLACEMENT = 1600;
+    final static int DEFAULT_FUELTYPE = 1;
     private CurrentTimestamp currentTimestamp;
     private VehicleDataLogger engineSpeed;
     private VehicleDataLogger speed;
@@ -45,29 +32,30 @@ public class DataManager {
     private CalculatedMpg calculatedMpg;
     private int fuelType = -1;
     private int engineCapacity = -1;
-    private static JSONObject vehicleDetails;
-//    private static DataManager instance;
     private Context context;
     private boolean initialised = false;
     Obd obd;
     private static boolean engineCapacityRequired = true;
+
     public DataManager(){};
-//    public static DataManager getInstance() {
-//        if (instance == null) {
-//            instance = new DataManager();
-//        }
-//        return instance;
-//    }
 
     public void initialise(Context context, Obd obd) {
         if (!initialised) {
             this.context = context.getApplicationContext();
             this.obd = obd;
 
-            String vin = obd.getVin();
-            if (vin != null) {
-                getVehicleSpecs(obd.getVin());
-            }
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+            getVehicleSpecs(sharedPreferences);
+
+            sharedPreferences.registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String preference) {
+                    if (preference.equals(ENGINESIZE_PREFERENCE) || preference.equals(FUELTYPE_PREFERENCE)) {
+                        getVehicleSpecs(sharedPreferences);
+                    }
+                }
+            });
 
             Poller poller = new Poller(1);
 
@@ -146,8 +134,7 @@ public class DataManager {
         }
     }
 
-    private void getVehicleSpecs(String vin) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+    private void getVehicleSpecs(SharedPreferences sharedPreferences) {
 
         try {
             fuelType = Integer.parseInt( sharedPreferences.getString(FUELTYPE_PREFERENCE, "-1") );
@@ -166,78 +153,51 @@ public class DataManager {
                 fuelType = fuelTypeParam.getData()[0];
             }
         }
-
-        vehicleDetails = getVehicleDetailsJSON(vin);
-
-        if ( fuelType == -1 || (engineCapacity == -1 && ( !(obd.supportsPid("10") || obd.supportsPid("66")) ) ) ) {
-            try {
-                JSONObject engineDetails = vehicleDetails.getJSONObject("engine");
-                engineCapacity = engineDetails.getInt("displacement");
-                Log.d("TAG", "getVehicleSpecs: " + engineCapacity);
-                fuelType = translateFuelType(engineDetails.getString("type"));
-            }
-            catch (JSONException e) {}
-
-            sharedPreferences.edit()
-                    .putString(ENGINESIZE_PREFERENCE, String.valueOf(engineCapacity))
-                    .putString(FUELTYPE_PREFERENCE, String.valueOf(fuelType))
-                    .apply();
-        }
     }
 
-    private int translateFuelType(String fuelType) {
-        switch (fuelType) {
-            case "gas":
-            case "petrol":
-                return 1;
-            case "diesel":
-                return 4;
-        }
-        return -1;
-    }
-
-    private JSONObject getVehicleDetailsJSON(String vin) {
-        JSONObject vehicleDetails;
-        String rootPath = context.getFilesDir().getPath();
-        String filepath = rootPath + "/" + vin;
-        File file = new File(filepath);
-        if (file.exists()) {
-            try {
-                vehicleDetails = readJsonFromFile(filepath);
-            } catch (IOException | JSONException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        else {
-            VinDecode vinDecode = new VinDecode(vin);
-            vehicleDetails = vinDecode.getResponse();
-            try {
-                writeJsonToFile(filepath, vehicleDetails);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return vehicleDetails;
-    }
-
-
-    public static void writeJsonToFile(String filename, JSONObject jsonObject) throws IOException {
-        String stringifyJson = jsonObject.toString();
-        FileWriter fileWriter = new FileWriter(filename);
-        fileWriter.write(stringifyJson);
-        fileWriter.close();
-    }
-
-    public static JSONObject readJsonFromFile(String filename) throws IOException, JSONException {
-        StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
-        String line;
-        while ((line = bufferedReader.readLine()) != null) {
-            stringBuilder.append(line);
-        }
-        bufferedReader.close();
-        return new JSONObject(stringBuilder.toString());
-    }
+//
+//    private JSONObject getVehicleDetailsJSON(String vin) {
+//        JSONObject vehicleDetails;
+//        String rootPath = context.getFilesDir().getPath();
+//        String filepath = rootPath + "/" + vin;
+//        File file = new File(filepath);
+//        if (file.exists()) {
+//            try {
+//                vehicleDetails = readJsonFromFile(filepath);
+//            } catch (IOException | JSONException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        else {
+//            VinDecode vinDecode = new VinDecode(vin);
+//            vehicleDetails = vinDecode.getResponse();
+//            try {
+//                writeJsonToFile(filepath, vehicleDetails);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        return vehicleDetails;
+//    }
+//
+//
+//    public static void writeJsonToFile(String filename, JSONObject jsonObject) throws IOException {
+//        String stringifyJson = jsonObject.toString();
+//        FileWriter fileWriter = new FileWriter(filename);
+//        fileWriter.write(stringifyJson);
+//        fileWriter.close();
+//    }
+//
+//    public static JSONObject readJsonFromFile(String filename) throws IOException, JSONException {
+//        StringBuilder stringBuilder = new StringBuilder();
+//        BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
+//        String line;
+//        while ((line = bufferedReader.readLine()) != null) {
+//            stringBuilder.append(line);
+//        }
+//        bufferedReader.close();
+//        return new JSONObject(stringBuilder.toString());
+//    }
 
     private DataSource<Double> getMassAirFlowSource(Poller poller) {
 
@@ -299,9 +259,7 @@ public class DataManager {
                     engineSpeed
             );
 
-            if (engineCapacity != -1) {
-                calculatedMaf.setEngineDisplacementCC(engineCapacity);
-            }
+            calculatedMaf.setEngineSpecs(this);
 
             poller.addPollingElement(manifoldAbsolutePressure);
             poller.addPollingElement(intakeAirTemperature);
@@ -326,10 +284,6 @@ public class DataManager {
         return speed;
     }
 
-    public static JSONObject getVehicleDetails() {
-        return vehicleDetails;
-    }
-
     public DataSource<Timestamp> getCurrentTimestamp() {
         return currentTimestamp;
     }
@@ -348,5 +302,15 @@ public class DataManager {
 
     public static boolean isEngineCapacityRequired() {
         return engineCapacityRequired;
+    }
+
+    @Override
+    public int getEngineCapacity() {
+        return engineCapacity == -1? DEFAULT_DISPLACEMENT : engineCapacity;
+    }
+
+    @Override
+    public int getFuelType() {
+        return fuelType == -1? DEFAULT_FUELTYPE : fuelType;
     }
 }

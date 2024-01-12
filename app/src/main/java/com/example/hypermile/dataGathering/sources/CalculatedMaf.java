@@ -1,18 +1,18 @@
 package com.example.hypermile.dataGathering.sources;
 
 
-import android.util.Log;
 
 import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataSource;
+import com.example.hypermile.dataGathering.EngineSpec;
 import com.example.hypermile.dataGathering.PollCompleteListener;
 
 public class CalculatedMaf extends DataSource<Double> implements PollCompleteListener {
     final static double UNIVERSAL_GAS_CONSTANT = 82.1; // (cm3 •atm)/(mole•K)
     final static double MASS_OF_AIR = 28.949; // g
     final static double KPA_ATM_CONVERSION = 0.00986923;
-    final static double VOLUMETRIC_EFFICIENCY = 0.9;
-    int engineDisplacementCC = 1600;
+    final static double VOLUMETRIC_EFFICIENCY = 0.8;
+    private EngineSpec engineSpec;
     double manifoldAbsolutePressure;
     double intakeTemperature;
     double engineSpeed;
@@ -44,8 +44,8 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
         });
     }
 
-    public void setEngineDisplacementCC(int engineDisplacementCC) {
-        this.engineDisplacementCC = engineDisplacementCC;
+    public void setEngineSpecs(EngineSpec engineSpec) {
+        this.engineSpec = engineSpec;
     }
 
     public void newManifoldAbsolutePressureData(double data) {
@@ -79,9 +79,9 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
 
         double gasDensity = gasDensity( intakePressure, (int) (temperature + 0.5) );
 
-        double intakeVolumePerMinute = rpm * ( engineDisplacementCC / 2.0 );
+        double intakeVolumePerMinute = rpm * ( engineSpec.getEngineCapacity() * VOLUMETRIC_EFFICIENCY / 2.0 );
 
-        return  intakeVolumePerMinute * gasDensity * VOLUMETRIC_EFFICIENCY / 60;
+        return  intakeVolumePerMinute * gasDensity / 60;
     }
 
     /**

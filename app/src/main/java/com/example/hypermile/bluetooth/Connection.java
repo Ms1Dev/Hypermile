@@ -293,7 +293,7 @@ public class Connection {
                         stringBuilder.append(charValue);
                     }
 
-//                    Log.d("TAG", "read: " + stringBuilder.toString());
+                    Log.d("TAG", "read: " + stringBuilder.toString());
 
                     if (stringBuilder.length() > 0) {
                         ObdFrame obdFrame = ObdFrame.createFrame(stringBuilder.toString());
