@@ -1,17 +1,11 @@
 package com.example.hypermile.bluetooth;
 
 
-import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
-import android.os.Parcelable;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.hypermile.R;
-
-import java.io.Serializable;
 
 public class DiscoveredDevice {
     private String name;
@@ -38,10 +32,10 @@ public class DiscoveredDevice {
     }
 
     public View setViewContent(View view) {
-        TextView deviceName = view.findViewById(R.id.deviceNameView);
+        TextView deviceName = view.findViewById(R.id.reportId);
         TextView deviceMac = view.findViewById(R.id.deviceMacView);
 
-        view.findViewById(R.id.deviceItemLayout).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.reportItemLayout).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     deviceSelectedCallback.deviceSelected(DiscoveredDevice.this);
