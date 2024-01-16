@@ -28,7 +28,14 @@ abstract public class DataSource<T> {
     }
 
     public String getName() {
-        return name;
+        assert(!((name == null || name.length() == 0) && (units == null || units.length() == 0) ));
+
+        if (name == null || name.length() == 0) {
+            return units;
+        }
+        else {
+            return name;
+        }
     }
 
     public void setName(String name) {

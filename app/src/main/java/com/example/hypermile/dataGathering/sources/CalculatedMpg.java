@@ -16,6 +16,8 @@ public class CalculatedMpg extends DataSource<Double> implements PollCompleteLis
     VehicleDataLogger speed;
 
     public CalculatedMpg(VehicleDataLogger speed, DataSource<Double> fuelRate) {
+        name = "MPG";
+
         speed.addDataInputListener( new DataInputObserver<Double>() {
             @Override
             public void incomingData(Double data) {

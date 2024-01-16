@@ -20,7 +20,6 @@ public class Obd implements ConnectionEventListener {
     private boolean ready = false;
     private final TreeMap<String, Parameter> supportedPids = new TreeMap<>();
     final private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
-    private ConnectionState connectionState = ConnectionState.DISCONNECTED;
     private Connection connection;
     public Obd() {}
 
@@ -70,7 +69,6 @@ public class Obd implements ConnectionEventListener {
     }
 
     private void updateEventListeners(ConnectionState connectionState) {
-        this.connectionState = connectionState;
         for (ConnectionEventListener eventListener : connectionEventListeners) {
             eventListener.onStateChange(connectionState);
         }

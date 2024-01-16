@@ -28,6 +28,7 @@ import com.example.hypermile.bluetooth.ConnectionEventListener;
 import com.example.hypermile.bluetooth.ConnectionState;
 import com.example.hypermile.dataGathering.DataManager;
 import com.example.hypermile.obd.Obd;
+import com.example.hypermile.reports.Journey;
 import com.example.hypermile.visual.ConnectionStatusBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -108,6 +109,13 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         dataManager = new DataManager();
         dataManager.initialise(this, obd);
         liveDataFragment.connectDataToGauges(dataManager);
+
+        Journey journey = new Journey();
+        obd.addConnectionEventListener(journey);
+        journey.addDataSource(dataManager.getEngineSpeed());
+        journey.addDataSource(dataManager.getSpeed());
+        journey.addDataSource(dataManager.getCalculatedMpg());
+        journey.start(dataManager.getCurrentTimestamp());
     }
 
     @Override

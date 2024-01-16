@@ -25,12 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class LiveDataFragment extends Fragment {
-
-    private DataManager dataManager;
-    private TableRow row_1;
-    private TableRow row_2;
-    private TableRow row_3;
-
     LiveDataGauge speedGauge;
     LiveDataGauge engineSpeedGauge;
     LiveDataGauge fuelRateGauge;
@@ -60,9 +54,9 @@ public class LiveDataFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_live_data, container, false);
 
-        row_1 = view.findViewById(R.id.tablerow_1);
-        row_2 = view.findViewById(R.id.tablerow_2);
-        row_3 = view.findViewById(R.id.tablerow_3);
+        TableRow row_1 = view.findViewById(R.id.tablerow_1);
+        TableRow row_2 = view.findViewById(R.id.tablerow_2);
+        TableRow row_3 = view.findViewById(R.id.tablerow_3);
 
         speedGauge = new LiveDataGauge(getContext());
         row_1.addView(speedGauge);

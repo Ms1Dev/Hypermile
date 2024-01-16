@@ -1,51 +1,85 @@
 package com.example.hypermile.reports;
 
 
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.example.hypermile.bluetooth.ConnectionEventListener;
+import com.example.hypermile.bluetooth.ConnectionState;
+import com.example.hypermile.dataGathering.DataInputObserver;
+import com.example.hypermile.dataGathering.DataSource;
 import com.example.hypermile.dataGathering.PollCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Journey implements PollCompleteListener {
+public class Journey implements DataInputObserver<Timestamp>, ConnectionEventListener {
+    private final ArrayList<DataSource<Double>> dataSources = new ArrayList<>();
+    private DataSource<Timestamp> timestampSource;
+    Map<String, Map<String,Object> > table = new HashMap<>();
 
-    private final ArrayList<Attribute> attributes = new ArrayList<>();
+    public Journey() {}
 
-    ArrayList<ArrayList<Object>> table = new ArrayList<>();
-
-    public Journey() {
-        attributes.add(new Attribute() {
-            @Override
-            public Object getData() {
-                return table.size();
-            }
-
-            @Override
-            public String getLabel() {
-                return "ID";
-            }
-
-            @Override
-            public Class<?> getType() {
-                return Integer.class;
-            }
-        });
+    public void start(DataSource<Timestamp> timestampSource) {
+        this.timestampSource = timestampSource;
+        timestampSource.addDataInputListener(this);
     }
 
-    public void addAttribute (Attribute attribute) {
-        attributes.add(attribute);
+    public void addDataSource (DataSource<Double> dataSource) {
+        dataSources.add(dataSource);
     }
 
     @Override
-    public void pollingComplete() {
-        addTableRow();
+    public void incomingData(Timestamp timestamp) {
+        addTableRow(timestamp);
     }
 
-    private void addTableRow() {
-        ArrayList<Object> row = new ArrayList<>();
+    @Override
+    public void onStateChange(ConnectionState connectionState) {
+        if (connectionState.equals(ConnectionState.DISCONNECTED)) {
+            complete();
+        }
+    }
 
-        for (Attribute attribute : attributes) {
-            row.add(attribute.getData());
+    private void addTableRow(Timestamp timestamp) {
+        if (timestamp == null) return;
+
+        Map<String, Object> row = new HashMap<>();
+
+        for (DataSource<Double> dataSource : dataSources) {
+            row.put(dataSource.getName(), dataSource.getData());
         }
 
-        table.add(row);
+        table.put(String.valueOf(timestamp.getTime()), row);
+    }
+
+
+    private void complete() {
+        timestampSource.removeDataInputListener(this);
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("journeys").document(timestampSource.getData().toString())
+            .set(table)
+            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d("Journey", "DocumentSnapshot successfully written!");
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w("Journey", "Error adding document", e);
+                }
+            });
     }
 }
