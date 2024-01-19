@@ -2,9 +2,10 @@ package com.example.hypermile.reports;
 
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class Report {
+public class Report implements Serializable {
     String dateOfReport;
     double avgMpg;
     Map<String, Map<String,Object>> journeyData;

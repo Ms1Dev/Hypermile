@@ -1,5 +1,6 @@
 package com.example.hypermile;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.hypermile.bluetooth.DiscoveredDeviceAdapter;
@@ -80,6 +82,19 @@ public class ReportsFragment extends Fragment {
         ReportAdapter reportAdapter = new ReportAdapter(this.getContext(), reports);
 
         reportList.setAdapter(reportAdapter);
+
+        reportList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long id) {
+                Report report = (Report) adapterView.getItemAtPosition(pos);
+
+                Intent reportIntent = new Intent(ReportsFragment.this.getContext(), ReportActivity.class);
+                reportIntent.putExtra("Report", report);
+
+                startActivity(reportIntent);
+
+            }
+        });
 
         return view;
     }
