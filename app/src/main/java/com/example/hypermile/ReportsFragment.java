@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.hypermile.bluetooth.DiscoveredDeviceAdapter;
 import com.example.hypermile.reports.Report;
 import com.example.hypermile.reports.ReportAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,7 +21,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class ReportsFragment extends Fragment {
@@ -51,7 +54,7 @@ public class ReportsFragment extends Fragment {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("users")
+        db.collection("journeys")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                        @Override
@@ -59,13 +62,20 @@ public class ReportsFragment extends Fragment {
                        {
                            if (task.isSuccessful()) {
                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d("TAG", "onComplete: " + document.getId());
                                     reports.add(new Report(document.getId(), document.getData()));
                                }
-                               } else {
-                                   Log.w("Report list", "Error getting documents.", task.getException());
-                               }
+                           }
+                           else {
+                               Log.w("Report list", "Error getting documents.", task.getException());
+                           }
                        }
                    });
+
+        Map<String,Object> testmap = new HashMap<>();
+        testmap.put("test", "asd");
+
+        reports.add(new Report("test", testmap));
 
         ReportAdapter reportAdapter = new ReportAdapter(this.getContext(), reports);
 

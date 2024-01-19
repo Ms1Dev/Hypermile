@@ -17,13 +17,35 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <FrameLayout
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:foregroundGravity="center_vertical|center_horizontal">
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="2dp"
+                app:srcCompat="@drawable/bordered_circle"
+                app:tint="@color/secondary_container" />
+
+            <TextView
+                android:id="@+id/mpgValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:text=""
+                android:textSize="20sp" />
+        </FrameLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_marginLeft="16dp"
             android:gravity="center_vertical"
             android:orientation="vertical">
-
             <TextView
                 android:id="@+id/reportId"
                 android:layout_width="match_parent"

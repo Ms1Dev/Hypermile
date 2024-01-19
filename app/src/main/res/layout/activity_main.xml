@@ -28,22 +28,24 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <ScrollView
-            android:id="@+id/scrollableContent"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/connectionStatusBar"
-            app:layout_constraintStart_toStartOf="parent"
-            android:clipChildren="false"
-            app:layout_constraintTop_toBottomOf="@+id/appbar">
+<!--        <ScrollView-->
+<!--            android:id="@+id/scrollableContent"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/connectionStatusBar"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            android:clipChildren="false"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/appbar">-->
 
             <FrameLayout
                 android:id="@+id/mainContent"
+                app:layout_constraintBottom_toTopOf="@+id/connectionStatusBar"
+                app:layout_constraintTop_toBottomOf="@+id/appbar"
                 android:layout_width="match_parent"
                 android:clipChildren="false"
                 android:layout_height="0dp">
             </FrameLayout>
-        </ScrollView>
+<!--        </ScrollView>-->
 
         <com.example.hypermile.visual.ConnectionStatusBar
             android:id="@+id/connectionStatusBar"
