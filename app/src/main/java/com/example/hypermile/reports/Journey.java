@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class Journey implements DataInputObserver<Timestamp>, ConnectionEventListener {
     private final ArrayList<DataSource<Double>> dataSources = new ArrayList<>();
-    private static DateFormat dateFormat = new SimpleDateFormat("hh:mm ddd MM yyyy", Locale.getDefault());
+    private final static DateFormat dateFormat = new SimpleDateFormat("HH:mm • EEEE d MMM yyyy", Locale.ENGLISH);
 
     private DataSource<Timestamp> timestampSource;
     Map<String, Map<String,Object> > table = new HashMap<>();
@@ -73,10 +73,10 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        Date date = new Date(timestampSource.getData().getTime());
-        String timestamp = dateFormat.format(date);
+//        Date date = new Date(timestampSource.getData().getTime());
+//        String timestamp = dateFormat.format(date);
 
-        db.collection("journeys").document(timestamp)
+        db.collection("journeys").document(String.valueOf(timestampSource.getData().getTime()))
             .set(table)
             .addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override

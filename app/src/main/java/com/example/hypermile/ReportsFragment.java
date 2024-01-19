@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -18,9 +19,14 @@ import com.example.hypermile.reports.Report;
 import com.example.hypermile.reports.ReportAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firestore.v1.Document;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,40 +53,40 @@ public class ReportsFragment extends Fragment {
     }
 
     @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+
+        if (!hidden) {
+
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_reports, container, false);
-
         ListView reportList = view.findViewById(R.id.report_list);
-
         List<Report> reports = new ArrayList<>();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference journeyCollection = db.collection("journeys");
 
-        db.collection("journeys")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                       @Override
-                       public void onComplete(@NonNull Task<QuerySnapshot> task)
-                       {
-                           if (task.isSuccessful()) {
-                               for (QueryDocumentSnapshot document : task.getResult()) {
-                                    Log.d("TAG", "onComplete: " + document.getId());
-                                    reports.add(new Report(document.getId(), document.getData()));
-                               }
-                           }
-                           else {
-                               Log.w("Report list", "Error getting documents.", task.getException());
-                           }
-                       }
-                   });
-
-        Map<String,Object> testmap = new HashMap<>();
-        testmap.put("test", "asd");
-
-        reports.add(new Report("test", testmap));
+//        journeyCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//               @Override
+//               public void onComplete(@NonNull Task<QuerySnapshot> task)
+//               {
+//                   if (task.isSuccessful()) {
+//                       for (QueryDocumentSnapshot document : task.getResult()) {
+//                            Log.d("TAG", "onComplete: " + document.getId());
+//                            reports.add(new Report(document.getId(), document.getData()));
+//                       }
+//                   }
+//                   else {
+//                       Log.w("Report list", "Error getting documents.", task.getException());
+//                   }
+//               }
+//           });
 
         ReportAdapter reportAdapter = new ReportAdapter(this.getContext(), reports);
-
         reportList.setAdapter(reportAdapter);
 
         reportList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -93,6 +99,20 @@ public class ReportsFragment extends Fragment {
 
                 startActivity(reportIntent);
 
+            }
+        });
+
+        //https://firebase.google.com/docs/firestore/query-data/listen
+
+        journeyCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                for (DocumentChange dc : value.getDocumentChanges()) {
+                    if (dc.getType() == DocumentChange.Type.ADDED) {
+                        QueryDocumentSnapshot document = dc.getDocument();
+                        reportAdapter.add(new Report(document.getId(), document.getData()));
+                    }
+                }
             }
         });
 

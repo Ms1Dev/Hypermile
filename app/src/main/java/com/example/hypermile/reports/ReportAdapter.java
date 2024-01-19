@@ -1,6 +1,7 @@
 package com.example.hypermile.reports;
 
 import android.content.Context;
+import android.icu.text.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +14,13 @@ import androidx.annotation.NonNull;
 import com.example.hypermile.R;
 import com.example.hypermile.bluetooth.DiscoveredDevice;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class ReportAdapter extends ArrayAdapter<Report> {
+    private final static java.text.DateFormat dateFormat = new SimpleDateFormat("HH:mm • EEEE d MMM yyyy", Locale.ENGLISH);
 
     public ReportAdapter(@NonNull Context context, List<Report> reportList) {
         super(context, 0, reportList);
@@ -33,7 +37,14 @@ public class ReportAdapter extends ArrayAdapter<Report> {
         TextView mpgValue = convertView.findViewById(R.id.mpgValue);
 
         if (report != null) {
-            reportId.setText(report.getDateOfReport());
+            String reportDate = report.getDateOfReport();
+            try{
+                Date date = new Date(Long.parseLong(reportDate));
+                reportDate = dateFormat.format(date);
+            }
+            catch (Exception e){}
+
+            reportId.setText(reportDate);
             mpgValue.setText(String.valueOf(Math.round( report.getAvgMpg() )));
         }
 
