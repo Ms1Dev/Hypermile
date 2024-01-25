@@ -3,12 +3,14 @@ package com.example.hypermile.dataGathering;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 
 import androidx.preference.PreferenceManager;
 
 import com.example.hypermile.MainActivity;
 import com.example.hypermile.UserAlert;
 import com.example.hypermile.dataGathering.sources.CalculatedMaf;
+import com.example.hypermile.dataGathering.sources.CurrentLocation;
 import com.example.hypermile.dataGathering.sources.CurrentTimestamp;
 import com.example.hypermile.dataGathering.sources.CalculatedFuelRate;
 import com.example.hypermile.dataGathering.sources.CalculatedMpg;
@@ -30,6 +32,7 @@ public class DataManager implements EngineSpec {
     private DataSource<Double> massAirFlow;
     private CalculatedFuelRate fuelRate;
     private CalculatedMpg calculatedMpg;
+    private CurrentLocation currentLocation;
     private int fuelType = -1;
     private int engineCapacity = -1;
     private Context context;
@@ -37,11 +40,12 @@ public class DataManager implements EngineSpec {
     Obd obd;
     private static boolean engineCapacityRequired = true;
 
-    public DataManager(){};
+    public DataManager(Context context){
+        this.context = context;
+    };
 
-    public void initialise(Context context, Obd obd) {
+    public void initialise(Obd obd) {
         if (!initialised) {
-            this.context = context.getApplicationContext();
             this.obd = obd;
 
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -130,6 +134,8 @@ public class DataManager implements EngineSpec {
                 ((MainActivity) context).alertUser(UserAlert.VEHICLE_SPEC_UNKNOWN);
             }
 
+            currentLocation = new CurrentLocation(context);
+
             initialised = true;
         }
     }
@@ -155,49 +161,6 @@ public class DataManager implements EngineSpec {
         }
     }
 
-//
-//    private JSONObject getVehicleDetailsJSON(String vin) {
-//        JSONObject vehicleDetails;
-//        String rootPath = context.getFilesDir().getPath();
-//        String filepath = rootPath + "/" + vin;
-//        File file = new File(filepath);
-//        if (file.exists()) {
-//            try {
-//                vehicleDetails = readJsonFromFile(filepath);
-//            } catch (IOException | JSONException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//        else {
-//            VinDecode vinDecode = new VinDecode(vin);
-//            vehicleDetails = vinDecode.getResponse();
-//            try {
-//                writeJsonToFile(filepath, vehicleDetails);
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//        return vehicleDetails;
-//    }
-//
-//
-//    public static void writeJsonToFile(String filename, JSONObject jsonObject) throws IOException {
-//        String stringifyJson = jsonObject.toString();
-//        FileWriter fileWriter = new FileWriter(filename);
-//        fileWriter.write(stringifyJson);
-//        fileWriter.close();
-//    }
-//
-//    public static JSONObject readJsonFromFile(String filename) throws IOException, JSONException {
-//        StringBuilder stringBuilder = new StringBuilder();
-//        BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
-//        String line;
-//        while ((line = bufferedReader.readLine()) != null) {
-//            stringBuilder.append(line);
-//        }
-//        bufferedReader.close();
-//        return new JSONObject(stringBuilder.toString());
-//    }
 
     private DataSource<Double> getMassAirFlowSource(Poller poller) {
 
@@ -298,6 +261,10 @@ public class DataManager implements EngineSpec {
 
     public DataSource<Double> getCalculatedMpg() {
         return calculatedMpg;
+    }
+
+    public DataSource<Location> getCurrentLocation() {
+        return currentLocation;
     }
 
     public static boolean isEngineCapacityRequired() {

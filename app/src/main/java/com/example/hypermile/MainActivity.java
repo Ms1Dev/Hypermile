@@ -10,6 +10,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -27,12 +28,15 @@ import com.example.hypermile.bluetooth.Connection;
 import com.example.hypermile.bluetooth.ConnectionEventListener;
 import com.example.hypermile.bluetooth.ConnectionState;
 import com.example.hypermile.dataGathering.DataManager;
+import com.example.hypermile.dataGathering.sources.CurrentLocation;
 import com.example.hypermile.obd.Obd;
 import com.example.hypermile.reports.Journey;
 import com.example.hypermile.visual.ConnectionStatusBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.security.Permission;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener, ConnectionEventListener {
     private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
@@ -70,6 +74,12 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         setSupportActionBar(toolbar);
 
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+        }
+
+//        CurrentLocation currentLocation = new CurrentLocation(this);
+
         if (
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
@@ -84,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             connection.addConnectionEventListener(this);
 
             connection.connectToExisting(this);
+
+            dataManager = new DataManager(this);
 
             new Thread(new Runnable() {
                 @Override
@@ -106,16 +118,20 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     public void obdReady() {
-        dataManager = new DataManager();
-        dataManager.initialise(this, obd);
-        liveDataFragment.connectDataToGauges(dataManager);
-
-        Journey journey = new Journey();
-        obd.addConnectionEventListener(journey);
-        journey.addDataSource(dataManager.getEngineSpeed());
-        journey.addDataSource(dataManager.getSpeed());
-        journey.addDataSource(dataManager.getCalculatedMpg());
-        journey.start(dataManager.getCurrentTimestamp());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                dataManager.initialise(obd);
+                liveDataFragment.connectDataToGauges(dataManager);
+                Journey journey = new Journey();
+                obd.addConnectionEventListener(journey);
+                journey.addDataSource(dataManager.getEngineSpeed());
+                journey.addDataSource(dataManager.getSpeed());
+                journey.addDataSource(dataManager.getCalculatedMpg());
+                journey.start(dataManager.getCurrentTimestamp());
+                journey.addLocationDataSource(dataManager.getCurrentLocation());
+            }
+        });
     }
 
     @Override

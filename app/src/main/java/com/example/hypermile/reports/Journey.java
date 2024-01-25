@@ -1,6 +1,7 @@
 package com.example.hypermile.reports;
 
 
+import android.location.Location;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -27,8 +28,8 @@ import java.util.Map;
 
 public class Journey implements DataInputObserver<Timestamp>, ConnectionEventListener {
     private final ArrayList<DataSource<Double>> dataSources = new ArrayList<>();
-    private final static DateFormat dateFormat = new SimpleDateFormat("HH:mm • EEEE d MMM yyyy", Locale.ENGLISH);
 
+    private DataSource<Location> locationDataSource;
     private DataSource<Timestamp> timestampSource;
     Map<String, Map<String,Object> > table = new HashMap<>();
 
@@ -41,6 +42,10 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
 
     public void addDataSource (DataSource<Double> dataSource) {
         dataSources.add(dataSource);
+    }
+
+    public void addLocationDataSource (DataSource<Location> dataSource) {
+        locationDataSource = dataSource;
     }
 
     @Override
@@ -63,6 +68,9 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         for (DataSource<Double> dataSource : dataSources) {
             row.put(dataSource.getName(), dataSource.getData());
         }
+        if (locationDataSource != null) {
+            row.put(locationDataSource.getName(), locationDataSource.getData());
+        }
 
         table.put(String.valueOf(timestamp.getTime()), row);
     }
@@ -72,9 +80,6 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         timestampSource.removeDataInputListener(this);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-//        Date date = new Date(timestampSource.getData().getTime());
-//        String timestamp = dateFormat.format(date);
 
         db.collection("journeys").document(String.valueOf(timestampSource.getData().getTime()))
             .set(table)

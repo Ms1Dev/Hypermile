@@ -64,27 +64,6 @@ public class VehicleDataLogger extends DataSource<Double> implements PollingElem
         }
     }
 
-//    private byte[] requestObdData() {
-//        connection.send(requestCode());
-//
-//        long currentMillis = System.currentTimeMillis();
-//
-//        while(!connection.hasData() && currentMillis + MAXIMUM_RESPONSE_WAIT > System.currentTimeMillis());
-//
-//        ObdFrame obdFrame = connection.getLatestFrame();
-//
-//        while(currentMillis + MINIMUM_RESPONSE_WAIT > System.currentTimeMillis());
-//
-//        if (obdFrame != null) {
-//            return obdFrame.getPayload();
-//        }
-//        else {
-//            Log.d("TAG", "run: MISS");
-//        }
-//
-//        return null;
-//    }
-
     @Override
     public void sampleData() {
         byte[] vehicleData = parameter.getData();
