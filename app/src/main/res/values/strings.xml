@@ -22,5 +22,6 @@
 
     <!-- App specific -->
     <string name="no_reports">No reports to show yet. Start the app before driving to create your first report!</string>
+    <string name="title_activity_maps">MapsActivity</string>
 
 </resources>
