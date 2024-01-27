@@ -15,20 +15,14 @@ import android.widget.TableRow;
 import com.example.hypermile.dataGathering.DataManager;
 import com.example.hypermile.visual.LiveDataGauge;
 import com.example.hypermile.visual.LiveDataLineChart;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
+import com.example.hypermile.visual.InclinationView;
 
 public class LiveDataFragment extends Fragment {
     LiveDataGauge speedGauge;
     LiveDataGauge engineSpeedGauge;
     LiveDataGauge fuelRateGauge;
     LiveDataLineChart liveDataLineChart;
+    InclinationView inclinationView;
 
     long startTimeOffset;
     View view;
@@ -70,7 +64,8 @@ public class LiveDataFragment extends Fragment {
         fuelRateGauge = new LiveDataGauge(getContext());
         row_3.addView(fuelRateGauge);
 
-        row_3.addView(getSpacer(getContext()));
+        inclinationView = new InclinationView(getContext());
+        row_3.addView(inclinationView);
 
         return view;
     }
@@ -92,6 +87,7 @@ public class LiveDataFragment extends Fragment {
                 engineSpeedGauge.setDataSource(dataManager.getEngineSpeed());
                 fuelRateGauge.setDataSource(dataManager.getFuelRate());
                 liveDataLineChart.setAxisSources(dataManager.getCurrentTimestamp(), dataManager.getCalculatedMpg());
+                inclinationView.setDataSource(dataManager.getCalculatedInclination());
             }
         });
 

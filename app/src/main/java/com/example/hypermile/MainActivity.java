@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 journey.addDataSource(dataManager.getEngineSpeed());
                 journey.addDataSource(dataManager.getSpeed());
                 journey.addDataSource(dataManager.getCalculatedMpg());
+                journey.addDataSource(dataManager.getCalculatedInclination());
                 journey.start(dataManager.getCurrentTimestamp());
                 journey.addLocationDataSource(dataManager.getCurrentLocation());
             }

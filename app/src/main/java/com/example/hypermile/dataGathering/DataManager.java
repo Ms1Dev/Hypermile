@@ -9,19 +9,20 @@ import androidx.preference.PreferenceManager;
 
 import com.example.hypermile.MainActivity;
 import com.example.hypermile.UserAlert;
+import com.example.hypermile.dataGathering.sources.CalculatedInclination;
 import com.example.hypermile.dataGathering.sources.CalculatedMaf;
 import com.example.hypermile.dataGathering.sources.CurrentLocation;
 import com.example.hypermile.dataGathering.sources.CurrentTimestamp;
 import com.example.hypermile.dataGathering.sources.CalculatedFuelRate;
 import com.example.hypermile.dataGathering.sources.CalculatedMpg;
 import com.example.hypermile.dataGathering.sources.MassAirFlowSensor;
+import com.example.hypermile.dataGathering.sources.RandomGenerator;
 import com.example.hypermile.dataGathering.sources.VehicleDataLogger;
 import com.example.hypermile.obd.Obd;
 import com.example.hypermile.obd.Parameter;
 import java.sql.Timestamp;
 
 public class DataManager implements EngineSpec {
-    private static final String PREFERENCE_FILENAME = "Hypermile_preferences";
     private static final String FUELTYPE_PREFERENCE = "fuelType";
     private static final String ENGINESIZE_PREFERENCE = "engineSize";
     final static int DEFAULT_DISPLACEMENT = 1600;
@@ -33,6 +34,8 @@ public class DataManager implements EngineSpec {
     private CalculatedFuelRate fuelRate;
     private CalculatedMpg calculatedMpg;
     private CurrentLocation currentLocation;
+    private CalculatedInclination calculatedInclination;
+    private RandomGenerator randomGenerator;
     private int fuelType = -1;
     private int engineCapacity = -1;
     private Context context;
@@ -116,9 +119,11 @@ public class DataManager implements EngineSpec {
             }
 
             currentTimestamp = new CurrentTimestamp();
+            randomGenerator = new RandomGenerator(-30, 30);
 
             poller.addPollingElement(engineSpeed);
             poller.addPollingElement(speed);
+            poller.addPollingElement(randomGenerator);
 
             poller.addPollCompleteListener(currentTimestamp);
             poller.addPollCompleteListener(calculatedMpg);
@@ -135,6 +140,8 @@ public class DataManager implements EngineSpec {
             }
 
             currentLocation = new CurrentLocation(context);
+            calculatedInclination = new CalculatedInclination();
+            currentLocation.addDataInputListener(calculatedInclination);
 
             initialised = true;
         }
@@ -265,6 +272,14 @@ public class DataManager implements EngineSpec {
 
     public DataSource<Location> getCurrentLocation() {
         return currentLocation;
+    }
+
+    public DataSource<Double> getCalculatedInclination() {
+        return calculatedInclination;
+    }
+
+    public DataSource<Double> getRandomGenerator() {
+        return randomGenerator;
     }
 
     public static boolean isEngineCapacityRequired() {
