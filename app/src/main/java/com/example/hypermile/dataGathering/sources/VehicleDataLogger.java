@@ -13,6 +13,7 @@ public class VehicleDataLogger extends DataSource<Double> implements PollingElem
     double divisor;
     int expectedBytes;
     int offset = 0;
+    String name;
     Parameter parameter;
 
     public VehicleDataLogger(Parameter parameter, String name, String units, int offset) {
@@ -70,5 +71,10 @@ public class VehicleDataLogger extends DataSource<Double> implements PollingElem
         if (vehicleData != null) {
             processResponse(vehicleData);
         }
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

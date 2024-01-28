@@ -9,7 +9,7 @@ public class CalculatedInclination extends DataSource<Double> implements DataInp
     private Location prevLocation;
 
     public CalculatedInclination() {
-        name = "Inclination";
+
     }
     @Override
     public void incomingData(Location data) {
@@ -21,5 +21,10 @@ public class CalculatedInclination extends DataSource<Double> implements DataInp
             notifyObservers(angleDegrees);
         }
         prevLocation = data;
+    }
+
+    @Override
+    public String getName() {
+        return "Inclination";
     }
 }

@@ -3,13 +3,15 @@ package com.example.hypermile.dataGathering;
 import java.util.ArrayList;
 
 abstract public class DataSource<T> {
-    protected String name;
     protected String units;
     protected int minValue;
     protected int maxValue;
     protected int decimalPoints = 0;
     protected T data;
     ArrayList<DataInputObserver<T>> dataInputObservers = new ArrayList<>();
+
+
+    public abstract String getName();
 
     public void addDataInputListener(DataInputObserver<T> dataInputObserver) {
         dataInputObservers.add(dataInputObserver);
@@ -25,21 +27,6 @@ abstract public class DataSource<T> {
         for (DataInputObserver<T> observer : dataInputObservers) {
             observer.incomingData(data);
         }
-    }
-
-    public String getName() {
-        assert(!((name == null || name.length() == 0) && (units == null || units.length() == 0) ));
-
-        if (name == null || name.length() == 0) {
-            return units;
-        }
-        else {
-            return name;
-        }
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getUnits() {

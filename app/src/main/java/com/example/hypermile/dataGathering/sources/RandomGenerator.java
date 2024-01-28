@@ -10,7 +10,6 @@ public class RandomGenerator extends DataSource<Double> implements PollingElemen
     Random random;
 
     public RandomGenerator(int min, int max) {
-        name = "Random";
         assert(max > min);
         this.min = min;
         this.max = max;
@@ -22,5 +21,10 @@ public class RandomGenerator extends DataSource<Double> implements PollingElemen
         double scaled = rand * (max - min);
         double offset = scaled + min;
         notifyObservers(offset);
+    }
+
+    @Override
+    public String getName() {
+        return "Random";
     }
 }

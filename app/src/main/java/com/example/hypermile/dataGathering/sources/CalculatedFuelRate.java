@@ -15,7 +15,6 @@ public class CalculatedFuelRate extends DataSource<Double> implements DataInputO
         this.massAirFlow = massAirFlow;
         massAirFlow.addDataInputListener(this);
         units = "L/h";
-        name = "Fuel Rate";
     }
 
     @Override
@@ -27,5 +26,10 @@ public class CalculatedFuelRate extends DataSource<Double> implements DataInputO
     public void setFuelType(int fuelType) {
         this.fuelType = fuelType;
         airFuelRatio = fuelType == 4? STOICHIOMETRIC_DIESEL : STOICHIOMETRIC_PETROL;
+    }
+
+    @Override
+    public String getName() {
+        return "Fuel Rate";
     }
 }

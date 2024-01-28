@@ -10,30 +10,30 @@ import com.example.hypermile.bluetooth.ConnectionEventListener;
 import com.example.hypermile.bluetooth.ConnectionState;
 import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataSource;
-import com.example.hypermile.dataGathering.PollCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class Journey implements DataInputObserver<Timestamp>, ConnectionEventListener {
     private final ArrayList<DataSource<Double>> dataSources = new ArrayList<>();
-
     private DataSource<Location> locationDataSource;
     private DataSource<Timestamp> timestampSource;
-    Map<String, Map<String,Object> > table = new HashMap<>();
 
-    public Journey() {}
+    private Double totalSpeed = 0.0;
+    private Double totalMpg = 0.0;
+    private int rowCount;
+    private int rowCountExcStops;
+    private final JourneyData journeyData;
+    private Location prevLocation;
+
+    public Journey() {
+        journeyData = new JourneyData();
+    }
 
     public void start(DataSource<Timestamp> timestampSource) {
         this.timestampSource = timestampSource;
@@ -61,28 +61,74 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
     }
 
     private void addTableRow(Timestamp timestamp) {
+        addDataRow(timestamp);
+        addRouteCoordinate();
+        rowCount++;
+    }
+
+    private void addDataRow(Timestamp timestamp) {
         if (timestamp == null) return;
 
-        Map<String, Object> row = new HashMap<>();
+        Map<String, Object> vehicleDataRow = new HashMap<>();
 
         for (DataSource<Double> dataSource : dataSources) {
-            row.put(dataSource.getName(), dataSource.getData());
+            cumulativeData(dataSource);
+            vehicleDataRow.put(dataSource.getName(), dataSource.getData());
         }
-        if (locationDataSource != null) {
-            row.put(locationDataSource.getName(), locationDataSource.getData());
-        }
+        vehicleDataRow.put("Timestamp", (Long) timestamp.getTime());
 
-        table.put(String.valueOf(timestamp.getTime()), row);
+        journeyData.addVehicleData(vehicleDataRow);
+    }
+
+    private void addRouteCoordinate() {
+        if (locationDataSource != null) {
+            Map<String, Double> routeCoordinate = new HashMap<>();
+            Location location = locationDataSource.getData();
+            routeCoordinate.put("latitude", location.getLatitude());
+            routeCoordinate.put("longitude", location.getLongitude());
+            routeCoordinate.put("altitude", location.getAltitude());
+            journeyData.addRouteCoordinate(routeCoordinate);
+
+            if (prevLocation != null) {
+                journeyData.addToTotalDistanceMetres((double) prevLocation.distanceTo(location));
+            }
+
+            prevLocation = location;
+        }
+    }
+
+    private void cumulativeData(DataSource<Double> dataSource) {
+        if (dataSource.getData() == null) return;
+        switch (dataSource.getName()) {
+            case "Speed":
+                double speed = dataSource.getData();
+                if (speed > 0) {
+                    rowCountExcStops++;
+                }
+                totalSpeed += dataSource.getData();
+                break;
+            case "MPG":
+                totalMpg += dataSource.getData();
+                break;
+        }
+    }
+
+
+    private void calcAverages() {
+        journeyData.setAvgMpg( totalMpg / rowCountExcStops );
+        journeyData.setAvgSpeed( totalSpeed / rowCountExcStops );
+        journeyData.setAvgSpeedIncStops( totalSpeed / rowCount );
     }
 
 
     private void complete() {
         timestampSource.removeDataInputListener(this);
+        calcAverages();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("journeys").document(String.valueOf(timestampSource.getData().getTime()))
-            .set(table)
+            .set(journeyData)
             .addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {

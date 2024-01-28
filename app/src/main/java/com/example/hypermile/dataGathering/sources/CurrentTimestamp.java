@@ -11,4 +11,9 @@ public class CurrentTimestamp extends DataSource<Timestamp> implements PollCompl
         data = new Timestamp(System.currentTimeMillis());
         notifyObservers(data);
     }
+
+    @Override
+    public String getName() {
+        return "Timestamp";
+    }
 }

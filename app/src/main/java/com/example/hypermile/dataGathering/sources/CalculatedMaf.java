@@ -44,6 +44,11 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
         });
     }
 
+    @Override
+    public String getName() {
+        return "MAF";
+    }
+
     public void setEngineSpecs(EngineSpec engineSpec) {
         this.engineSpec = engineSpec;
     }
