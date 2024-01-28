@@ -59,8 +59,6 @@ public class ReportActivity extends AppCompatActivity {
         highMpgKey.setText(highMpgKeyText);
 
         statisticsLayout = findViewById(R.id.statisticsLayout);
-
-        report.processData();
         addStatistics(report);
 
         mapsFragment = new MapsFragment(report.getRoute(), LOW_MPG_BOUNDARY, MID_MPG_BOUNDARY);

@@ -22,20 +22,21 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import org.checkerframework.checker.units.qual.A;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MapsFragment extends Fragment {
     double startLat;
     double startLong;
     int lowMpgBoundary;
     int midMpgBoundary;
-    ArrayList<Location> route;
-    public MapsFragment(ArrayList<Location> route, int lowMpgBoundary, int midMpgBoundary) {
+    ArrayList<Map<String,Double>> route;
+    public MapsFragment(ArrayList<Map<String,Double>> route, int lowMpgBoundary, int midMpgBoundary) {
         this.route = route;
         this.lowMpgBoundary = lowMpgBoundary;
         this.midMpgBoundary = midMpgBoundary;
         if (route.size() > 0) {
-            startLat = route.get(0).getLatitude();
-            startLong = route.get(0).getLongitude();
+            startLat = route.get(0).get("latitude");
+            startLong = route.get(0).get("longitude");
         }
     }
 //https://www.digitalocean.com/community/tutorials/android-google-map-drawing-route-two-points
@@ -60,30 +61,20 @@ public class MapsFragment extends Fragment {
         }
     }
     private void drawRoute(GoogleMap googleMap) {
-//        ArrayList<LatLng> points = new ArrayList<>();
-//        PolylineOptions lineOptions = new PolylineOptions();
+        Map<String,Double> prevCoordinate = null;
+        for (Map<String,Double> coordinate : route) {
+            if (prevCoordinate != null) {
 
-        Location prevLocation = null;
-        for (Location location : route) {
-//            LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
-//            points.add(position);
-            if (prevLocation != null) {
-
-                LatLng posTo = new LatLng(location.getLatitude(), location.getLongitude());
-                LatLng posFrom = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
+                LatLng posTo = new LatLng(coordinate.get("latitude"), coordinate.get("longitude"));
+                LatLng posFrom = new LatLng(prevCoordinate.get("latitude"), prevCoordinate.get("longitude"));
                 PolylineOptions lineOptions = new PolylineOptions();
-                lineOptions.add(posFrom,posTo).color(getLineColour(Double.valueOf(prevLocation.getProvider())));
+//                lineOptions.add(posFrom,posTo).color(getLineColour(Double.valueOf(prevLocation.getProvider())));
+                lineOptions.add(posFrom,posTo).color(Color.GREEN);
+
                 googleMap.addPolyline(lineOptions);
             }
-            prevLocation = location;
+            prevCoordinate = coordinate;
         }
-
-//        lineOptions.addAll(points);
-//        lineOptions.width(12);
-//        lineOptions.color(Color.RED);
-//        lineOptions.geodesic(true);
-//        googleMap.addPolyline(lineOptions);
-
     }
 
     @Nullable

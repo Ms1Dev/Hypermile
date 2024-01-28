@@ -118,6 +118,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         journeyData.setAvgMpg( totalMpg / rowCountExcStops );
         journeyData.setAvgSpeed( totalSpeed / rowCountExcStops );
         journeyData.setAvgSpeedIncStops( totalSpeed / rowCount );
+
     }
 
 

@@ -12,6 +12,8 @@ public class JourneyData implements Serializable {
     private Double avgSpeedIncStops = 0.0;
     private Double avgMpg = 0.0;
 
+    public JourneyData(){}
+
     public void addVehicleData(Map<String,Object> row) {
         vehicleData.add(row);
     }

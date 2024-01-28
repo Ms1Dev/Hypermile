@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.hypermile.bluetooth.DiscoveredDeviceAdapter;
+import com.example.hypermile.reports.JourneyData;
 import com.example.hypermile.reports.Report;
 import com.example.hypermile.reports.ReportAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -29,6 +30,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firestore.v1.Document;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,22 +72,6 @@ public class ReportsFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         CollectionReference journeyCollection = db.collection("journeys");
 
-//        journeyCollection.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//               @Override
-//               public void onComplete(@NonNull Task<QuerySnapshot> task)
-//               {
-//                   if (task.isSuccessful()) {
-//                       for (QueryDocumentSnapshot document : task.getResult()) {
-//                            Log.d("TAG", "onComplete: " + document.getId());
-//                            reports.add(new Report(document.getId(), document.getData()));
-//                       }
-//                   }
-//                   else {
-//                       Log.w("Report list", "Error getting documents.", task.getException());
-//                   }
-//               }
-//           });
-
         ReportAdapter reportAdapter = new ReportAdapter(this.getContext(), reports);
         reportList.setAdapter(reportAdapter);
 
@@ -110,7 +96,8 @@ public class ReportsFragment extends Fragment {
                 for (DocumentChange dc : value.getDocumentChanges()) {
                     if (dc.getType() == DocumentChange.Type.ADDED) {
                         QueryDocumentSnapshot document = dc.getDocument();
-                        reportAdapter.add(new Report(document.getId(), document.getData()));
+                        JourneyData journeyData = document.toObject(JourneyData.class);
+                        reportAdapter.add(new Report(document.getId(), journeyData));
                     }
                 }
             }
