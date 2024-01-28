@@ -68,9 +68,11 @@ public class MapsFragment extends Fragment {
                 LatLng posTo = new LatLng(coordinate.get("latitude"), coordinate.get("longitude"));
                 LatLng posFrom = new LatLng(prevCoordinate.get("latitude"), prevCoordinate.get("longitude"));
                 PolylineOptions lineOptions = new PolylineOptions();
-//                lineOptions.add(posFrom,posTo).color(getLineColour(Double.valueOf(prevLocation.getProvider())));
-                lineOptions.add(posFrom,posTo).color(Color.GREEN);
-
+                Double mpg = prevCoordinate.get("mpg");;
+                if (mpg == null) {
+                    mpg = 0.0;
+                }
+                lineOptions.add(posFrom,posTo).color(getLineColour(mpg));
                 googleMap.addPolyline(lineOptions);
             }
             prevCoordinate = coordinate;

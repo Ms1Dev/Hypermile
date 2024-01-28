@@ -26,6 +26,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
 
     private Double totalSpeed = 0.0;
     private Double totalMpg = 0.0;
+    private Double currentMpg = 0.0;
     private int rowCount;
     private int rowCountExcStops;
     private final JourneyData journeyData;
@@ -87,6 +88,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
             routeCoordinate.put("latitude", location.getLatitude());
             routeCoordinate.put("longitude", location.getLongitude());
             routeCoordinate.put("altitude", location.getAltitude());
+            routeCoordinate.put("mpg", currentMpg);
             journeyData.addRouteCoordinate(routeCoordinate);
 
             if (prevLocation != null) {
@@ -108,7 +110,8 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
                 totalSpeed += dataSource.getData();
                 break;
             case "MPG":
-                totalMpg += dataSource.getData();
+                currentMpg = dataSource.getData();
+                totalMpg += currentMpg;
                 break;
         }
     }
