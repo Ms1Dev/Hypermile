@@ -1,5 +1,9 @@
 package com.example.hypermile.reports;
 
+import android.util.Log;
+
+import com.google.firebase.Timestamp;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
@@ -11,6 +15,8 @@ public class JourneyData implements Serializable {
     private Double avgSpeed = 0.0;
     private Double avgSpeedIncStops = 0.0;
     private Double avgMpg = 0.0;
+    private Double fuelUsed = 0.0;
+    private transient Timestamp createdWhen;
 
     public JourneyData(){}
 
@@ -48,6 +54,22 @@ public class JourneyData implements Serializable {
 
     public void setAvgSpeedIncStops(Double avgSpeedIncStops) {
         this.avgSpeedIncStops = avgSpeedIncStops;
+    }
+
+    public Timestamp getCreatedWhen() {
+        return createdWhen;
+    }
+
+    public void setCreatedWhen(Timestamp createdWhen) {
+        this.createdWhen = createdWhen;
+    }
+
+    public Double getFuelUsed() {
+        return fuelUsed;
+    }
+
+    public void addFuelUsed(double fuelUsed) {
+        this.fuelUsed += fuelUsed;
     }
 
     public Double getAvgMpg() {

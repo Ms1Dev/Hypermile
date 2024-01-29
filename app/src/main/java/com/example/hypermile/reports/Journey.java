@@ -10,6 +10,7 @@ import com.example.hypermile.bluetooth.ConnectionEventListener;
 import com.example.hypermile.bluetooth.ConnectionState;
 import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataSource;
+import com.example.hypermile.util.Utils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -23,10 +24,11 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
     private final ArrayList<DataSource<Double>> dataSources = new ArrayList<>();
     private DataSource<Location> locationDataSource;
     private DataSource<Timestamp> timestampSource;
-
+    private Timestamp prevTimestamp;
     private Double totalSpeed = 0.0;
     private Double totalMpg = 0.0;
     private Double currentMpg = 0.0;
+    private Double currentFuelRate = 0.0;
     private int rowCount;
     private int rowCountExcStops;
     private final JourneyData journeyData;
@@ -65,6 +67,17 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         addDataRow(timestamp);
         addRouteCoordinate();
         rowCount++;
+
+        if (prevTimestamp != null) {
+            long millisecondsElapsed = Utils.millisDiff(prevTimestamp, timestamp);
+            journeyData.addFuelUsed(fuelUsed(millisecondsElapsed));
+        }
+        prevTimestamp = timestamp;
+    }
+
+    private double fuelUsed(long milliseconds) {
+        double hours = milliseconds / 3600000.0;
+        return currentFuelRate * hours;
     }
 
     private void addDataRow(Timestamp timestamp) {
@@ -82,7 +95,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
     }
 
     private void addRouteCoordinate() {
-        if (locationDataSource != null) {
+        if (locationDataSource.getData() != null) {
             Map<String, Double> routeCoordinate = new HashMap<>();
             Location location = locationDataSource.getData();
             routeCoordinate.put("latitude", location.getLatitude());
@@ -113,6 +126,9 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
                 currentMpg = dataSource.getData();
                 totalMpg += currentMpg;
                 break;
+            case "Fuel Rate":
+                currentFuelRate = dataSource.getData();
+                break;
         }
     }
 
@@ -121,12 +137,13 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         journeyData.setAvgMpg( totalMpg / rowCountExcStops );
         journeyData.setAvgSpeed( totalSpeed / rowCountExcStops );
         journeyData.setAvgSpeedIncStops( totalSpeed / rowCount );
-
     }
 
 
     private void complete() {
         timestampSource.removeDataInputListener(this);
+        com.google.firebase.Timestamp createdWhen = new com.google.firebase.Timestamp(timestampSource.getData());
+        journeyData.setCreatedWhen(createdWhen);
         calcAverages();
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();

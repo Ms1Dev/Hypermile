@@ -4,6 +4,7 @@ import android.location.Location;
 import android.media.JetPlayer;
 import android.util.Log;
 
+import com.example.hypermile.util.Utils;
 import com.google.type.LatLng;
 
 import org.checkerframework.checker.units.qual.A;
@@ -20,6 +21,7 @@ public class Report implements Serializable {
     String dateOfReport;
     double totalDistance;
     double fuelUsed;
+    double fuelUsedIncStops;
     double avgSpeed;
     double avgSpeedIncStops;
     private final JourneyData journeyData;
@@ -27,8 +29,9 @@ public class Report implements Serializable {
     public Report(String dateOfReport, JourneyData journeyData) {
         this.dateOfReport = dateOfReport;
         this.journeyData = journeyData;
-        totalDistance = Math.round((journeyData.getTotalDistanceMetres() * METRES_MILES_CONVERSION) * 100) / 100.0;
-        fuelUsed = Math.round((journeyData.getAvgMpg() / totalDistance * GALLON_LITRE_CONVERSION) * 100) / 100.0;
+        totalDistance = Utils.metresToMiles(journeyData.getTotalDistanceMetres());
+        fuelUsed = Utils.litresUsedFromMpgDistance(journeyData.getAvgMpg(), totalDistance);
+        fuelUsedIncStops = Utils.round2dp(journeyData.getFuelUsed());
         avgSpeed = Math.round((journeyData.getAvgSpeed() * KPH_MPH_CONVERSION) * 100) / 100.0;
         avgSpeedIncStops = Math.round((journeyData.getAvgSpeedIncStops() * KPH_MPH_CONVERSION) * 100) / 100.0;
     }
@@ -57,7 +60,11 @@ public class Report implements Serializable {
         return dateOfReport;
     }
 
+    public double getFuelUsedIncStops() {
+        return fuelUsedIncStops;
+    }
+
     public double getAvgMpg() {
-        return journeyData.getAvgMpg();
+        return  Utils.round2dp(journeyData.getAvgMpg());
     }
 }

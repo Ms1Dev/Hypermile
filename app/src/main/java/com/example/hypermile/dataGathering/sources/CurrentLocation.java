@@ -23,7 +23,6 @@ public class CurrentLocation extends DataSource<Location> implements LocationLis
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-            data = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         }
         else {
             // TODO: tell user no location?

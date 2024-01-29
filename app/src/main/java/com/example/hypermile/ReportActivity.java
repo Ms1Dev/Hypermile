@@ -71,24 +71,28 @@ public class ReportActivity extends AppCompatActivity {
         TextView averageSpeed = new TextView(this);
         TextView averageSpeedIncStationary = new TextView(this);
         TextView fuelUsed = new TextView(this);
+        TextView fuelUsedIncStationary = new TextView(this);
         TextView totalDistance = new TextView(this);
 
         String avgMpgStr = "Average MPG: " + report.getAvgMpg();
         String avgSpeedStr = "Average Speed: " + report.getAvgSpeed() + " KPH";
         String avgSpeedIncStationaryStr = "Average Speed (inc stationary): " + report.getAvgSpeedIncStationary() + " KPH";
         String fuelUsedStr = "Fuel used: " + report.getFuelUsed() + " litres";
+        String fuelUsedIncStationaryStr = "Fuel used (inc stationary): " + report.getFuelUsedIncStops() + " litres";
         String totalDistanceStr = "Total distance: " + report.getTotalDistance() + " miles";
 
         averageMpg.setText(avgMpgStr);
         averageSpeed.setText(avgSpeedStr);
         averageSpeedIncStationary.setText(avgSpeedIncStationaryStr);
         fuelUsed.setText(fuelUsedStr);
+        fuelUsedIncStationary.setText(fuelUsedIncStationaryStr);
         totalDistance.setText(totalDistanceStr);
 
         statisticsLayout.addView(averageMpg);
         statisticsLayout.addView(averageSpeed);
         statisticsLayout.addView(averageSpeedIncStationary);
         statisticsLayout.addView(fuelUsed);
+        statisticsLayout.addView(fuelUsedIncStationary);
         statisticsLayout.addView(totalDistance);
     }
 
