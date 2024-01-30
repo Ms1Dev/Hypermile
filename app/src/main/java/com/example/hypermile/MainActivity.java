@@ -73,42 +73,58 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
-        }
-
-//        CurrentLocation currentLocation = new CurrentLocation(this);
-
         if (
-                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED
-        ){
-
-            connection = new Connection();
-            connectionStatusBar = findViewById(R.id.connectionStatusBar);
-            connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
-            obd = new Obd();
-            connection.addConnectionEventListener(obd);
-            obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
-            connection.addConnectionEventListener(this);
-
-            connection.connectToExisting(this);
-
-            dataManager = new DataManager(this);
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    obd.initialise(connection);
-                    while (!obd.isReady());
-                    obdReady();
-                }
-            }).start();
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN}, 0);
         }
         else {
+            begin();
+        }
+
+        // TODO: if no device in preferences then select from manage bluetooth
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED
+        ) {
             alertUser(UserAlert.BLUETOOTH_PERMISSION_NOT_GRANTED);
         }
+        else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: warn user of GPS needed
+        }
+        else {
+            begin();
+        }
+    }
+
+    private void begin() {
+        connection = new Connection();
+        connectionStatusBar = findViewById(R.id.connectionStatusBar);
+        connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
+        obd = new Obd();
+        connection.addConnectionEventListener(obd);
+        obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
+        connection.addConnectionEventListener(this);
+
+        connection.connectToExisting(this);
+
+        dataManager = new DataManager(this);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                obd.initialise(connection);
+                while (!obd.isReady());
+                obdReady();
+            }
+        }).start();
     }
 
     @Override

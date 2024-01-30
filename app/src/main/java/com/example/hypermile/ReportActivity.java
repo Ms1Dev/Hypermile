@@ -27,10 +27,9 @@ public class ReportActivity extends AppCompatActivity {
     public static final int MID_MPG_COLOUR = Color.YELLOW;
     public static final int HIGH_MPG_COLOUR = Color.GREEN;
 
-    MapsFragment mapsFragment;
-
-    LinearLayout statisticsLayout;
-    TableLayout statisticsTable;
+    private MapsFragment mapsFragment;
+    private LinearLayout statisticsLayout;
+    private TableLayout statisticsTable;
 
 
     @Override
