@@ -91,6 +91,15 @@
                         android:text="Statistics"
                         android:textSize="18sp"
                         android:textAlignment="center" />
+                    <TableLayout
+                        android:id="@+id/statisticsTable"
+                        style="@style/TableLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="10dp"
+                        android:stretchColumns="1">
+
+                    </TableLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

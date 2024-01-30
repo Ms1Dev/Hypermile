@@ -10,13 +10,14 @@ import com.google.type.LatLng;
 import org.checkerframework.checker.units.qual.A;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Report implements Serializable {
-    private final static double METRES_MILES_CONVERSION = 0.0006213712;
-    private final static double GALLON_LITRE_CONVERSION = 4.54609;
+    public final static java.text.DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm • EEEE d MMM yyyy", Locale.ENGLISH);
     final static private double KPH_MPH_CONVERSION = 0.621371;
     String dateOfReport;
     double totalDistance;

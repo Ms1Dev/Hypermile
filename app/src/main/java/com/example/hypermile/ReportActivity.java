@@ -9,8 +9,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.Space;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.example.hypermile.reports.Report;
@@ -25,6 +30,7 @@ public class ReportActivity extends AppCompatActivity {
     MapsFragment mapsFragment;
 
     LinearLayout statisticsLayout;
+    TableLayout statisticsTable;
 
 
     @Override
@@ -39,7 +45,7 @@ public class ReportActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("Report " + report.getDateOfReport());
+        actionBar.setTitle(Report.DATE_FORMAT.format(Double.valueOf(report.getDateOfReport())));
 
         TextView lowMpgKey = findViewById(R.id.low_mpg_val);
         TextView midMpgKey = findViewById(R.id.mid_mpg_val);
@@ -59,6 +65,8 @@ public class ReportActivity extends AppCompatActivity {
         highMpgKey.setText(highMpgKeyText);
 
         statisticsLayout = findViewById(R.id.statisticsLayout);
+        statisticsTable = findViewById(R.id.statisticsTable);
+
         addStatistics(report);
 
         mapsFragment = new MapsFragment(report.getRoute(), LOW_MPG_BOUNDARY, MID_MPG_BOUNDARY);
@@ -67,33 +75,31 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     private void addStatistics(Report report) {
-        TextView averageMpg = new TextView(this);
-        TextView averageSpeed = new TextView(this);
-        TextView averageSpeedIncStationary = new TextView(this);
-        TextView fuelUsed = new TextView(this);
-        TextView fuelUsedIncStationary = new TextView(this);
-        TextView totalDistance = new TextView(this);
+        addTableRow("Average MPG",String.valueOf(report.getAvgMpg()));
+        addTableRow("Average Speed",String.valueOf(report.getAvgSpeed() + " KPH"));
+        addTableRow("Average Speed (inc stationary)",String.valueOf(report.getAvgSpeedIncStationary() + " KPH"));
+        addTableRow("Fuel used",String.valueOf(report.getFuelUsed() + " litres" ));
+        addTableRow("Fuel used (inc stationary)",String.valueOf(report.getFuelUsedIncStops() + " litres"));
+        addTableRow("Total distance",String.valueOf(report.getTotalDistance() + " miles"));
+    }
 
-        String avgMpgStr = "Average MPG: " + report.getAvgMpg();
-        String avgSpeedStr = "Average Speed: " + report.getAvgSpeed() + " KPH";
-        String avgSpeedIncStationaryStr = "Average Speed (inc stationary): " + report.getAvgSpeedIncStationary() + " KPH";
-        String fuelUsedStr = "Fuel used: " + report.getFuelUsed() + " litres";
-        String fuelUsedIncStationaryStr = "Fuel used (inc stationary): " + report.getFuelUsedIncStops() + " litres";
-        String totalDistanceStr = "Total distance: " + report.getTotalDistance() + " miles";
 
-        averageMpg.setText(avgMpgStr);
-        averageSpeed.setText(avgSpeedStr);
-        averageSpeedIncStationary.setText(avgSpeedIncStationaryStr);
-        fuelUsed.setText(fuelUsedStr);
-        fuelUsedIncStationary.setText(fuelUsedIncStationaryStr);
-        totalDistance.setText(totalDistanceStr);
+    private void addTableRow(String label, String value) {
+        TableRow tableRow = new TableRow(this);
+        TextView labelView = new TextView(this);
+        TextView valueView = new TextView(this);
 
-        statisticsLayout.addView(averageMpg);
-        statisticsLayout.addView(averageSpeed);
-        statisticsLayout.addView(averageSpeedIncStationary);
-        statisticsLayout.addView(fuelUsed);
-        statisticsLayout.addView(fuelUsedIncStationary);
-        statisticsLayout.addView(totalDistance);
+        labelView.setText(label);
+        valueView.setText(value);
+
+        tableRow.addView(labelView);
+        tableRow.addView(new Space(this));
+        tableRow.addView(valueView);
+
+        tableRow.setMinimumHeight(80);
+        tableRow.setVerticalGravity(Gravity.CENTER_VERTICAL);
+
+        statisticsTable.addView(tableRow);
     }
 
     /**

@@ -40,7 +40,7 @@ public class ReportAdapter extends ArrayAdapter<Report> {
             String reportDate = report.getDateOfReport();
             try{
                 Date date = new Date(Long.parseLong(reportDate));
-                reportDate = dateFormat.format(date);
+                reportDate = Report.DATE_FORMAT.format(date);
             }
             catch (Exception e){}
 

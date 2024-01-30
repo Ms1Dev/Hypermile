@@ -63,10 +63,33 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        view.findViewById(R.id.weeklyStatBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getStatistics(7);
+            }
+        });
+
+        view.findViewById(R.id.monthlyStatBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                getStatistics(28);
+            }
+        });
+
+        view.findViewById(R.id.yearlyStatBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getStatistics(365);
+            }
+        });
+
         getStatistics(7);
 
         return view;
     }
+
 
 
     private void setStatistics(Map<String, Double> statistics) {
@@ -78,12 +101,10 @@ public class HomeFragment extends Fragment {
                 TextView carbonFootprint = view.findViewById(R.id.carbonFootprint);
                 TextView averageMpg = view.findViewById(R.id.averageMpg);
 
-                String totalDistanceStr = String.valueOf(statistics.get("Total Distance"));
-                String fuelUsedStr = String.valueOf(statistics.get("Fuel Used"));
-                String carbonFootprintStr = String.valueOf(statistics.get("Carbon Footprint"));
-                String averageMpgStr = String.valueOf(statistics.get("Average MPG"));
-
-                Log.d(TAG, "setStatistics: " + carbonFootprintStr);
+                String totalDistanceStr = String.valueOf(statistics.get("Total Distance") + " miles");
+                String fuelUsedStr = String.valueOf(statistics.get("Fuel Used") + " litres");
+                String carbonFootprintStr = String.valueOf(statistics.get("Carbon Footprint") + " kgCO2e");
+                String averageMpgStr = String.valueOf(statistics.get("Average MPG") + " mpg");
 
                 totalDistance.setText(totalDistanceStr);
                 fuelUsed.setText(fuelUsedStr);
