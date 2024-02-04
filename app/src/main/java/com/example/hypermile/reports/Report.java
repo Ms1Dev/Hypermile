@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Used by the ReportAdapter and ReportActivity to show report data
+ */
 public class Report implements Serializable {
     public final static java.text.DateFormat DATE_FORMAT = new SimpleDateFormat("HH:mm • EEEE d MMM yyyy", Locale.ENGLISH);
     final static private double KPH_MPH_CONVERSION = 0.621371;

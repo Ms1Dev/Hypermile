@@ -17,6 +17,10 @@ import com.example.hypermile.util.Utils;
 
 import java.util.Locale;
 
+/**
+ * A view that contains an image of a car and shows inclination value
+ * Rotates an image of a car so it matches the inclination of the vehicle
+ */
 public class InclinationView extends RelativeLayout implements DataInputObserver<Double> {
     private final static int DIAL_RANGE = 75;
     private final static int NORMAL_TEXT_SIZE = 25;
@@ -28,7 +32,6 @@ public class InclinationView extends RelativeLayout implements DataInputObserver
     private TextView label;
     int value = 0;
     View view;
-
     DataSource<Double> dataSource;
     GaugeView gaugeView;
 

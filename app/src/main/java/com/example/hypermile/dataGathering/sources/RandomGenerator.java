@@ -5,6 +5,10 @@ import com.example.hypermile.dataGathering.PollingElement;
 
 import java.util.Random;
 
+/**
+ * Used for development.
+ * Generates a random double between min and max values
+ */
 public class RandomGenerator extends DataSource<Double> implements PollingElement {
     int min, max;
     Random random;

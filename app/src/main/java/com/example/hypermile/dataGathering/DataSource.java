@@ -2,6 +2,12 @@ package com.example.hypermile.dataGathering;
 
 import java.util.ArrayList;
 
+/**
+ * Abstract template class for all data sources.
+ * Implements the main functionality of a datasource without knowing the type.
+ * Stores a list of observers that should be notified when the data is updated.
+ * @param <T>
+ */
 abstract public class DataSource<T> {
     protected String units;
     protected int minValue;
@@ -10,12 +16,11 @@ abstract public class DataSource<T> {
     protected T data;
     ArrayList<DataInputObserver<T>> dataInputObservers = new ArrayList<>();
 
-
     public abstract String getName();
+
 
     public void addDataInputListener(DataInputObserver<T> dataInputObserver) {
         dataInputObservers.add(dataInputObserver);
-//        dataInputObserver.setUnits(units);
     }
 
     public void removeDataInputListener(DataInputObserver<T> dataInputObserver) {

@@ -4,11 +4,20 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+/**
+ * Data poller
+ * Calls the "sampleData" method on pollingElement classes at a regular interval.
+ * Also notifies pollCompleteListeners after each round of polling.
+ */
 public class Poller extends Thread {
-    private final static int RESPONSE_DELAY = 100;
     private int sleepDuration = 500;
     ArrayList<PollingElement> pollingElements = new ArrayList<>();
     ArrayList<PollCompleteListener> pollCompleteListeners = new ArrayList<>();
+
+
+    public Poller(int sampleRateHz) {
+        sleepDuration = 1000 / sampleRateHz;
+    }
 
     public void addPollingElement(PollingElement pollingElement) {
         if (pollingElement != null) {
@@ -26,10 +35,6 @@ public class Poller extends Thread {
         for (PollCompleteListener pollCompleteListener : pollCompleteListeners) {
             pollCompleteListener.pollingComplete();
         }
-    }
-
-    public Poller(int sampleRateHz) {
-        sleepDuration = 1000 / sampleRateHz;
     }
 
     public void run() {

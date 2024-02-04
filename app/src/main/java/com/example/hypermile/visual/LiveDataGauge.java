@@ -14,6 +14,10 @@ import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataSource;
 import com.example.hypermile.util.Utils;
 
+/**
+ * Extension of the custom gauge view
+ * Shows a label with the data along with the gauge
+ */
 public class LiveDataGauge extends RelativeLayout implements DataInputObserver<Double> {
     DataSource<Double> dataSource;
     GaugeView gaugeView;

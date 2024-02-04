@@ -5,6 +5,9 @@ import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataSource;
 import com.example.hypermile.dataGathering.PollCompleteListener;
 
+/**
+ * Calculates the MPG from speed and fuel rate.
+ */
 public class CalculatedMpg extends DataSource<Double> implements PollCompleteListener {
     final static private double UK_GALLON_CONVERSION = 0.21996923465436;
     final static private double MAX_MPG = 99.99;
@@ -49,6 +52,9 @@ public class CalculatedMpg extends DataSource<Double> implements PollCompleteLis
         calculateData();
     }
 
+    /**
+     * If fuel rate and speed data received then this calculates the MPG
+     */
     private void calculateData() {
         if (newFuelData && newSpeedData) {
             newFuelData = false;
@@ -62,11 +68,15 @@ public class CalculatedMpg extends DataSource<Double> implements PollCompleteLis
         }
     }
 
+
     public static double calcMpg(double litresPerHour, double milesPerHour) {
         double gallonsPerHour = litresPerHour * UK_GALLON_CONVERSION;
         return milesPerHour / gallonsPerHour;
     }
 
+    /**
+     * When a round of sensor polling finishes then the stale data is flagged so it isn't mistakenly used on the next cycle
+     */
     @Override
     public void pollingComplete() {
         newFuelData = false;

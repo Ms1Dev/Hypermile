@@ -9,6 +9,9 @@ import android.widget.RelativeLayout;
 import com.example.hypermile.R;
 import com.example.hypermile.bluetooth.ConnectionEventListener;
 
+/**
+ * Provides a visual indication of the connection status of Bluetooth and OBD device
+ */
 public class ConnectionStatusBar extends RelativeLayout {
     View view;
     ProgressStatusBar blueToothStatusBar;

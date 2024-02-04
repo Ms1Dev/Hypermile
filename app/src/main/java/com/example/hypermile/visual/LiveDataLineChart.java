@@ -21,6 +21,11 @@ import com.github.mikephil.charting.data.LineDataSet;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
+/**
+ * Line chart used for showing MPG over time
+ * Uses the MPAndroidChart library: https://github.com/PhilJay/MPAndroidChart
+ * Documentation: https://weeklycoding.com/mpandroidchart-documentation/
+ */
 public class LiveDataLineChart extends RelativeLayout  {
     DataSource<Timestamp> xAxis;
     DataSource<Double> yAxis;
@@ -66,6 +71,11 @@ public class LiveDataLineChart extends RelativeLayout  {
 
     }
 
+    /**
+     *
+     * @param context
+     * @param attrs
+     */
     private void initialise(Context context, AttributeSet attrs) {
         view = LayoutInflater.from(context).inflate(R.layout.live_data_line_chart, this);
         lineChart = view.findViewById(R.id.line_chart);
@@ -100,18 +110,27 @@ public class LiveDataLineChart extends RelativeLayout  {
         currentY = y;
     }
 
+    /**
+     * Called when new data is available
+     * @param x
+     */
     private void updateGraph(Timestamp x) {
         if (currentY == null) return;
         addEntry((float)(x.getTime() - startTimeOffset), currentY.floatValue());
         currentY = null;
     }
 
+    /**
+     * Adds a new datapoint to the graph and scrolls to keep new data in view
+     * Dynamically adding data is not officially supported in the documentation but it can be done
+     * See: https://github.com/PhilJay/MPAndroidChart/wiki/Dynamic-&-Realtime-Data
+     */
     private void addEntry(float x, float y) {
         Entry entry = new Entry(x, y);
         dataSet.addEntry(entry);
         lineData.notifyDataChanged();
         lineChart.notifyDataSetChanged();
-        lineChart.setVisibleXRangeMinimum(20000);
+        lineChart.setVisibleXRangeMinimum(20000); // this is such a large number because the X axis is in milliseconds
         lineChart.setVisibleXRangeMaximum(20000);
         lineChart.moveViewToX(dataSet.getXMax());
     }

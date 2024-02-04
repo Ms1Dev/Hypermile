@@ -1,7 +1,5 @@
 package com.example.hypermile.obd;
 
-import android.util.Log;
-
 import com.example.hypermile.bluetooth.Connection;
 import com.example.hypermile.bluetooth.ConnectionEventListener;
 import com.example.hypermile.bluetooth.ConnectionState;
@@ -10,6 +8,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+/**
+ * Manages communication with the OBD scanner once a bluetooth connection is available.
+ */
 public class Obd implements ConnectionEventListener {
     private final static int SEARCH_FOR_PROTOCOL_TIMEOUT = 20000;
     private final static int SEARCH_FOR_PROTOCOL_ATTEMPTS = 3;
@@ -23,10 +24,13 @@ public class Obd implements ConnectionEventListener {
     private Connection connection;
     public Obd() {}
 
+    /**
+     * Initialise the communication with the vehicle
+     * See elm327 documentation for more information on commands: https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
+     * @param connection
+     * @return boolean
+     */
     public boolean initialise(Connection connection) {
-        // elm327 documentation
-        // https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
-
         this.connection = connection;
 
         while(!connection.hasConnection());
@@ -49,6 +53,12 @@ public class Obd implements ConnectionEventListener {
         return ready;
     }
 
+    /**
+     * Resets the connection and configures scanner
+     * @return boolean
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private boolean reset() throws IOException, InterruptedException {
         updateEventListeners(ConnectionState.CONNECTING);
         connection.sendCommand("ATD\r"); // set all defaults
@@ -78,6 +88,12 @@ public class Obd implements ConnectionEventListener {
         return supportedPids.get(pid);
     }
 
+    /**
+     * Uses the elm327 built in auto scan function to detect the vehicles CANBUS protocol
+     * @return boolean
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private boolean findProtocol() throws IOException, InterruptedException {
 
         int attempts = 0;
@@ -101,7 +117,28 @@ public class Obd implements ConnectionEventListener {
         return false;
     }
 
+    /**
+     * Get the IDs of supported parameters from the vehicle
+     * @throws InterruptedException
+     */
     private void getSupportedPids() throws InterruptedException {
+        /*
+         * This nested for loop is quite ugly so I'll explain...
+         * To know which sensors or parameter IDs (PIDs) a vehicle supports it will respond with binary data representing those PIDs
+         * The number of bits from the MSB is the PID that is supported
+         * For example, from the following byte 00001001 the 5th and 8th bits are set
+         * This would mean PID 0x05 and 0x08 are supported.
+         *
+         * Each response covers 4 bytes containing 32 PIDs out of 200 PIDs in total
+         *
+         * i: each 4 byte response
+         * j: each byte of that response
+         * k: each bit of that byte
+         *
+         * Adding up all the offsets to get the value of the PID: i + j * 8 + (8 - k)
+         *
+         * For more info visit: https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_01_PID_00_-_Show_PIDs_supported
+         */
         for (int i = 0x00; i <= 0xC8; i += 0x20) {
             String request = String.format("01%02x\r", i);
 

@@ -13,7 +13,10 @@ import com.example.hypermile.R;
 import com.example.hypermile.bluetooth.ConnectionEventListener;
 import com.example.hypermile.bluetooth.ConnectionState;
 
-
+/**
+ * UI component of the ConnectionStatusBar
+ * Provides the progress bar for one of the connections
+ */
 public class ProgressStatusBar extends RelativeLayout implements ConnectionEventListener {
     View view;
     ProgressBar progressStatusBar;

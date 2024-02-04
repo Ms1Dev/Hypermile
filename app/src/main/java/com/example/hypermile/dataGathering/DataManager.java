@@ -22,6 +22,10 @@ import com.example.hypermile.obd.Obd;
 import com.example.hypermile.obd.Parameter;
 import java.sql.Timestamp;
 
+/**
+ * Initialises all data sources and connects them to the polling object.
+ * Provides getters for accessing data sources.
+ */
 public class DataManager implements EngineSpec {
     private static final String FUELTYPE_PREFERENCE = "fuelType";
     private static final String ENGINESIZE_PREFERENCE = "engineSize";
@@ -147,6 +151,11 @@ public class DataManager implements EngineSpec {
         }
     }
 
+    /**
+     * This will try to get fuel type and engine size from shared preferences.
+     * Engine size and fuel type are need for some calculations.
+     * @param sharedPreferences
+     */
     private void getVehicleSpecs(SharedPreferences sharedPreferences) {
 
         try {
@@ -168,7 +177,12 @@ public class DataManager implements EngineSpec {
         }
     }
 
-
+    /**
+     * Mass airflow can come from 3 possible sources either directly from 2 mass airflow sensors
+     * OR by calculating it from various other sensors (see ./sources/CalculatedMaf.java class)
+     * @param poller
+     * @return DataSource<Double>
+     */
     private DataSource<Double> getMassAirFlowSource(Poller poller) {
 
         Parameter maf = obd.getPid("10");

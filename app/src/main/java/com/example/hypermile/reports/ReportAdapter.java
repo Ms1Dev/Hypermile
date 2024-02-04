@@ -19,6 +19,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Array adapter used to show a list of reports
+ */
 public class ReportAdapter extends ArrayAdapter<Report> {
     private final static java.text.DateFormat dateFormat = new SimpleDateFormat("HH:mm • EEEE d MMM yyyy", Locale.ENGLISH);
 

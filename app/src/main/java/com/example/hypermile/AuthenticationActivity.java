@@ -31,7 +31,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Objects;
 
-
+/**
+ * Handles logging in and registering users
+ */
 public class AuthenticationActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
@@ -57,11 +59,8 @@ public class AuthenticationActivity extends AppCompatActivity {
     }
 
     protected void loadFragment(Fragment fragment) {
-// create a FragmentManager
         FragmentManager fragmentManager = getFragmentManager();
-// create a FragmentTransaction to begin the transaction and replace the
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//// replace the FrameLayout with new Fragment
         fragmentTransaction.replace(R.id.authLayout, fragment);
         fragmentTransaction.commit(); // save the changes
     }
@@ -110,6 +109,11 @@ public class AuthenticationActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Creates a meaningful error message to present to the user if there is a problem logging in
+     * @param exception
+     * @return
+     */
     private String translateException(Exception exception) {
         try {
             throw exception;

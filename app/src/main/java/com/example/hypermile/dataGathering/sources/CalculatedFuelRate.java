@@ -3,6 +3,9 @@ package com.example.hypermile.dataGathering.sources;
 import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataSource;
 
+/**
+ * Datasource that observes the mass airflow datasource and calculates fuel rate using air-fuel ratio
+ */
 public class CalculatedFuelRate extends DataSource<Double> implements DataInputObserver<Double> {
     final static private double STOICHIOMETRIC_PETROL = 14.7;
     final static private double STOICHIOMETRIC_DIESEL = 14.5;

@@ -6,7 +6,12 @@ import com.example.hypermile.dataGathering.DataSource;
 import com.example.hypermile.dataGathering.PollingElement;
 import com.example.hypermile.obd.Parameter;
 
-
+/**
+ * Generic data source used with OBD sensor reading.
+ * OBD sensors provide data in a very similar format so this class covers most of them.
+ * To better understand what is meant by upperByteMultiplier, divisor, etc. visit: https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_01_-_Show_current_data
+ * and look at the "Formula" column. Data is usually passed as 2 bytes with a formula to decode them.
+ */
 public class VehicleDataLogger extends DataSource<Double> implements PollingElement {
     String code;
     double upperByteMultiplier;

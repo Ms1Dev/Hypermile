@@ -1,13 +1,14 @@
 package com.example.hypermile.reports;
 
-import android.util.Log;
-
 import com.google.firebase.Timestamp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
+/**
+ * Data is stored in FireStore using this class
+ */
 public class JourneyData implements Serializable {
     private ArrayList<Map<String,Object>> vehicleData = new ArrayList<>();
     private ArrayList<Map<String,Double>> route = new ArrayList<>();

@@ -20,6 +20,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Collects journey data and stores it in FireStore when a journey is complete
+ */
 public class Journey implements DataInputObserver<Timestamp>, ConnectionEventListener {
     private final ArrayList<DataSource<Double>> dataSources = new ArrayList<>();
     private DataSource<Location> locationDataSource;
@@ -112,6 +115,10 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         }
     }
 
+    /**
+     * Collects data that is used for averages and totals
+     * @param dataSource
+     */
     private void cumulativeData(DataSource<Double> dataSource) {
         if (dataSource.getData() == null) return;
         switch (dataSource.getName()) {
@@ -139,7 +146,10 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         journeyData.setAvgSpeedIncStops( totalSpeed / rowCount );
     }
 
-
+    /**
+     * Called when the journey ends.
+     * Stores all data to FireStore
+     */
     private void complete() {
         timestampSource.removeDataInputListener(this);
         com.google.firebase.Timestamp createdWhen = new com.google.firebase.Timestamp(timestampSource.getData());

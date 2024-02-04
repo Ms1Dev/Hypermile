@@ -18,6 +18,10 @@ import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 import java.util.Locale;
 
+/**
+ * Custom made Gauge Dial view
+ * Used on the live data page
+ */
 public class GaugeView extends RelativeLayout {
     private final static int DIAL_RANGE = 75;
     private final static int NORMAL_TEXT_SIZE = 25;
@@ -49,6 +53,11 @@ public class GaugeView extends RelativeLayout {
         initialise(context, attrs);
     }
 
+    /**
+     * Loads attributes from res/values/attrs.xml and applies them to view
+     * @param context
+     * @param attrs
+     */
     private void initialise(Context context, AttributeSet attrs) {
         view = LayoutInflater.from(context).inflate(R.layout.gauge_view, this);
         dial = view.findViewById(R.id.dial);
@@ -94,6 +103,11 @@ public class GaugeView extends RelativeLayout {
         }
     }
 
+    /**
+     * Constrains the value so it can be used with the dial
+     * @param value
+     * @return
+     */
     private int convertToDialValue(int value) {
         if (min == max) return 0;
         int convertedValue = ((value - min) * DIAL_RANGE) / (max - min);
@@ -102,6 +116,11 @@ public class GaugeView extends RelativeLayout {
         return convertedValue;
     }
 
+    /**
+     * Updates the view with a new value
+     * Uses runOnUiThread so it can make changes to the UI
+     * @param value
+     */
     public void updateValue(Double value) {
         ((Activity) view.getContext()).runOnUiThread(new Runnable() {
             @Override
@@ -113,6 +132,11 @@ public class GaugeView extends RelativeLayout {
         });
     }
 
+    /**
+     * Sets the min max range of the dial
+     * @param min
+     * @param max
+     */
     public void setRange(int min, int max) {
         this.min = min;
         this.max = max;

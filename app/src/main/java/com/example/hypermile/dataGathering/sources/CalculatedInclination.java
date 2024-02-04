@@ -5,6 +5,9 @@ import android.location.Location;
 import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataSource;
 
+/**
+ * Calculates the current inclination of the vehicle using the current and previous GPS coordinates
+ */
 public class CalculatedInclination extends DataSource<Double> implements DataInputObserver<Location> {
     private Location prevLocation;
 

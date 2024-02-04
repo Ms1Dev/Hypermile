@@ -5,6 +5,9 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * Data frame that is received from the OBD scanner
+ */
 public class ObdFrame {
     final static String CAN_ID = "7E8";
     final static int PAYLOAD_SIZE_POS = 1;
@@ -16,7 +19,12 @@ public class ObdFrame {
     byte pid;
     ArrayList<Byte> dataIn = new ArrayList<>();
 
-
+    /**
+     * Attempts to create a valid OBD frame from the given data
+     * Will return null if data is invalid
+     * @param data
+     * @return
+     */
     public static ObdFrame createFrame(String data) {
         int idPos = data.indexOf(CAN_ID);
 
@@ -34,6 +42,13 @@ public class ObdFrame {
         }
     }
 
+    /**
+     * Create frame from data
+     * If data is made up of multiple frames then the additional data
+     * is appended to the payload to maintain a single frame object
+     * @param frames
+     * @throws InvalidFrameException
+     */
     public ObdFrame(String[] frames) throws InvalidFrameException {
         this.frameData = frames;
 

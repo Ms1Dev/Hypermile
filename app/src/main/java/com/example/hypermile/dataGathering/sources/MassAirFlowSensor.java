@@ -4,6 +4,10 @@ import android.util.Log;
 
 import com.example.hypermile.obd.Parameter;
 
+/**
+ * One of two potential mass airflow sensors that can be found on vehicles.
+ * Is a derived VehicleDataLogger class as the calculation is slightly more complicated than other sensors.
+ */
 public class MassAirFlowSensor extends VehicleDataLogger {
     public MassAirFlowSensor(Parameter parameter, String name, String units, double upperByteMultiplier, int divisor, int expectedBytes) {
         super(parameter, name, units, upperByteMultiplier, divisor, expectedBytes);

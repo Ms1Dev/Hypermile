@@ -15,7 +15,7 @@ import com.example.hypermile.dataGathering.DataSource;
 
 
 public class CurrentLocation extends DataSource<Location> implements LocationListener {
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60;
 
     public CurrentLocation(Context context){
