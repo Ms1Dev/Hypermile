@@ -1,6 +1,7 @@
 package com.example.hypermile.dataGathering;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
@@ -9,6 +10,8 @@ import androidx.preference.PreferenceManager;
 
 import com.example.hypermile.MainActivity;
 import com.example.hypermile.UserAlert;
+import com.example.hypermile.bluetooth.ConnectionEventListener;
+import com.example.hypermile.bluetooth.ConnectionState;
 import com.example.hypermile.dataGathering.sources.CalculatedInclination;
 import com.example.hypermile.dataGathering.sources.CalculatedMaf;
 import com.example.hypermile.dataGathering.sources.CurrentLocation;
@@ -21,12 +24,13 @@ import com.example.hypermile.dataGathering.sources.VehicleDataLogger;
 import com.example.hypermile.obd.Obd;
 import com.example.hypermile.obd.Parameter;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 /**
  * Initialises all data sources and connects them to the polling object.
  * Provides getters for accessing data sources.
  */
-public class DataManager implements EngineSpec {
+public class DataManager implements EngineSpec, ConnectionEventListener {
     private static final String FUELTYPE_PREFERENCE = "fuelType";
     private static final String ENGINESIZE_PREFERENCE = "engineSize";
     final static int DEFAULT_DISPLACEMENT = 1600;
@@ -44,17 +48,28 @@ public class DataManager implements EngineSpec {
     private int engineCapacity = -1;
     private Context context;
     private boolean initialised = false;
-    Obd obd;
+    private Obd obd;
     private static boolean engineCapacityRequired = true;
+    ArrayList<DataManagerReadyListener> dataManagerReadyListeners = new ArrayList<>();
 
-    public DataManager(Context context){
+    public void addDataManagerReadyListener(DataManagerReadyListener dataManagerReadyListener) {
+        dataManagerReadyListeners.add(dataManagerReadyListener);
+    }
+
+    protected void notifyListeners() {
+        for (DataManagerReadyListener dataManagerReadyListener : dataManagerReadyListeners) {
+            dataManagerReadyListener.dataManagerReady();
+        }
+    }
+
+
+    public DataManager(Context context, Obd obd){
         this.context = context;
+        this.obd = obd;
     };
 
-    public void initialise(Obd obd) {
+    public void initialise() {
         if (!initialised) {
-            this.obd = obd;
-
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
             getVehicleSpecs(sharedPreferences);
@@ -148,6 +163,7 @@ public class DataManager implements EngineSpec {
             currentLocation.addDataInputListener(calculatedInclination);
 
             initialised = true;
+            notifyListeners();
         }
     }
 
@@ -308,5 +324,17 @@ public class DataManager implements EngineSpec {
     @Override
     public int getFuelType() {
         return fuelType == -1? DEFAULT_FUELTYPE : fuelType;
+    }
+
+    @Override
+    public void onStateChange(ConnectionState connectionState) {
+        if (connectionState == ConnectionState.CONNECTED && !initialised) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    initialise();
+                }
+            });
+        }
     }
 }

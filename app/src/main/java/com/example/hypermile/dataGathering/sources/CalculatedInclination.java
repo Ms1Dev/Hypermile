@@ -9,21 +9,26 @@ import com.example.hypermile.dataGathering.DataSource;
  * Calculates the current inclination of the vehicle using the current and previous GPS coordinates
  */
 public class CalculatedInclination extends DataSource<Double> implements DataInputObserver<Location> {
+    private static final int MIN_DISTANCE = 5;
     private Location prevLocation;
 
-    public CalculatedInclination() {
+    public CalculatedInclination() {}
 
-    }
     @Override
     public void incomingData(Location data) {
         if (prevLocation != null) {
             double horizontalDistance = prevLocation.distanceTo(data);
-            double verticalDistance = data.getAltitude() - prevLocation.getAltitude();
-            double angleRadians = Math.atan(verticalDistance / horizontalDistance);
-            double angleDegrees = Math.toDegrees(angleRadians);
-            notifyObservers(angleDegrees);
+            if (horizontalDistance > MIN_DISTANCE) {
+                double verticalDistance = data.getAltitude() - prevLocation.getAltitude();
+                double angleRadians = Math.atan(verticalDistance / horizontalDistance);
+                double angleDegrees = Math.toDegrees(angleRadians);
+                notifyObservers(angleDegrees);
+                prevLocation = data;
+            }
         }
-        prevLocation = data;
+        else {
+            prevLocation = data;
+        }
     }
 
     @Override

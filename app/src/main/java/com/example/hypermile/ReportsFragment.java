@@ -85,6 +85,11 @@ public class ReportsFragment extends Fragment {
         journeyCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    ((MainActivity) getContext()).alertUser(UserAlert.FIREBASE_ERROR);
+                    return;
+                }
+
                 for (DocumentChange dc : value.getDocumentChanges()) {
                     if (dc.getType() == DocumentChange.Type.ADDED) {
                         QueryDocumentSnapshot document = dc.getDocument();

@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +14,19 @@ import android.widget.Space;
 import android.widget.TableRow;
 
 import com.example.hypermile.dataGathering.DataManager;
+import com.example.hypermile.dataGathering.DataManagerReadyListener;
 import com.example.hypermile.visual.LiveDataGauge;
 import com.example.hypermile.visual.LiveDataLineChart;
 import com.example.hypermile.visual.InclinationView;
 
-public class LiveDataFragment extends Fragment {
+public class LiveDataFragment extends Fragment implements DataManagerReadyListener {
     LiveDataGauge speedGauge;
     LiveDataGauge engineSpeedGauge;
     LiveDataGauge fuelRateGauge;
     LiveDataLineChart liveDataLineChart;
     InclinationView inclinationView;
+
+    private DataManager dataManager;
 
     long startTimeOffset;
     View view;
@@ -79,7 +83,7 @@ public class LiveDataFragment extends Fragment {
         return space;
     }
 
-    public void connectDataToGauges(DataManager dataManager) {
+    public void connectDataToGauges() {
         ((Activity) view.getContext()).runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -92,5 +96,16 @@ public class LiveDataFragment extends Fragment {
         });
 
         startTimeOffset = System.currentTimeMillis();
+    }
+
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    @Override
+    public void dataManagerReady() {
+        if (dataManager != null) {
+            connectDataToGauges();
+        }
     }
 }

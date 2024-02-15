@@ -26,35 +26,57 @@ public class Obd implements ConnectionEventListener {
 
     /**
      * Initialise the communication with the vehicle
-     * See elm327 documentation for more information on commands: https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
      * @param connection
      * @return boolean
      */
-    public boolean initialise(Connection connection) {
+    public void initialise(Connection connection) {
         this.connection = connection;
 
-        while(!connection.hasConnection());
-
-        try {
-            if (reset()) {
-                Thread.sleep(MINIMUM_RESPONSE_WAIT);
-                getSupportedPids();
-                Thread.sleep(MINIMUM_RESPONSE_WAIT);
-                connection.sendCommand("0902\r");
-                Thread.sleep(MINIMUM_RESPONSE_WAIT);
-                ready = true;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(!connection.hasConnection());
+                try {
+                    if (reset()) {
+                        Thread.sleep(MINIMUM_RESPONSE_WAIT);
+                        getSupportedPids();
+                        Thread.sleep(MINIMUM_RESPONSE_WAIT);
+                        connection.sendCommand("0902\r");
+                        Thread.sleep(MINIMUM_RESPONSE_WAIT);
+                        ready = true;
+                    }
+                }
+                catch (InterruptedException | IOException e) {
+                    ready = false;
+                    updateEventListeners(ConnectionState.ERROR);
+                }
+                updateEventListeners(ready? ConnectionState.CONNECTED : ConnectionState.ERROR);
             }
-        }
-        catch (InterruptedException | IOException e) {
-            ready = false;
-            updateEventListeners(ConnectionState.ERROR);
-        }
-        updateEventListeners(ready? ConnectionState.CONNECTED : ConnectionState.ERROR);
-        return ready;
+        }).start();
+
+//        while(!connection.hasConnection());
+//
+//        try {
+//            if (reset()) {
+//                Thread.sleep(MINIMUM_RESPONSE_WAIT);
+//                getSupportedPids();
+//                Thread.sleep(MINIMUM_RESPONSE_WAIT);
+//                connection.sendCommand("0902\r");
+//                Thread.sleep(MINIMUM_RESPONSE_WAIT);
+//                ready = true;
+//            }
+//        }
+//        catch (InterruptedException | IOException e) {
+//            ready = false;
+//            updateEventListeners(ConnectionState.ERROR);
+//        }
+//        updateEventListeners(ready? ConnectionState.CONNECTED : ConnectionState.ERROR);
     }
 
     /**
      * Resets the connection and configures scanner
+     * Various AT commands are used to configure the scanner
+     * See elm327 documentation page 9 onwards for more information on commands: https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
      * @return boolean
      * @throws IOException
      * @throws InterruptedException
@@ -101,8 +123,8 @@ public class Obd implements ConnectionEventListener {
         do {
             long startMillis = System.currentTimeMillis();
             attempts++;
-            connection.sendCommand("ATSP0\r"); // Auto detect protocol
-            connection.sendCommand("0100\r"); // Request available PIDs (just to test for response)
+            connection.sendCommand("ATSP0\r"); // Auto detect protocol command
+            connection.sendCommand("0100\r"); // Request available PIDs 0x00 - 0x20 (just to check for response)
 
             while (!connection.hasData()) {
                 Thread.sleep(100);
@@ -124,7 +146,7 @@ public class Obd implements ConnectionEventListener {
     private void getSupportedPids() throws InterruptedException {
         /*
          * This nested for loop is quite ugly so I'll explain...
-         * To know which sensors or parameter IDs (PIDs) a vehicle supports it will respond with binary data representing those PIDs
+         * To know which sensors AKA parameter IDs (PIDs) a vehicle supports it will respond with binary data representing those PIDs
          * The number of bits from the MSB is the PID that is supported
          * For example, from the following byte 00001001 the 5th and 8th bits are set
          * This would mean PID 0x05 and 0x08 are supported.
@@ -136,10 +158,11 @@ public class Obd implements ConnectionEventListener {
          * k: each bit of that byte
          *
          * Adding up all the offsets to get the value of the PID: i + j * 8 + (8 - k)
+         * then AND it with the response to check whether it is available
          *
          * For more info visit: https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_01_PID_00_-_Show_PIDs_supported
          */
-        for (int i = 0x00; i <= 0xC8; i += 0x20) {
+        for (int i = 0x00; i <= 0xC8; i += 0x20) { // increments of 0x20 or 32 decimal
             String request = String.format("01%02x\r", i);
 
             byte[] response = requestData(request.getBytes());
@@ -149,7 +172,7 @@ public class Obd implements ConnectionEventListener {
 
             for (int j = 0; j < 4; j++) {
                 for (int k = 0; k < 8; k++) {
-                    if ((response[j] & (1 << k)) > 0) {
+                    if ((response[j] & (1 << k)) > 0) { // if the value of this bit is greater than 0 this pid is available
                         byte supportedPid = (byte) (i + j * 8 + (8 - k));
                         Parameter parameter = new Parameter(supportedPid, this);
                         supportedPids.put(parameter.asString(), parameter);

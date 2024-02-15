@@ -31,6 +31,7 @@ import com.example.hypermile.dataGathering.DataManager;
 import com.example.hypermile.dataGathering.sources.CurrentLocation;
 import com.example.hypermile.obd.Obd;
 import com.example.hypermile.reports.Journey;
+import com.example.hypermile.reports.JourneyMonitor;
 import com.example.hypermile.visual.ConnectionStatusBar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -50,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private Obd obd;
     private Connection connection;
     private DataManager dataManager;
+    private JourneyMonitor journeyMonitor;
+    private Snackbar alertSnackBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,41 +130,24 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         connection.connectToExisting(this);
 
-        dataManager = new DataManager(this);
+        dataManager = new DataManager(this, obd);
+        obd.addConnectionEventListener(dataManager);
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                obd.initialise(connection);
-                while (!obd.isReady());
-                obdReady();
-            }
-        }).start();
+        liveDataFragment.setDataManager(dataManager);
+        dataManager.addDataManagerReadyListener(liveDataFragment);
+
+        JourneyMonitor journeyMonitor = new JourneyMonitor(dataManager);
+        obd.addConnectionEventListener(journeyMonitor);
+
+        dataManager.addDataManagerReadyListener(journeyMonitor);
+
+        obd.initialise(connection);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.overflow, menu);
         return true;
-    }
-
-    public void obdReady() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                dataManager.initialise(obd);
-                liveDataFragment.connectDataToGauges(dataManager);
-                Journey journey = new Journey();
-                obd.addConnectionEventListener(journey);
-                journey.addDataSource(dataManager.getEngineSpeed());
-                journey.addDataSource(dataManager.getSpeed());
-                journey.addDataSource(dataManager.getCalculatedMpg());
-                journey.addDataSource(dataManager.getCalculatedInclination());
-                journey.addDataSource(dataManager.getFuelRate());
-                journey.start(dataManager.getCurrentTimestamp());
-                journey.addLocationDataSource(dataManager.getCurrentLocation());
-            }
-        });
     }
 
     @Override
@@ -219,8 +205,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         Snackbar snackbar = null;
         switch (userAlert) {
             case VEHICLE_SPEC_UNKNOWN:
-                snackbar = Snackbar.make(this, getWindow().getDecorView(), "Vehicle details need to be manually set", Snackbar.LENGTH_INDEFINITE);
-                snackbar.setAction("Settings", new View.OnClickListener() {
+                alertSnackBar = Snackbar.make(this, getWindow().getDecorView(), "Vehicle details need to be manually set", Snackbar.LENGTH_INDEFINITE);
+                alertSnackBar.setAction("Settings", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         launchSettings();
@@ -228,18 +214,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                 });
                 break;
             case BLUETOOTH_PERMISSION_NOT_GRANTED:
-                snackbar = Snackbar.make(this, getWindow().getDecorView(), "Bluetooth permissions required", Snackbar.LENGTH_INDEFINITE);
-                Snackbar finalSnackbar = snackbar;
-                snackbar.setAction("OK", new View.OnClickListener() {
+                alertSnackBar = Snackbar.make(this, getWindow().getDecorView(), "Bluetooth permissions required", Snackbar.LENGTH_INDEFINITE);
+                alertSnackBar.setAction("OK", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        finalSnackbar.dismiss();
+                        alertSnackBar.dismiss();
+                    }
+                });
+                break;
+            case FIREBASE_ERROR:
+                alertSnackBar = Snackbar.make(this, getWindow().getDecorView(), "Database error. Please contact support", Snackbar.LENGTH_INDEFINITE);
+                alertSnackBar.setAction("OK", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        alertSnackBar.dismiss();
                     }
                 });
                 break;
         }
-        snackbar.setAnchorView(findViewById(R.id.connectionStatusBar));
-        snackbar.show();
+        alertSnackBar.setAnchorView(findViewById(R.id.connectionStatusBar));
+        alertSnackBar.show();
     }
 
     private void launchSettings() {

@@ -150,7 +150,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
      * Called when the journey ends.
      * Stores all data to FireStore
      */
-    private void complete() {
+    public void complete() {
         timestampSource.removeDataInputListener(this);
         com.google.firebase.Timestamp createdWhen = new com.google.firebase.Timestamp(timestampSource.getData());
         journeyData.setCreatedWhen(createdWhen);
