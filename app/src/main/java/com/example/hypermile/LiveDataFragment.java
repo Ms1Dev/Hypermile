@@ -19,17 +19,21 @@ import com.example.hypermile.visual.LiveDataGauge;
 import com.example.hypermile.visual.LiveDataLineChart;
 import com.example.hypermile.visual.InclinationView;
 
+/**
+ * Presents live data to the user in the form of gauges and tables.
+ * Individual elements update every time new data is received from one of the many data sources.
+ */
 public class LiveDataFragment extends Fragment implements DataManagerReadyListener {
-    LiveDataGauge speedGauge;
-    LiveDataGauge engineSpeedGauge;
-    LiveDataGauge fuelRateGauge;
-    LiveDataLineChart liveDataLineChart;
-    InclinationView inclinationView;
+    private LiveDataGauge speedGauge;
+    private LiveDataGauge engineSpeedGauge;
+    private LiveDataGauge fuelRateGauge;
+    private LiveDataLineChart liveDataLineChart;
+    private InclinationView inclinationView;
 
     private DataManager dataManager;
 
-    long startTimeOffset;
-    View view;
+    private long startTimeOffset;
+    private View view;
 
     public LiveDataFragment() {
         // Required empty public constructor
@@ -48,6 +52,9 @@ public class LiveDataFragment extends Fragment implements DataManagerReadyListen
         startTimeOffset = System.currentTimeMillis();
     }
 
+    /**
+     * Table rows and elements are added dynamically here to give the option to add more at a later date.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_live_data, container, false);
@@ -74,15 +81,10 @@ public class LiveDataFragment extends Fragment implements DataManagerReadyListen
         return view;
     }
 
-    private Space getSpacer(Context context) {
-        Space space = new Space(context);
-        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
-        layoutParams.span = 1;
-        layoutParams.weight = 1;
-        space.setLayoutParams(layoutParams);
-        return space;
-    }
-
+    /**
+     * Connects the data sources to their respective gauges.
+     * Can only be done when the DataManager is ready so is called by the dataManagerReady function.
+     */
     public void connectDataToGauges() {
         ((Activity) view.getContext()).runOnUiThread(new Runnable() {
             @Override
@@ -108,4 +110,20 @@ public class LiveDataFragment extends Fragment implements DataManagerReadyListen
             connectDataToGauges();
         }
     }
+
+
+    /**
+     * Creates a space equal to the size of one gauge for when the gauge number is uneven.
+     * @param context
+     * @return
+     */
+    private Space getSpacer(Context context) {
+        Space space = new Space(context);
+        TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+        layoutParams.span = 1;
+        layoutParams.weight = 1;
+        space.setLayoutParams(layoutParams);
+        return space;
+    }
+
 }

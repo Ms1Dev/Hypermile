@@ -9,13 +9,15 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
+/**
+ * Shows a simple login form to the user to enter credentials.
+ */
 public class LoginFragment extends android.app.Fragment implements AuthRequester {
-    View view;
-    EditText usernameField;
-    EditText passwordField;
-    Button loginButton;
-    TextView signupLink;
+    private View view;
+    private EditText usernameField;
+    private EditText passwordField;
+    private Button loginButton;
+    private TextView signupLink;
 
 
     @Override

@@ -29,7 +29,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * This fragment is the default home screen fragment.
+ * Shows info about the latest report and some statistics on the home screen.
+ */
 public class HomeFragment extends Fragment {
     private final static String TAG = "HoneFragment";
     private final static long DAY_SECONDS = 86400;
@@ -53,14 +56,13 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         view = inflater.inflate(R.layout.fragment_home, container, false);
         goToReportsBtn = (Button) view.findViewById(R.id.goToReportsBtn);
         viewLatestReportBtn = (Button) view.findViewById(R.id.viewLatestReportBtn);
         latestReportInfo = view.findViewById(R.id.latestReportInfo);
-
         viewLatestReportBtn.setEnabled(false);
 
+        // set onclick listener for button that will take user to the reports list fragment
         goToReportsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,14 +70,14 @@ public class HomeFragment extends Fragment {
                 mainActivity.selectFragmentProgrammatically(R.id.reports);
             }
         });
-
+        // set onclick listener for weekly statistics
         view.findViewById(R.id.weeklyStatBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getStatistics(7);
             }
         });
-
+        // set onclick listener for monthly (28 day) statistics
         view.findViewById(R.id.monthlyStatBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,7 +85,7 @@ public class HomeFragment extends Fragment {
                 getStatistics(28);
             }
         });
-
+        // set onclick listener for yearly statistics
         view.findViewById(R.id.yearlyStatBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -91,33 +93,23 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // call methods for updating the UI with firestore data
         getStatistics(7);
-
         getLatestReport();
 
         return view;
     }
 
-    private void latestReportRetrieved(Report report) {
-        viewLatestReportBtn.setEnabled(true);
-        viewLatestReportBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent reportIntent = new Intent(getContext(), ReportActivity.class);
-                reportIntent.putExtra("Report", report);
-                startActivity(reportIntent);
-            }
-        });
-
-        String reportText = getResources().getString(R.string.latest_report, report.getAvgMpg(), report.getFuelUsedIncStops());
-
-        latestReportInfo.setText(reportText);
-    }
-
-
+    /**
+     * Attempts to retrieve the most recent document from firestore
+     */
     private void getLatestReport() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // get the journey collection
         CollectionReference journeyCollection = db.collection("journeys");
+
+        // order by the createdWhen attribute and limit to 1 to get the latest
         Query latestJourney = journeyCollection.orderBy("createdWhen").limit(1);
 
         latestJourney.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -132,29 +124,33 @@ public class HomeFragment extends Fragment {
         });
     }
 
-
-    private void setStatistics(Map<String, Double> statistics) {
-        getActivity().runOnUiThread(new Runnable() {
+    /**
+     * Called when the latest document is retrieved from firestore.
+     * Updates the homepage to show info and a link to this report.
+     * @param report
+     */
+    private void latestReportRetrieved(Report report) {
+        // enable the button and add onclick listener that will launch the report activity
+        viewLatestReportBtn.setEnabled(true);
+        viewLatestReportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                TextView totalDistance = view.findViewById(R.id.totalDistance);
-                TextView fuelUsed = view.findViewById(R.id.fuelUsage);
-                TextView carbonFootprint = view.findViewById(R.id.carbonFootprint);
-                TextView averageMpg = view.findViewById(R.id.averageMpg);
-
-                String totalDistanceStr = String.valueOf(statistics.get("Total Distance") + " miles");
-                String fuelUsedStr = String.valueOf(statistics.get("Fuel Used") + " litres");
-                String carbonFootprintStr = String.valueOf(statistics.get("Carbon Footprint") + " kgCO2e");
-                String averageMpgStr = String.valueOf(statistics.get("Average MPG") + " mpg");
-
-                totalDistance.setText(totalDistanceStr);
-                fuelUsed.setText(fuelUsedStr);
-                carbonFootprint.setText(carbonFootprintStr);
-                averageMpg.setText(averageMpgStr);
+            public void onClick(View view) {
+                Intent reportIntent = new Intent(getContext(), ReportActivity.class);
+                reportIntent.putExtra("Report", report);
+                startActivity(reportIntent);
             }
         });
+
+        // update the text to show info about report
+        String reportText = getResources().getString(R.string.latest_report, report.getAvgMpg(), report.getFuelUsedIncStops());
+        latestReportInfo.setText(reportText);
     }
 
+    /**
+     * Retrieves documents that have been created between now and the number of days prior.
+     * Iterates over those documents and creates totals/averages for certain attributes.
+     * @param daysPrior
+     */
     private void getStatistics(int daysPrior) {
         long secondsPrior = DAY_SECONDS * daysPrior;
         Timestamp now = Timestamp.now();
@@ -174,10 +170,10 @@ public class HomeFragment extends Fragment {
                     Double fuelUsed = 0.0;
                     int avgCounter = 0;
 
+                    // iterate over the documents
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         try {
-                            fuelUsed += (Double) document.get("fuelUsed");
-
+                            // accumulate mpg and increment counter if greater than 0 and not NaN
                             Double _avgMpg = (Double) document.get("avgMpg");
                             try {
                                 if (!_avgMpg.isNaN() && _avgMpg > 0) {
@@ -187,6 +183,8 @@ public class HomeFragment extends Fragment {
                             }
                             catch (NullPointerException e){}
 
+                            // accumulate fuel usage and distance
+                            fuelUsed += (Double) document.get("fuelUsed");
                             totalDistance += (Double) document.get("totalDistanceMetres");
                         }
                         catch (NullPointerException e) {
@@ -194,22 +192,52 @@ public class HomeFragment extends Fragment {
                         }
                     }
 
+                    // format the data
                     double distanceMiles = Utils.metresToMiles(totalDistance);
                     double litresUsed = Utils.round2dp(fuelUsed);
+                    double mpg = Utils.round2dp(avgMpg / avgCounter);
 
+                    // add data to a map to pass to the ui method
                     Map<String, Double> statistics = new HashMap<>();
                     statistics.put("Total Distance", distanceMiles);
                     statistics.put("Fuel Used", litresUsed);
                     statistics.put("Carbon Footprint", Utils.kgCO2e(litresUsed, 1));
-                    statistics.put("Average MPG", Utils.round2dp(avgMpg / avgCounter));
+                    statistics.put("Average MPG", mpg);
 
-                    Log.d(TAG, "onComplete: " + avgMpg);
-
+                    // populate ui elements with data
                     setStatistics(statistics);
 
                 } else {
                     Log.d(TAG, "Error getting documents: ", task.getException());
                 }
+            }
+        });
+    }
+
+    /**
+     * Populates the statistics fields on the home screen.
+     * This is called by the getStatistics method
+     * @param statistics
+     */
+    private void setStatistics(Map<String, Double> statistics) {
+        // to make changes to the ui it needs to run on the ui thread
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TextView totalDistance = view.findViewById(R.id.totalDistance);
+                TextView fuelUsed = view.findViewById(R.id.fuelUsage);
+                TextView carbonFootprint = view.findViewById(R.id.carbonFootprint);
+                TextView averageMpg = view.findViewById(R.id.averageMpg);
+
+                String totalDistanceStr = String.valueOf(statistics.get("Total Distance") + " miles");
+                String fuelUsedStr = String.valueOf(statistics.get("Fuel Used") + " litres");
+                String carbonFootprintStr = String.valueOf(statistics.get("Carbon Footprint") + " kgCO2e");
+                String averageMpgStr = String.valueOf(statistics.get("Average MPG") + " mpg");
+
+                totalDistance.setText(totalDistanceStr);
+                fuelUsed.setText(fuelUsedStr);
+                carbonFootprint.setText(carbonFootprintStr);
+                averageMpg.setText(averageMpgStr);
             }
         });
     }

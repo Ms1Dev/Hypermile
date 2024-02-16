@@ -83,7 +83,11 @@ public class Connection {
         return latestFrame != null;
     }
 
-
+    /**
+     * Tries to connect to an existing MAC address if it is stored in shared preferences.
+     * Better for the user if they do not need to select the device on every session.
+     * @param context
+     */
     public void connectToExisting(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
         if (sharedPreferences.contains(PREFERENCE_DEVICE_MAC)) {
@@ -99,7 +103,11 @@ public class Connection {
         }
     }
 
-
+    /**
+     * Returns the latest frame of data received by the OBD device.
+     * Clears the frame so it can only be retrieved once.
+     * @return
+     */
     public ObdFrame getLatestFrame() {
         ObdFrame obdFrame = latestFrame;
         latestFrame = null;
@@ -117,7 +125,10 @@ public class Connection {
         }
     }
 
-
+    /**
+     * This is called when a device is selected from the bluetooth device list.
+     * @param bluetoothDevice
+     */
     public void manuallySelectedConnection(BluetoothDevice bluetoothDevice) {
         autoConnectAttempts = 0;
         createConnection(bluetoothDevice);
@@ -160,7 +171,9 @@ public class Connection {
         updateEventListeners(ConnectionState.CONNECTED);
     }
 
-
+    /**
+     * Will monitor the connection and attempt to reconnect if it is disconnected.
+     */
     private void autoConnect() {
         autoConnectThread = new Thread(new Runnable() {
             @Override
@@ -190,6 +203,13 @@ public class Connection {
         autoConnectThread.start();
     }
 
+    /**
+     * Send a command using the connection thread.
+     * @param command
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
     public boolean sendCommand(String command) throws IOException, InterruptedException {
         byte[] cmdAsBytes = command.getBytes();
         if (connectionThread != null) {
@@ -214,7 +234,7 @@ public class Connection {
                 _socket = bluetoothDevice.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"));
             }
             catch (IOException | SecurityException e) {
-                Log.d("Err", "ConnectThread: Failed to create socket");
+                Log.e("Err", "Connection error", e);
             }
             bluetoothSocket = _socket;
         }
@@ -229,18 +249,21 @@ public class Connection {
                 try {
                     bluetoothSocket.close();
                 } catch (IOException closeException) {
-                    Log.e("Err", "Could not close the client socket", closeException);
+                    Log.e("Err", "Could not close bluetooth socket", closeException);
                 }
                 return;
             }
             catch (NullPointerException e) {
-                Log.e("Err", "Bluetooth socket is null, bluetooth possibly turned off: ", e);
+                Log.e("Err", "Bluetooth socket null: ", e);
                 updateEventListeners(ConnectionState.ERROR);
                 return;
             }
             manageConnection(bluetoothSocket);
         }
 
+        /**
+         * In case the connection needs to be cancelled before a connection has been established
+         */
         public void cancel() {
             try {
                 bluetoothSocket.close();
@@ -263,6 +286,7 @@ public class Connection {
 
         public ConnectionThread(BluetoothSocket socket) {
             bluetoothSocket = socket;
+            // because the streams are final temporary ones are needed
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
@@ -281,20 +305,25 @@ public class Connection {
             outputStream = tmpOut;
         }
 
+        /**
+         * This run method is monitoring the socket for incoming messages and will run while there is a connection.
+         */
         public void run() {
             while (!isInterrupted()) {
                 try {
                     StringBuilder stringBuilder = new StringBuilder();
-
                     int readValue;
                     while ((readValue = inputStream.read()) != -1) {
                         char charValue = (char) readValue;
-                        if (charValue == '>') break;
+                        if (charValue == '>') break; // this character is the end of a message from OBD
                         stringBuilder.append(charValue);
                     }
 
+                    // if message was received try to make an OBD frame from it
                     if (stringBuilder.length() > 0) {
                         ObdFrame obdFrame = ObdFrame.createFrame(stringBuilder.toString());
+
+                        // if its a valid frame then store it as the latest frame
                         if (obdFrame != null) latestFrame = obdFrame;
                     }
 
@@ -306,7 +335,12 @@ public class Connection {
             }
         }
 
-
+        /**
+         * Write data out over bluetooth.
+         * This clears the latest received frame because the outbound message always expects a response
+         * so anything that's left in there from before is irrelevant and may confuse things
+         * @param bytes
+         */
         public void write(byte[] bytes) {
             try {
                 latestFrame = null;
@@ -316,7 +350,9 @@ public class Connection {
             }
         }
 
-
+        /**
+         * If the bluetooth connection needs to be cancelled then close the socket and set the appropriate statuses
+         */
         public void cancel() {
             try {
                 bluetoothSocket.close();

@@ -62,10 +62,17 @@ public class AuthenticationActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.authLayout, fragment);
-        fragmentTransaction.commit(); // save the changes
+        fragmentTransaction.commit();
     }
 
-
+    /**
+     * Attempts to register user with credentials.
+     * This is called by the sign up fragment
+     * @param email
+     * @param password
+     * @param authRequester
+     * @return
+     */
     public String registerUser(String email, String password, AuthRequester authRequester) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -74,7 +81,6 @@ public class AuthenticationActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         FirebaseUser user = firebaseAuth.getCurrentUser();
                         startMainActivity();
-                        Log.d("debug","Workeddd");
                     }
                     else {
                         authRequester.authError(translateException(task.getException()));
@@ -84,6 +90,14 @@ public class AuthenticationActivity extends AppCompatActivity {
         return errorMessage;
     }
 
+    /**
+     * Will attempt to log user in with credentials.
+     * This is called by the login fragment
+     * @param email
+     * @param password
+     * @param authRequester
+     * @return
+     */
     public String loginUser(String email, String password, AuthRequester authRequester) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -101,6 +115,10 @@ public class AuthenticationActivity extends AppCompatActivity {
         return errorMessage;
     }
 
+    /**
+     * Launches the main activity on successful login or sign up
+     * Finishes this activity.
+     */
     public void startMainActivity() {
         if (firebaseAuth.getCurrentUser() != null) {
             Intent intent = new Intent(AuthenticationActivity.this, MainActivity.class);
