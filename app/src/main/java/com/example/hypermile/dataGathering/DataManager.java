@@ -68,6 +68,10 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
         this.obd = obd;
     };
 
+    /**
+     * Create instances of various data sources.
+     * Also creates a polling object that will request an update from all data sources at regular intervals.
+     */
     public void initialise() {
         if (!initialised) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -85,6 +89,10 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
 
             Poller poller = new Poller(1);
 
+
+            /*
+                see ./sources/VehicleDataLogger.java class for more info on the vehicle data logger and its parameters
+             */
             Parameter speedParameter = obd.getPid("0D");
             if (speedParameter != null) {
                 speed = new VehicleDataLogger(
@@ -140,10 +148,12 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
             currentTimestamp = new CurrentTimestamp();
             randomGenerator = new RandomGenerator(-30, 30);
 
+            // elements that sample their data during polling
             poller.addPollingElement(engineSpeed);
             poller.addPollingElement(speed);
             poller.addPollingElement(randomGenerator);
 
+            // these elements are notified when a round of polling has completed
             poller.addPollCompleteListener(currentTimestamp);
             poller.addPollCompleteListener(calculatedMpg);
 
@@ -154,6 +164,7 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
 
             poller.start();
 
+            // If the alternate MAF calculation is used the engine capacity and fuel type are needed so alert user.
             if (fuelType == -1 || (engineCapacity == -1 && engineCapacityRequired)) {
                 ((MainActivity) context).alertUser(UserAlert.VEHICLE_SPEC_UNKNOWN);
             }
@@ -194,13 +205,14 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
     }
 
     /**
-     * Mass airflow can come from 3 possible sources either directly from 2 mass airflow sensors
+     * Mass airflow can come from 3 possible sources. Either directly from 2 mass airflow sensors
      * OR by calculating it from various other sensors (see ./sources/CalculatedMaf.java class)
      * @param poller
      * @return DataSource<Double>
      */
     private DataSource<Double> getMassAirFlowSource(Poller poller) {
 
+        // This is the most common MAF sensor on a vehicle
         Parameter maf = obd.getPid("10");
         if (maf != null) {
             VehicleDataLogger massAirFlow = new VehicleDataLogger(
@@ -233,6 +245,7 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
         }
 
         // if no MAF sensors then do it the hard way
+        // MAF can be calculated with Intake temperature, intake pressure, RPM and engine capacity
         Parameter manifoldPressure = obd.getPid("0B");
         Parameter intakeTemperature = obd.getPid("0F");
 

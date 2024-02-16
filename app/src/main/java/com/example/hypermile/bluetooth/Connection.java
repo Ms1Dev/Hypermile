@@ -143,6 +143,8 @@ public class Connection {
 
         initConnThread = new InitConnThread(bluetoothDevice);
         initConnThread.start();
+
+        autoConnect();
     }
 
 
@@ -156,8 +158,6 @@ public class Connection {
         isConnected = true;
 
         updateEventListeners(ConnectionState.CONNECTED);
-
-//        Obd.getInstance().initialise(getInstance());
     }
 
 
@@ -292,8 +292,6 @@ public class Connection {
                         if (charValue == '>') break;
                         stringBuilder.append(charValue);
                     }
-
-//                    Log.d("TAG", "read: " + stringBuilder.toString());
 
                     if (stringBuilder.length() > 0) {
                         ObdFrame obdFrame = ObdFrame.createFrame(stringBuilder.toString());
