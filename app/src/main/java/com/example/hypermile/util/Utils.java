@@ -28,6 +28,10 @@ public class Utils {
         }
     }
 
+    static public double gallonsToLitres(double gallons) {
+        return gallons * GALLON_LITRE_CONVERSION;
+    }
+
     /**
      * Returns the litres of fuel used to travel a certain distance at a specific MPG
      * @param mpg
@@ -36,7 +40,7 @@ public class Utils {
      */
     static public double litresUsedFromMpgDistance(double mpg, double distance) {
         if (distance == 0.0 || mpg == 0.0) return 0.0;
-        return round2dp(mpg / distance * GALLON_LITRE_CONVERSION);
+        return round2dp((distance / mpg) * GALLON_LITRE_CONVERSION);
     }
 
     /**

@@ -4,8 +4,10 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import com.example.hypermile.dataGathering.sources.CalculatedFuelRate;
 import com.example.hypermile.dataGathering.sources.CalculatedMaf;
 import com.example.hypermile.dataGathering.sources.CalculatedMpg;
+import com.example.hypermile.util.Utils;
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -57,5 +59,32 @@ public class UnitTests {
         double mpg = CalculatedMpg.calcMpg(5, 62.1371);
         assertEquals(56.4962, mpg, 0.001);
     }
+
+    @Test
+    public void gallonsToLitres() {
+        double litres = Utils.gallonsToLitres(1);
+        assertEquals(4.54609, litres, 0.001);
+    }
+
+    @Test
+    public void litresUsedFromMpg() {
+        double litres = Utils.litresUsedFromMpgDistance(30.0, 30.0);
+        double expectedLitres = Utils.round2dp( Utils.gallonsToLitres(1) );
+        assertEquals(expectedLitres, litres, 0.001);
+    }
+
+    @Test
+    public void litresUsedFromMpg2() {
+        double litres = Utils.litresUsedFromMpgDistance(30.0, 0.3);
+        double expectedLitres = Utils.round2dp( Utils.gallonsToLitres(0.01) );
+        assertEquals(expectedLitres, litres, 0.001);
+    }
+
+    @Test
+    public void metresToMiles() {
+        double metres = Utils.metresToMiles(1609.34);
+        assertEquals(1, metres, 0.001);
+    }
+
 
 }

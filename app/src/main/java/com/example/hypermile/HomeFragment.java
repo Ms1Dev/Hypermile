@@ -131,15 +131,24 @@ public class HomeFragment extends Fragment {
                     Double totalDistance = 0.0;
                     Double avgMpg = 0.0;
                     Double fuelUsed = 0.0;
+                    int avgCounter = 0;
 
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         try {
                             fuelUsed += (Double) document.get("fuelUsed");
-                            avgMpg += (Double) document.get("avgMpg");
+
+                            Double _avgMpg = (Double) document.get("avgMpg");
+                            try {
+                                if (!_avgMpg.isNaN() && _avgMpg > 0) {
+                                    avgMpg += _avgMpg;
+                                    avgCounter++;
+                                }
+                            }
+                            catch (NullPointerException e){}
+
                             totalDistance += (Double) document.get("totalDistanceMetres");
                         }
                         catch (NullPointerException e) {
-                            //TODO: statistics error
                             Log.d(TAG, "Error: " + e);
                         }
                     }
@@ -151,7 +160,9 @@ public class HomeFragment extends Fragment {
                     statistics.put("Total Distance", distanceMiles);
                     statistics.put("Fuel Used", litresUsed);
                     statistics.put("Carbon Footprint", Utils.kgCO2e(litresUsed, 1));
-                    statistics.put("Average MPG", Utils.round2dp(avgMpg));
+                    statistics.put("Average MPG", Utils.round2dp(avgMpg / avgCounter));
+
+                    Log.d(TAG, "onComplete: " + avgMpg);
 
                     setStatistics(statistics);
 

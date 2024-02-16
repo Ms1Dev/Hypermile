@@ -131,6 +131,9 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
                 break;
             case "MPG":
                 currentMpg = dataSource.getData();
+                if (currentMpg.isNaN()) {
+                    currentMpg = 0.0;
+                }
                 totalMpg += currentMpg;
                 break;
             case "Fuel Rate":
