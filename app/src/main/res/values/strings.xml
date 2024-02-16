@@ -24,4 +24,6 @@
     <string name="no_reports">No reports to show yet. Start the app before driving to create your first report!</string>
     <string name="title_activity_maps">MapsActivity</string>
 
+    <string name="latest_report">Latest report now available. You managed an average MPG of %.2f and used %.2f litres of fuel. Click the link below to see a more detailed report."</string>
+
 </resources>

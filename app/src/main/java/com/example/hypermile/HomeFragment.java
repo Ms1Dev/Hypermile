@@ -1,5 +1,6 @@
 package com.example.hypermile;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,11 +13,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.hypermile.reports.JourneyData;
+import com.example.hypermile.reports.Report;
 import com.example.hypermile.util.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -32,6 +36,7 @@ public class HomeFragment extends Fragment {
 
     Button viewLatestReportBtn;
     Button goToReportsBtn;
+    TextView latestReportInfo;
     View view;
 
 
@@ -52,6 +57,7 @@ public class HomeFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_home, container, false);
         goToReportsBtn = (Button) view.findViewById(R.id.goToReportsBtn);
         viewLatestReportBtn = (Button) view.findViewById(R.id.viewLatestReportBtn);
+        latestReportInfo = view.findViewById(R.id.latestReportInfo);
 
         viewLatestReportBtn.setEnabled(false);
 
@@ -87,9 +93,44 @@ public class HomeFragment extends Fragment {
 
         getStatistics(7);
 
+        getLatestReport();
+
         return view;
     }
 
+    private void latestReportRetrieved(Report report) {
+        viewLatestReportBtn.setEnabled(true);
+        viewLatestReportBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent reportIntent = new Intent(getContext(), ReportActivity.class);
+                reportIntent.putExtra("Report", report);
+                startActivity(reportIntent);
+            }
+        });
+
+        String reportText = getResources().getString(R.string.latest_report, report.getAvgMpg(), report.getFuelUsedIncStops());
+
+        latestReportInfo.setText(reportText);
+    }
+
+
+    private void getLatestReport() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference journeyCollection = db.collection("journeys");
+        Query latestJourney = journeyCollection.orderBy("createdWhen").limit(1);
+
+        latestJourney.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                    JourneyData journeyData = document.toObject(JourneyData.class);
+                    latestReportRetrieved( new Report(document.getId(), journeyData) );
+                }
+            }
+        });
+    }
 
 
     private void setStatistics(Map<String, Double> statistics) {
