@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.example.hypermile.reports.JourneyData;
@@ -18,6 +20,8 @@ import com.example.hypermile.reports.Report;
 import com.example.hypermile.util.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.tabs.TabItem;
+import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -40,6 +44,8 @@ public class HomeFragment extends Fragment {
     Button viewLatestReportBtn;
     Button goToReportsBtn;
     TextView latestReportInfo;
+    private ProgressBar statisticsLoadProgressBar;
+    private TableLayout statisticsTable;
     View view;
 
 
@@ -61,6 +67,10 @@ public class HomeFragment extends Fragment {
         viewLatestReportBtn = (Button) view.findViewById(R.id.viewLatestReportBtn);
         latestReportInfo = view.findViewById(R.id.latestReportInfo);
         viewLatestReportBtn.setEnabled(false);
+        statisticsLoadProgressBar= view.findViewById(R.id.statisticsLoadProgressBar);
+        statisticsTable = view.findViewById(R.id.statisticsTable);
+
+        TabLayout statisticsTabs = view.findViewById(R.id.statisticsSelectRange);
 
         // set onclick listener for button that will take user to the reports list fragment
         goToReportsBtn.setOnClickListener(new View.OnClickListener() {
@@ -70,28 +80,29 @@ public class HomeFragment extends Fragment {
                 mainActivity.selectFragmentProgrammatically(R.id.reports);
             }
         });
-        // set onclick listener for weekly statistics
-        view.findViewById(R.id.weeklyStatBtn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getStatistics(7);
-            }
-        });
-        // set onclick listener for monthly (28 day) statistics
-        view.findViewById(R.id.monthlyStatBtn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-                getStatistics(28);
-            }
-        });
-        // set onclick listener for yearly statistics
-        view.findViewById(R.id.yearlyStatBtn).setOnClickListener(new View.OnClickListener() {
+        statisticsTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onClick(View view) {
-                getStatistics(365);
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0:
+                        getStatistics(7);
+                        break;
+                    case 1:
+                        getStatistics(28);
+                        break;
+                    case 2:
+                        getStatistics(365);
+                        break;
+                }
             }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {}
         });
+
 
         // call methods for updating the UI with firestore data
         getStatistics(7);
@@ -155,6 +166,9 @@ public class HomeFragment extends Fragment {
      * @param daysPrior
      */
     private void getStatistics(int daysPrior) {
+        statisticsTable.setVisibility(View.GONE);
+        statisticsLoadProgressBar.setVisibility(View.VISIBLE);
+
         long secondsPrior = DAY_SECONDS * daysPrior;
         Timestamp now = Timestamp.now();
         long fromSeconds = now.getSeconds() - secondsPrior;
@@ -241,6 +255,9 @@ public class HomeFragment extends Fragment {
                 fuelUsed.setText(fuelUsedStr);
                 carbonFootprint.setText(carbonFootprintStr);
                 averageMpg.setText(averageMpgStr);
+
+                statisticsTable.setVisibility(View.VISIBLE);
+                statisticsLoadProgressBar.setVisibility(View.GONE);
             }
         });
     }

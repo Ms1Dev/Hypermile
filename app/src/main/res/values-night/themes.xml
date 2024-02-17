@@ -110,4 +110,11 @@
         <item name="android:textColor">@color/primary_container</item>
     </style>
 
+    <style name="TabStyle">
+        <item name="android:background">@drawable/tab_background</item>
+        <item name="android:radius">10dp</item>
+        <item name="tabTextColor">@color/on_surface_variant</item>
+        <item name="tabSelectedTextColor">@color/on_surface</item>
+    </style>
+
 </resources>
