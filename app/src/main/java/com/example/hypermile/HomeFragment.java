@@ -110,14 +110,17 @@ public class HomeFragment extends Fragment {
         CollectionReference journeyCollection = db.collection("journeys");
 
         // order by the createdWhen attribute and limit to 1 to get the latest
-        Query latestJourney = journeyCollection.orderBy("createdWhen").limit(1);
+        Query latestJourney = journeyCollection.orderBy("createdWhen", Query.Direction.DESCENDING).limit(1);
 
         latestJourney.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+                    // get the first document (there should only be one anyway)
                     DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                    // convert the document to a JourneyData class object
                     JourneyData journeyData = document.toObject(JourneyData.class);
+                    // create an Report instance using the JourneyData object and pass to method for updating UI
                     latestReportRetrieved( new Report(document.getId(), journeyData) );
                 }
             }

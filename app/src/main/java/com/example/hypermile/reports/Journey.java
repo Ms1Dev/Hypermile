@@ -28,8 +28,8 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
     private DataSource<Location> locationDataSource;
     private DataSource<Timestamp> timestampSource;
     private Timestamp prevTimestamp;
-    private Timestamp journeyStart;
-    private Timestamp journeyEnd;
+    private long journeyStart;
+    private long journeyEnd;
     private Double totalSpeed = 0.0;
     private Double totalMpg = 0.0;
     private Double currentMpg = 0.0;
@@ -46,7 +46,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
     public void start(DataSource<Timestamp> timestampSource) {
         this.timestampSource = timestampSource;
         timestampSource.addDataInputListener(this);
-        journeyStart = timestampSource.getData();
+        journeyStart = System.currentTimeMillis();
     }
 
     public void addDataSource (DataSource<Double> dataSource) {
@@ -154,7 +154,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         journeyData.setAvgSpeedIncStops( avgSpeedIncStops );
 
         double speedMetresPerHour = avgSpeedIncStops * 1000;
-        double timeDiffHours = (journeyEnd.getTime() - journeyStart.getTime()) / 3600000.0;
+        double timeDiffHours = (journeyEnd - journeyStart) / 3600000.0;
         journeyData.setTotalDistanceMetres(speedMetresPerHour * timeDiffHours);
     }
 
@@ -164,8 +164,8 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
      */
     public void complete() {
         timestampSource.removeDataInputListener(this);
-        journeyEnd = timestampSource.getData();
-        com.google.firebase.Timestamp createdWhen = new com.google.firebase.Timestamp(journeyEnd);
+        journeyEnd = System.currentTimeMillis();
+        com.google.firebase.Timestamp createdWhen = new com.google.firebase.Timestamp(timestampSource.getData());
         journeyData.setCreatedWhen(createdWhen);
         calcAverages();
 

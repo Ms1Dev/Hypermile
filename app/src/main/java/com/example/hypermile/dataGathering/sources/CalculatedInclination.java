@@ -9,7 +9,7 @@ import com.example.hypermile.dataGathering.DataSource;
  * Calculates the current inclination of the vehicle using the current and previous GPS coordinates
  */
 public class CalculatedInclination extends DataSource<Double> implements DataInputObserver<Location> {
-    private static final int MIN_DISTANCE = 10;
+    private static final int MIN_DISTANCE = 25;
     private Location prevLocation;
 
     public CalculatedInclination() {}

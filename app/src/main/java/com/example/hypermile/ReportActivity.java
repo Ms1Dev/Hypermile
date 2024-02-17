@@ -82,7 +82,7 @@ public class ReportActivity extends AppCompatActivity {
         }
         else {
             findViewById(R.id.mapCard).setVisibility(View.GONE);
-            // show an info box
+            findViewById(R.id.noMapInfo).setVisibility(View.VISIBLE);
         }
     }
 

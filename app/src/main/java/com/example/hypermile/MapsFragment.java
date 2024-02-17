@@ -19,6 +19,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.RoundCap;
 
 import org.checkerframework.checker.units.qual.A;
 
@@ -40,7 +41,7 @@ public class MapsFragment extends Fragment {
             startLong = route.get(0).get("longitude");
         }
     }
-//https://www.digitalocean.com/community/tutorials/android-google-map-drawing-route-two-points
+
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
         @Override
         public void onMapReady(GoogleMap googleMap) {
@@ -61,33 +62,45 @@ public class MapsFragment extends Fragment {
             return ReportActivity.HIGH_MPG_COLOUR;
         }
     }
+
+    /**
+     * Draws a line representing the route on the map
+     * The line is built piece by piece using gps coordinates that were stored from the journey
+     * Each segment of the line is coloured depending on the MPG at that given moment.
+     * @param googleMap
+     */
     private void drawRoute(GoogleMap googleMap) {
+        // running this on a new thread so it doesn't block the main thread
         new Thread(new Runnable() {
             @Override
             public void run() {
-
                 Map<String,Double> prevCoordinate = null;
-                PolylineOptions lineOptions = new PolylineOptions();
 
+                // iterate through all coodinates that were stored from the journey
                 for (Map<String,Double> coordinate : route) {
+                    PolylineOptions polyline = new PolylineOptions();
                     if (prevCoordinate != null) {
                         LatLng posTo = new LatLng(coordinate.get("latitude"), coordinate.get("longitude"));
                         LatLng posFrom = new LatLng(prevCoordinate.get("latitude"), prevCoordinate.get("longitude"));
+
+                        // set the colour of the poly line
                         Double mpg = prevCoordinate.get("mpg");;
                         if (mpg == null) {
                             mpg = 0.0;
                         }
-                        lineOptions.add(posFrom,posTo).color(getLineColour(mpg));
+                        polyline.add(posFrom,posTo).color(getLineColour(mpg));
+                        polyline.endCap(new RoundCap()); // rounding the ends of each segment creates a smooth line
                     }
                     prevCoordinate = coordinate;
-                }
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        googleMap.addPolyline(lineOptions);
-                    }
-                });
+                    // ui changes still need to be done on the main thread
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            googleMap.addPolyline(polyline);
+                        }
+                    });
+                }
             }
         }).start();
     }

@@ -26,4 +26,6 @@
 
     <string name="latest_report">Latest report now available. You managed an average MPG of %.2f and used %.2f litres of fuel. Click the link below to see a more detailed report."</string>
 
+    <string name="no_gps_data_info">You may have not given the app the correct location permissions. If permissions are for foreground only then ensure the app is open for the entire journey.</string>
+
 </resources>
