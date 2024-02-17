@@ -28,6 +28,8 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
     private DataSource<Location> locationDataSource;
     private DataSource<Timestamp> timestampSource;
     private Timestamp prevTimestamp;
+    private Timestamp journeyStart;
+    private Timestamp journeyEnd;
     private Double totalSpeed = 0.0;
     private Double totalMpg = 0.0;
     private Double currentMpg = 0.0;
@@ -44,6 +46,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
     public void start(DataSource<Timestamp> timestampSource) {
         this.timestampSource = timestampSource;
         timestampSource.addDataInputListener(this);
+        journeyStart = timestampSource.getData();
     }
 
     public void addDataSource (DataSource<Double> dataSource) {
@@ -108,7 +111,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
             journeyData.addRouteCoordinate(routeCoordinate);
 
             if (prevLocation != null) {
-                journeyData.addToTotalDistanceMetres((double) prevLocation.distanceTo(location));
+                journeyData.addToTotalGpsDistanceMetres((double) prevLocation.distanceTo(location));
             }
 
             prevLocation = location;
@@ -146,7 +149,13 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
     private void calcAverages() {
         journeyData.setAvgMpg( totalMpg / rowCountExcStops );
         journeyData.setAvgSpeed( totalSpeed / rowCountExcStops );
-        journeyData.setAvgSpeedIncStops( totalSpeed / rowCount );
+
+        double avgSpeedIncStops = totalSpeed / rowCount;
+        journeyData.setAvgSpeedIncStops( avgSpeedIncStops );
+
+        double speedMetresPerHour = avgSpeedIncStops * 1000;
+        double timeDiffHours = (journeyEnd.getTime() - journeyStart.getTime()) / 3600000.0;
+        journeyData.setTotalDistanceMetres(speedMetresPerHour * timeDiffHours);
     }
 
     /**
@@ -155,7 +164,8 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
      */
     public void complete() {
         timestampSource.removeDataInputListener(this);
-        com.google.firebase.Timestamp createdWhen = new com.google.firebase.Timestamp(timestampSource.getData());
+        journeyEnd = timestampSource.getData();
+        com.google.firebase.Timestamp createdWhen = new com.google.firebase.Timestamp(journeyEnd);
         journeyData.setCreatedWhen(createdWhen);
         calcAverages();
 

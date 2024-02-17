@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,22 +62,34 @@ public class MapsFragment extends Fragment {
         }
     }
     private void drawRoute(GoogleMap googleMap) {
-        Map<String,Double> prevCoordinate = null;
-        for (Map<String,Double> coordinate : route) {
-            if (prevCoordinate != null) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
 
-                LatLng posTo = new LatLng(coordinate.get("latitude"), coordinate.get("longitude"));
-                LatLng posFrom = new LatLng(prevCoordinate.get("latitude"), prevCoordinate.get("longitude"));
+                Map<String,Double> prevCoordinate = null;
                 PolylineOptions lineOptions = new PolylineOptions();
-                Double mpg = prevCoordinate.get("mpg");;
-                if (mpg == null) {
-                    mpg = 0.0;
+
+                for (Map<String,Double> coordinate : route) {
+                    if (prevCoordinate != null) {
+                        LatLng posTo = new LatLng(coordinate.get("latitude"), coordinate.get("longitude"));
+                        LatLng posFrom = new LatLng(prevCoordinate.get("latitude"), prevCoordinate.get("longitude"));
+                        Double mpg = prevCoordinate.get("mpg");;
+                        if (mpg == null) {
+                            mpg = 0.0;
+                        }
+                        lineOptions.add(posFrom,posTo).color(getLineColour(mpg));
+                    }
+                    prevCoordinate = coordinate;
                 }
-                lineOptions.add(posFrom,posTo).color(getLineColour(mpg));
-                googleMap.addPolyline(lineOptions);
+
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        googleMap.addPolyline(lineOptions);
+                    }
+                });
             }
-            prevCoordinate = coordinate;
-        }
+        }).start();
     }
 
     @Nullable

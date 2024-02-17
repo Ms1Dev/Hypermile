@@ -55,6 +55,9 @@ public class Report implements Serializable {
     public double getTotalDistance() {
         return totalDistance;
     }
+    public double getTotalGpsDistance() {
+        return journeyData.getTotalGpsDistanceMetres();
+    }
 
     public double getFuelUsed() {
         return fuelUsed;

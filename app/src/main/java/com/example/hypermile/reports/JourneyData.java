@@ -13,6 +13,7 @@ public class JourneyData implements Serializable {
     private ArrayList<Map<String,Object>> vehicleData = new ArrayList<>();
     private ArrayList<Map<String,Double>> route = new ArrayList<>();
     private Double totalDistanceMetres = 0.0;
+    private Double totalGpsDistanceMetres = 0.0;
     private Double avgSpeed = 0.0;
     private Double avgSpeedIncStops = 0.0;
     private Double avgMpg = 0.0;
@@ -33,8 +34,12 @@ public class JourneyData implements Serializable {
         return totalDistanceMetres;
     }
 
-    public void addToTotalDistanceMetres(Double distanceMetres) {
-        this.totalDistanceMetres += distanceMetres;
+    public void addToTotalGpsDistanceMetres(Double distanceMetres) {
+        this.totalGpsDistanceMetres += distanceMetres;
+    }
+
+    public Double getTotalGpsDistanceMetres() {
+        return totalGpsDistanceMetres;
     }
 
     public void setTotalDistanceMetres(Double totalDistanceMetres) {

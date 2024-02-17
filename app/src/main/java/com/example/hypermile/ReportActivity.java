@@ -71,19 +71,25 @@ public class ReportActivity extends AppCompatActivity {
 
         addStatistics(report);
 
+        // if permissions for GPS/internet are granted AND gps coordinates were recorded then show a map of route
         if (
-            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED
+                ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
+                report.getTotalGpsDistance() > 0.0
         ) {
             mapsFragment = new MapsFragment(report.getRoute(), LOW_MPG_BOUNDARY, MID_MPG_BOUNDARY);
             getSupportFragmentManager().beginTransaction().add(R.id.mapLayout, mapsFragment).commit();
+        }
+        else {
+            findViewById(R.id.mapCard).setVisibility(View.GONE);
+            // show an info box
         }
     }
 
     private void addStatistics(Report report) {
         addTableRow("Average MPG",String.valueOf(report.getAvgMpg()));
-        addTableRow("Average Speed",String.valueOf(report.getAvgSpeed() + " KPH"));
-        addTableRow("Average Speed (inc stationary)",String.valueOf(report.getAvgSpeedIncStationary() + " KPH"));
+        addTableRow("Average Speed",String.valueOf(report.getAvgSpeed() + " MPH"));
+        addTableRow("Average Speed (inc stationary)",String.valueOf(report.getAvgSpeedIncStationary() + " MPH"));
         addTableRow("Fuel used",String.valueOf(report.getFuelUsed() + " litres" ));
         addTableRow("Fuel used (inc stationary)",String.valueOf(report.getFuelUsedIncStops() + " litres"));
         addTableRow("Total distance",String.valueOf(report.getTotalDistance() + " miles"));
