@@ -115,7 +115,7 @@ public class LiveDataLineChart extends RelativeLayout  {
      * @param x
      */
     private void updateGraph(Timestamp x) {
-        if (currentY == null) return;
+        if (currentY == null || currentY.isNaN()) return;
         addEntry((float)(x.getTime() - startTimeOffset), currentY.floatValue());
         currentY = null;
     }

@@ -28,6 +28,7 @@ public class JourneyMonitor implements DataInputObserver<Double>, ConnectionEven
     private void stopJourney() {
         if (currentJourney != null) {
             currentJourney.complete();
+            currentJourney = null;
         }
     }
 

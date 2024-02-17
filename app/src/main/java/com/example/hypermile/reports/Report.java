@@ -34,7 +34,7 @@ public class Report implements Serializable {
         this.dateOfReport = dateOfReport;
         this.journeyData = journeyData;
         totalDistance = Utils.metresToMiles(journeyData.getTotalDistanceMetres());
-        fuelUsed = Utils.litresUsedFromMpgDistance(journeyData.getAvgMpg(), totalDistance);
+        fuelUsed = Utils.round2dp(journeyData.getFuelUsedExcStops());
         fuelUsedIncStops = Utils.round2dp(journeyData.getFuelUsed());
         avgSpeed = Math.round((journeyData.getAvgSpeed() * KPH_MPH_CONVERSION) * 100) / 100.0;
         avgSpeedIncStops = Math.round((journeyData.getAvgSpeedIncStops() * KPH_MPH_CONVERSION) * 100) / 100.0;

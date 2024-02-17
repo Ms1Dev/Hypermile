@@ -18,6 +18,9 @@ public class JourneyData implements Serializable {
     private Double avgSpeedIncStops = 0.0;
     private Double avgMpg = 0.0;
     private Double fuelUsed = 0.0;
+
+
+    private Double fuelUsedExcStops = 0.0;
     private transient Timestamp createdWhen;
 
     public JourneyData(){}
@@ -73,11 +76,15 @@ public class JourneyData implements Serializable {
     public Double getFuelUsed() {
         return fuelUsed;
     }
-
     public void addFuelUsed(double fuelUsed) {
         this.fuelUsed += fuelUsed;
     }
-
+    public Double getFuelUsedExcStops() {
+        return fuelUsedExcStops;
+    }
+    public void addFuelUsedExcStops(Double fuelUsed) {
+        fuelUsedExcStops += fuelUsed;
+    }
     public Double getAvgMpg() {
         return avgMpg;
     }

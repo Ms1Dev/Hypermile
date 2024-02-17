@@ -34,6 +34,7 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
     private Double totalMpg = 0.0;
     private Double currentMpg = 0.0;
     private Double currentFuelRate = 0.0;
+    private Double currentSpeed = 0.0;
     private int rowCount;
     private int rowCountExcStops;
     private final JourneyData journeyData;
@@ -76,7 +77,11 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
 
         if (prevTimestamp != null) {
             long millisecondsElapsed = Utils.millisDiff(prevTimestamp, timestamp);
-            journeyData.addFuelUsed(fuelUsed(millisecondsElapsed));
+            double fuelUsed = fuelUsed(millisecondsElapsed);
+            journeyData.addFuelUsed(fuelUsed);
+            if (currentSpeed > 0) {
+                journeyData.addFuelUsedExcStops(fuelUsed);
+            }
         }
         prevTimestamp = timestamp;
     }
@@ -130,7 +135,8 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
                 if (speed > 0) {
                     rowCountExcStops++;
                 }
-                totalSpeed += dataSource.getData();
+                currentSpeed = dataSource.getData();
+                totalSpeed += currentSpeed;
                 break;
             case "MPG":
                 currentMpg = dataSource.getData();
