@@ -94,8 +94,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         else {
             begin();
         }
-
-        // TODO: if no device in preferences then select from manage bluetooth
     }
 
     @Override
@@ -120,11 +118,17 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     private void begin() {
+        // create a bluetooth connection instance
         connection = new Connection();
+        // status bar for showing status of bluetooth and obd
         connectionStatusBar = findViewById(R.id.connectionStatusBar);
+        // connection status bar listen to bluetooth connection status
         connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
+        // create an obd connection instance (connection of device to car ECU)
         obd = new Obd();
+        // obd can only start once a bluetooth connection is established so listen for connection
         connection.addConnectionEventListener(obd);
+        // status bar must also listen for changes in obd connection
         obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
         connection.addConnectionEventListener(this);
 
@@ -253,27 +257,26 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     private boolean loadFragment(int item_id) {
+        getSupportFragmentManager().beginTransaction()
+                .hide(homeFragment)
+                .hide(reportsFragment)
+                .hide(liveDataFragment)
+                .commit();
         if (item_id == R.id.home) {
             getSupportFragmentManager().beginTransaction()
                     .show(homeFragment)
-                    .hide(reportsFragment)
-                    .hide(liveDataFragment)
                     .commit();
             return true;
         }
         else if (item_id == R.id.live_data) {
             getSupportFragmentManager().beginTransaction()
                     .show(liveDataFragment)
-                    .hide(reportsFragment)
-                    .hide(homeFragment)
                     .commit();
             return true;
         }
         else if (item_id == R.id.reports) {
             getSupportFragmentManager().beginTransaction()
                     .show(reportsFragment)
-                    .hide(liveDataFragment)
-                    .hide(homeFragment)
                     .commit();
             return true;
         }
@@ -283,12 +286,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     private void signOut() {
         FirebaseAuth.getInstance().signOut();
-        connection.disconnect();
+        if (connection != null) {
+            connection.disconnect();
+        }
         Intent intent = new Intent(MainActivity.this, AuthenticationActivity.class);
         startActivity(intent);
         finish();
     }
 
+    /**
+     * Called when the bluetooth connection changes.
+     * If connection is successful then the MAC address of the device is stored in shared preferences
+     * @param connectionState
+     */
     @Override
     public void onStateChange(ConnectionState connectionState) {
         if (connectionState == ConnectionState.CONNECTED) {

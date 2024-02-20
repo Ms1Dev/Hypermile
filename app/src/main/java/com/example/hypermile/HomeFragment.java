@@ -20,9 +20,9 @@ import com.example.hypermile.reports.Report;
 import com.example.hypermile.util.Utils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,6 +31,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -115,10 +116,11 @@ public class HomeFragment extends Fragment {
      * Attempts to retrieve the most recent document from firestore
      */
     private void getLatestReport() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // get the journey collection
-        CollectionReference journeyCollection = db.collection("journeys");
+        CollectionReference journeyCollection = db.collection(userId);
 
         // order by the createdWhen attribute and limit to 1 to get the latest
         Query latestJourney = journeyCollection.orderBy("createdWhen", Query.Direction.DESCENDING).limit(1);
@@ -127,12 +129,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    // get the first document (there should only be one anyway)
-                    DocumentSnapshot document = task.getResult().getDocuments().get(0);
-                    // convert the document to a JourneyData class object
-                    JourneyData journeyData = document.toObject(JourneyData.class);
-                    // create an Report instance using the JourneyData object and pass to method for updating UI
-                    latestReportRetrieved( new Report(document.getId(), journeyData) );
+                    List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                    if (documents.size() == 1) {
+                        // get the first document (there should only be one anyway)
+                        DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                        // convert the document to a JourneyData class object
+                        JourneyData journeyData = document.toObject(JourneyData.class);
+                        // create an Report instance using the JourneyData object and pass to method for updating UI
+                        latestReportRetrieved( new Report(document.getId(), journeyData) );
+                    }
                 }
             }
         });
@@ -174,8 +179,9 @@ public class HomeFragment extends Fragment {
         long fromSeconds = now.getSeconds() - secondsPrior;
         Timestamp filterDate = new Timestamp(fromSeconds, now.getNanoseconds());
 
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference journeyCollection = db.collection("journeys");
+        CollectionReference journeyCollection = db.collection(userId);
         Query filteredJourneys = journeyCollection.whereGreaterThan("createdWhen", filterDate);
 
         filteredJourneys.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

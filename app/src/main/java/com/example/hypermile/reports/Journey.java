@@ -13,6 +13,7 @@ import com.example.hypermile.dataGathering.DataSource;
 import com.example.hypermile.util.Utils;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.sql.Timestamp;
@@ -175,9 +176,10 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         journeyData.setCreatedWhen(createdWhen);
         calcAverages();
 
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("journeys").document(String.valueOf(timestampSource.getData().getTime()))
+        db.collection(userId).document(String.valueOf(timestampSource.getData().getTime()))
             .set(journeyData)
             .addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override

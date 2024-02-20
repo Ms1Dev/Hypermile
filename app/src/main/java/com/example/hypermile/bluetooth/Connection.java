@@ -18,7 +18,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.UUID;
 
-
+/**
+ * Spawns threads for connecting to bluetooth and maintaining connection.
+ */
 public class Connection {
     private static final int CONNECTION_ATTEMPTS = 3;
     private static final int MONITOR_FREQUENCY = 5000;
@@ -161,6 +163,7 @@ public class Connection {
 
     /**
      * Spawns a ConnectionThread which manages communication with the device
+     * Updates connection event listeners to CONNECTED
      * @param bluetoothSocket
      */
     private void manageConnection(BluetoothSocket bluetoothSocket) {
@@ -182,8 +185,7 @@ public class Connection {
                     try {
                         Thread.sleep(MONITOR_FREQUENCY);
                         ConnectionState connectionState = getConnectionState();
-                        if (connectionState == ConnectionState.DISCONNECTED && autoConnectAttempts < CONNECTION_ATTEMPTS &&  bluetoothDevice != null)
-                        {
+                        if (connectionState == ConnectionState.DISCONNECTED && autoConnectAttempts < CONNECTION_ATTEMPTS &&  bluetoothDevice != null){
                             autoConnectAttempts++;
                             createConnection(bluetoothDevice);
                         }
@@ -194,7 +196,7 @@ public class Connection {
                             autoConnectFailed();
                         }
                     } catch (InterruptedException e) {
-                        //TODO:
+                        Log.d("TAG", "run: " + e);
                     }
                 }
             }
@@ -230,7 +232,7 @@ public class Connection {
         public InitConnThread(BluetoothDevice bluetoothDevice) {
             BluetoothSocket _socket = null;
             try {
-                //TODO: figure out why this UUID is used
+                // UUID for bluetooth from this source: https://developer.android.com/reference/android/bluetooth/BluetoothDevice#createInsecureRfcommSocketToServiceRecord(java.util.UUID)
                 _socket = bluetoothDevice.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"));
             }
             catch (IOException | SecurityException e) {
@@ -282,7 +284,6 @@ public class Connection {
         private final BluetoothSocket bluetoothSocket;
         private final InputStream inputStream;
         private final OutputStream outputStream;
-        Connection connection;
 
         public ConnectionThread(BluetoothSocket socket) {
             bluetoothSocket = socket;
@@ -306,7 +307,7 @@ public class Connection {
         }
 
         /**
-         * This run method is monitoring the socket for incoming messages and will run while there is a connection.
+         * This run method is monitoring the socket for incoming messages and will continue to run while there is a connection.
          */
         public void run() {
             while (!isInterrupted()) {

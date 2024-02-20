@@ -20,6 +20,7 @@ import com.example.hypermile.reports.Report;
 import com.example.hypermile.reports.ReportAdapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.EventListener;
@@ -61,8 +62,9 @@ public class ReportsFragment extends Fragment {
         ListView reportList = view.findViewById(R.id.report_list);
         List<Report> reports = new ArrayList<>();
 
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference journeyCollection = db.collection("journeys");
+        CollectionReference journeyCollection = db.collection(userId);
 
         ReportAdapter reportAdapter = new ReportAdapter(this.getContext(), reports);
         reportList.setAdapter(reportAdapter);

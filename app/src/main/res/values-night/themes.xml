@@ -43,6 +43,7 @@
         <item name="snackbarTextViewStyle">@style/TextLight</item>
         <item name="snackbarButtonStyle">@style/SnackbarButtonStyle</item>
 
+        <item name="alertDialogStyle">@style/AlertDialogStyle</item>
     </style>
 
     <style name="Card" parent="Widget.Material3.CardView.Elevated">
@@ -99,7 +100,10 @@
         <item name="android:layout_margin">15dp</item>
         <item name="android:paddingVertical">10dp</item>
         <item name="backgroundTint">@color/cardview_dark_background</item>
+    </style>
 
+    <style name="AlertDialogStyle">
+        <item name="background">@color/secondary_container</item>
     </style>
 
     <style name="TextLight" parent="Widget.Material3.Snackbar.TextView">

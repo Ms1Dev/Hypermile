@@ -1,5 +1,7 @@
 package com.example.hypermile.obd;
 
+import android.util.Log;
+
 import com.example.hypermile.bluetooth.Connection;
 import com.example.hypermile.bluetooth.ConnectionEventListener;
 import com.example.hypermile.bluetooth.ConnectionState;
@@ -12,8 +14,8 @@ import java.util.TreeMap;
  * Manages communication with the OBD scanner once a bluetooth connection is available.
  */
 public class Obd implements ConnectionEventListener {
-    private final static int SEARCH_FOR_PROTOCOL_TIMEOUT = 20000;
-    private final static int SEARCH_FOR_PROTOCOL_ATTEMPTS = 3;
+    private final static int SEARCH_FOR_PROTOCOL_TIMEOUT = 10000;
+    private final static int SEARCH_FOR_PROTOCOL_ATTEMPTS = 5;
     private final static int MINIMUM_RESPONSE_WAIT = 150;
     private final static int MAXIMUM_RESPONSE_WAIT = 500;
     private final static int MAX_ERRORS = 5;
@@ -53,24 +55,6 @@ public class Obd implements ConnectionEventListener {
                 updateEventListeners(ready? ConnectionState.CONNECTED : ConnectionState.ERROR);
             }
         }).start();
-
-//        while(!connection.hasConnection());
-//
-//        try {
-//            if (reset()) {
-//                Thread.sleep(MINIMUM_RESPONSE_WAIT);
-//                getSupportedPids();
-//                Thread.sleep(MINIMUM_RESPONSE_WAIT);
-//                connection.sendCommand("0902\r");
-//                Thread.sleep(MINIMUM_RESPONSE_WAIT);
-//                ready = true;
-//            }
-//        }
-//        catch (InterruptedException | IOException e) {
-//            ready = false;
-//            updateEventListeners(ConnectionState.ERROR);
-//        }
-//        updateEventListeners(ready? ConnectionState.CONNECTED : ConnectionState.ERROR);
     }
 
     /**
@@ -83,8 +67,9 @@ public class Obd implements ConnectionEventListener {
      */
     private boolean reset() throws IOException, InterruptedException {
         updateEventListeners(ConnectionState.CONNECTING);
+        Log.d("TAG", "reset: ");
+        connection.sendCommand("ATZ\r"); // reset
         connection.sendCommand("ATD\r"); // set all defaults
-        connection.sendCommand("ATWS\r"); // reset
         connection.sendCommand("ATE0\r"); // echo command off
         connection.sendCommand("ATL1\r"); // line feeds on
         connection.sendCommand("ATS1\r"); // spaces between bytes on
@@ -145,9 +130,9 @@ public class Obd implements ConnectionEventListener {
      */
     private void getSupportedPids() throws InterruptedException {
         /*
-         * This nested for loop is quite ugly so I'll explain...
+         * This nested FOR loop is quite ugly so I'll explain...
          * To know which sensors AKA parameter IDs (PIDs) a vehicle supports it will respond with binary data representing those PIDs
-         * The number of bits from the MSB is the PID that is supported
+         * The number of bits from the left (MSB) is the PID that is supported
          * For example, from the following byte 00001001 the 5th and 8th bits are set
          * This would mean PID 0x05 and 0x08 are supported.
          *
