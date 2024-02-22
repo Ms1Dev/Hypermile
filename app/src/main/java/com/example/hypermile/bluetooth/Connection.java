@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 /**
@@ -33,7 +35,7 @@ public class Connection {
     private ConnectionState connectionState = ConnectionState.DISCONNECTED;
     private boolean isConnected = false;
     private int autoConnectAttempts = 0;
-    private Thread autoConnectThread;
+    private Timer autoConnectTimer;
     final private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
 
     public Connection(){}
@@ -60,12 +62,13 @@ public class Connection {
         if (connectionThread != null) {
             connectionThread.cancel();
         }
-        if (autoConnectThread != null) {
-            autoConnectThread.interrupt();
+        if (autoConnectTimer != null) {
+            autoConnectTimer.cancel();
         }
     }
 
     public void autoConnectFailed() {
+        autoConnectTimer.cancel();
         updateEventListeners(ConnectionState.ERROR);
     }
 
@@ -178,31 +181,23 @@ public class Connection {
      * Will monitor the connection and attempt to reconnect if it is disconnected.
      */
     private void autoConnect() {
-        autoConnectThread = new Thread(new Runnable() {
+        autoConnectTimer = new Timer();
+        autoConnectTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                while(!autoConnectThread.isInterrupted()) {
-                    try {
-                        Thread.sleep(MONITOR_FREQUENCY);
-                        ConnectionState connectionState = getConnectionState();
-                        if (connectionState == ConnectionState.DISCONNECTED && autoConnectAttempts < CONNECTION_ATTEMPTS &&  bluetoothDevice != null){
-                            autoConnectAttempts++;
-                            createConnection(bluetoothDevice);
-                        }
-                        else if (connectionState == ConnectionState.CONNECTED) {
-                            autoConnectAttempts = 0;
-                        }
-                        else if (autoConnectAttempts >= CONNECTION_ATTEMPTS) {
-                            autoConnectFailed();
-                        }
-                    } catch (InterruptedException e) {
-                        Log.d("TAG", "run: " + e);
-                    }
+                ConnectionState connectionState = getConnectionState();
+                if (connectionState != ConnectionState.CONNECTED && connectionState != ConnectionState.CONNECTING  && autoConnectAttempts < CONNECTION_ATTEMPTS &&  bluetoothDevice != null){
+                    autoConnectAttempts++;
+                    createConnection(bluetoothDevice);
+                }
+                else if (connectionState == ConnectionState.CONNECTED) {
+                    autoConnectAttempts = 0;
+                }
+                else if (autoConnectAttempts >= CONNECTION_ATTEMPTS) {
+                    autoConnectFailed();
                 }
             }
-        });
-        autoConnectThread.setDaemon(true);
-        autoConnectThread.start();
+        }, 0, 5000);
     }
 
     /**

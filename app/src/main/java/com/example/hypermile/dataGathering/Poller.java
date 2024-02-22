@@ -3,6 +3,8 @@ package com.example.hypermile.dataGathering;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Data poller
@@ -10,7 +12,7 @@ import java.util.ArrayList;
  * Also notifies pollCompleteListeners after each round of polling.
  */
 public class Poller extends Thread {
-    private int sleepDuration = 500;
+    private int sleepDuration;
     ArrayList<PollingElement> pollingElements = new ArrayList<>();
     ArrayList<PollCompleteListener> pollCompleteListeners = new ArrayList<>();
 
@@ -38,19 +40,15 @@ public class Poller extends Thread {
     }
 
     public void run() {
-        while(true) {
-            try {
-                sleep(sleepDuration);
-
-                for (PollingElement pollingElement : this.pollingElements) {
+        new Timer().scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                for (PollingElement pollingElement : pollingElements) {
                     pollingElement.sampleData();
                 }
 
                 pollingComplete();
-
-            } catch (InterruptedException e) {
-                Log.e("Err", "run: ", e);
             }
-        }
+        }, 0, sleepDuration);
     }
 }

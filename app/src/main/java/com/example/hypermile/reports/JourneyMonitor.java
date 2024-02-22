@@ -20,9 +20,6 @@ public class JourneyMonitor implements DataInputObserver<Double>, ConnectionEven
 
     public JourneyMonitor(DataManager dataManager) {
         this.dataManager = dataManager;
-
-//        // listen for changes in RPM to determine when the car has been started or stopped
-//        dataManager.getEngineSpeed().addDataInputListener(this);
     }
 
     private void stopJourney() {
@@ -84,7 +81,7 @@ public class JourneyMonitor implements DataInputObserver<Double>, ConnectionEven
         if (connectionState.equals(ConnectionState.DISCONNECTED)) {
             startTimerForJourneyEnd();
         }
-        else if (connectionState.equals(ConnectionState.CONNECTED)) {
+        else if (connectionState.equals(ConnectionState.CONNECTED) && engineRunning) {
             startJourney();
         }
     }

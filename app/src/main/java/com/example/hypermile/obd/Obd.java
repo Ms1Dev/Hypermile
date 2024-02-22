@@ -21,6 +21,7 @@ public class Obd implements ConnectionEventListener {
     private final static int MAX_ERRORS = 5;
     private int errors = 0;
     private boolean ready = false;
+    private boolean initialised = false;
     private final TreeMap<String, Parameter> supportedPids = new TreeMap<>();
     final private ArrayList<ConnectionEventListener> connectionEventListeners = new ArrayList<>();
     private Connection connection;
@@ -46,6 +47,7 @@ public class Obd implements ConnectionEventListener {
                         connection.sendCommand("0902\r");
                         Thread.sleep(MINIMUM_RESPONSE_WAIT);
                         ready = true;
+                        initialised = true;
                     }
                 }
                 catch (InterruptedException | IOException e) {
@@ -67,7 +69,6 @@ public class Obd implements ConnectionEventListener {
      */
     private boolean reset() throws IOException, InterruptedException {
         updateEventListeners(ConnectionState.CONNECTING);
-        Log.d("TAG", "reset: ");
         connection.sendCommand("ATZ\r"); // reset
         connection.sendCommand("ATD\r"); // set all defaults
         connection.sendCommand("ATE0\r"); // echo command off
@@ -118,7 +119,10 @@ public class Obd implements ConnectionEventListener {
                 }
             }
             ObdFrame obdFrame = connection.getLatestFrame();
-            if (obdFrame != null) return true;
+
+            if (obdFrame != null) {
+                return true;
+            }
 
         } while (attempts < SEARCH_FOR_PROTOCOL_ATTEMPTS);
         return false;
@@ -250,9 +254,11 @@ public class Obd implements ConnectionEventListener {
             ready = false;
             updateEventListeners(ConnectionState.DISCONNECTED);
         }
-        else if (connectionState == ConnectionState.CONNECTED && !ready) {
+        else if (!ready && initialised) {
             try {
-                reset();
+                ready = reset();
+                updateEventListeners(ready? ConnectionState.CONNECTED : ConnectionState.ERROR);
+                errors = 0;
             } catch (IOException | InterruptedException e) {
                 updateEventListeners(ConnectionState.ERROR);
             }
