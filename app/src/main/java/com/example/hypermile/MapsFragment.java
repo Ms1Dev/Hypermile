@@ -76,14 +76,14 @@ public class MapsFragment extends Fragment {
             public void run() {
                 Map<String,Double> prevCoordinate = null;
 
-                // iterate through all coodinates that were stored from the journey
+                // iterate through all coordinates that were stored from the journey
                 for (Map<String,Double> coordinate : route) {
                     PolylineOptions polyline = new PolylineOptions();
                     if (prevCoordinate != null) {
                         LatLng posTo = new LatLng(coordinate.get("latitude"), coordinate.get("longitude"));
                         LatLng posFrom = new LatLng(prevCoordinate.get("latitude"), prevCoordinate.get("longitude"));
 
-                        // set the colour of the poly line
+                        // set the colour of the poly line based on the mpg value
                         Double mpg = prevCoordinate.get("mpg");;
                         if (mpg == null) {
                             mpg = 0.0;

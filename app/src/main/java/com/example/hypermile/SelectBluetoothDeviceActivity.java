@@ -110,14 +110,6 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
      * Adds bluetooth devices to the list view
      */
     private void populateDeviceList() {
-//        // request permissions
-//        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-//            permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
-//        }
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-//            permissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN);
-//        }
-
         if (
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED

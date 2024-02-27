@@ -9,10 +9,14 @@ import com.example.hypermile.dataGathering.DataManagerReadyListener;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Listens out for events that indicate the start and end of a journey, i.e. engine start/stop, connection lost
+ * Creates new journey every time a journey start condition is detected
+ * On journey end it calls the Journey.complete() method which in turn writes the journey to Firestore
+ */
 public class JourneyMonitor implements DataInputObserver<Double>, ConnectionEventListener, DataManagerReadyListener {
     private static final int STOPPED_ENGINE_ALLOWANCE_TIME = 10 * 1000;
-    private long engineStoppedWhen;
-    private DataManager dataManager;
+    private final DataManager dataManager;
     private Journey currentJourney;
     private Timer stopJourneyTimer;
     private boolean engineRunning = false;
@@ -42,6 +46,10 @@ public class JourneyMonitor implements DataInputObserver<Double>, ConnectionEven
         }
     }
 
+    /**
+     * Data listener method
+     * Listening for changes in RPM to detect engine stop/start
+     */
     @Override
     public void incomingData(Double data) {
         boolean engineRunningNow = data > 0.0;
@@ -54,14 +62,16 @@ public class JourneyMonitor implements DataInputObserver<Double>, ConnectionEven
             }
         }
         else if (engineRunning && currentJourney != null) {
-            engineStoppedWhen = System.currentTimeMillis();
-
             startTimerForJourneyEnd();
         }
 
         engineRunning = engineRunningNow;
     }
 
+    /**
+     * When the end of a journey is detected then wait before completing the journey
+     * This is to allow for the car stalling or temporary loss of connection
+     */
     private void startTimerForJourneyEnd() {
         if (stopJourneyTimer == null)  {
             stopJourneyTimer = new Timer();
@@ -76,6 +86,9 @@ public class JourneyMonitor implements DataInputObserver<Double>, ConnectionEven
         }
     }
 
+    /**
+     * Listen for connection state changes to detect connection ending
+     */
     @Override
     public void onStateChange(ConnectionState connectionState) {
         if (connectionState.equals(ConnectionState.DISCONNECTED)) {
@@ -86,6 +99,9 @@ public class JourneyMonitor implements DataInputObserver<Double>, ConnectionEven
         }
     }
 
+    /**
+     * The DataManager must be ready before starting a journey and to allow listening to RPM
+     */
     @Override
     public void dataManagerReady() {
         dataManagerIsReady = true;

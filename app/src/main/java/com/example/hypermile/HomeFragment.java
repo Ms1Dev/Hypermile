@@ -168,7 +168,6 @@ public class HomeFragment extends Fragment {
     /**
      * Retrieves documents that have been created between now and the number of days prior.
      * Iterates over those documents and creates totals/averages for certain attributes.
-     * @param daysPrior
      */
     private void getStatistics(int daysPrior) {
         statisticsTable.setVisibility(View.GONE);

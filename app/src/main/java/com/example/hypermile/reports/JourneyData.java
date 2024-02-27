@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Data is stored in FireStore using this class
+ * This class acts as a data structure for storing journey data
+ * When data is retrieved from Firestore it is cast to this class to make handling the data easier
  */
 public class JourneyData implements Serializable {
     private ArrayList<Map<String,Object>> vehicleData = new ArrayList<>();

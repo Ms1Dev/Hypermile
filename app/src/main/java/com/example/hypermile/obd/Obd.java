@@ -136,13 +136,13 @@ public class Obd implements ConnectionEventListener {
         /*
          * This nested FOR loop is quite ugly so I'll explain...
          * To know which sensors AKA parameter IDs (PIDs) a vehicle supports it will respond with binary data representing those PIDs
-         * The number of bits from the left (MSB) is the PID that is supported
+         * The number of bits from the left (MSB) is the number of the PID that is supported
          * For example, from the following byte 00001001 the 5th and 8th bits are set
          * This would mean PID 0x05 and 0x08 are supported.
          *
-         * Each response covers 4 bytes containing 32 PIDs out of 200 PIDs in total
+         * Each response covers 4 bytes containing 32 PIDs
          *
-         * i: each 4 byte response
+         * i: the start offset of each 4 byte response
          * j: each byte of that response
          * k: each bit of that byte
          *
@@ -176,6 +176,10 @@ public class Obd implements ConnectionEventListener {
         return supportedPids.containsKey(pid);
     }
 
+    /**
+     * Request the VIN of the vehicle
+     * @return
+     */
     public String getVin() {
         byte[] vin = requestData("0902\r".getBytes());
         if (vin != null) {
@@ -191,6 +195,9 @@ public class Obd implements ConnectionEventListener {
         return requestData(requestCode);
     }
 
+    /**
+     * Request data using a request code instead of a Parameter object
+     */
     private byte[] requestData(byte[] requestCode) {
         connection.send(requestCode);
 
@@ -208,11 +215,17 @@ public class Obd implements ConnectionEventListener {
         return null;
     }
 
+    /**
+     * Requests OBD data but with additional check to make sure OBD is ready
+     */
     public byte[] requestObdData(Parameter parameter) {
         if (!ready) return null;
         return requestData(parameter);
     }
 
+    /**
+     * Request data from the OBD device for the given parameter
+     */
     private byte[] requestData(Parameter parameter) {
         connection.send(parameter.getRequestCode());
 
@@ -248,6 +261,9 @@ public class Obd implements ConnectionEventListener {
         return ready;
     }
 
+    /**
+     * Listen to changes of the bluetooth connection. OBD cannot communicate without bluetooth
+     */
     @Override
     public void onStateChange(ConnectionState connectionState) {
         if (connectionState != ConnectionState.CONNECTED) {

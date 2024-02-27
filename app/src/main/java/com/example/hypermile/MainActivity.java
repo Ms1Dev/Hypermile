@@ -96,6 +96,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         }
     }
 
+    /**
+     *  This is called when the user selects an option for permissions
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -175,7 +178,9 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         return false;
     }
 
-
+    /**
+     * Launches the select bluetooth device activity
+     */
     ActivityResultLauncher<Void> selectBluetoothActivityLauncher = registerForActivityResult(new ActivityResultContract<Void, BluetoothDevice>() {
         @NonNull
         @Override
@@ -185,7 +190,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         @Override
         public BluetoothDevice parseResult(int resultCode, @Nullable Intent intent) {
             if (resultCode == Activity.RESULT_OK && intent != null) {
-                Log.d("TAG", "onActivityResult() returned: " + intent);
                 return intent.getParcelableExtra("device");
             }
             else if (resultCode == 999) {
@@ -197,14 +201,18 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         @Override
         public void onActivityResult(BluetoothDevice result) {
             if (result != null) {
-                Log.d("TAG", "onActivityResult() returned: " + result);
+                // pass the selected device to the connection object to attempt a connection
                 connection.manuallySelectedConnection(result);
+                // change the state of the connection status bar
                 connectionStatusBar.getBlueToothConnectionListener().onStateChange(connection.getConnectionState());
             }
         }
     });
 
-
+    /**
+     * Shows a snack bar with alert message for the user
+     * @param userAlert
+     */
     public void alertUser(UserAlert userAlert) {
         Snackbar snackbar = null;
         switch (userAlert) {
