@@ -17,9 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link SignupFragment#newInstance} factory method to
- * create an instance of this fragment.
+ *
  */
 public class SignupFragment extends Fragment implements AuthRequester {
     private View view;

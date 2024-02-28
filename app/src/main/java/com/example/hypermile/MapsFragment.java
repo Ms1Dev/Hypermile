@@ -26,6 +26,11 @@ import org.checkerframework.checker.units.qual.A;
 import java.util.ArrayList;
 import java.util.Map;
 
+/**
+ * Uses Google Maps API to create a map fragment
+ * Also draws a route on the map with the given coordinates
+ * Each coordinate is paired with a MPG value which is used to set the colour of each segment of the route
+ */
 public class MapsFragment extends Fragment {
     double startLat;
     double startLong;
@@ -51,6 +56,9 @@ public class MapsFragment extends Fragment {
         }
     };
 
+    /**
+     * Translates the MPG value into a colour: red, yellow, green
+     */
     private int getLineColour(Double mpgValue) {
         if (mpgValue < lowMpgBoundary) {
             return ReportActivity.LOW_MPG_COLOUR;

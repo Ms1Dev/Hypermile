@@ -58,7 +58,6 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
                 if (deviceName != null) {
                     discoveredDeviceAdapter.add(new DiscoveredDevice(device, deviceName, SelectBluetoothDeviceActivity.this));
                 }
-
             }
 
             // discovery has finished
@@ -89,7 +88,6 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
             populateDeviceList();
         }
         else {
-            Log.d("TAG", "onCreate: " + "no permiss");
             setResult(999);
             finish();
         }

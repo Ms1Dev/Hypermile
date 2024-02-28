@@ -23,6 +23,7 @@ import java.util.Map;
 
 /**
  * Collects journey data and stores it in FireStore when a journey is complete
+ * Listens to the timestamp data source. Adds a row of data every time a new timestamp is received
  */
 public class Journey implements DataInputObserver<Timestamp>, ConnectionEventListener {
     private final ArrayList<DataSource<Double>> dataSources = new ArrayList<>();
@@ -87,11 +88,9 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         prevTimestamp = timestamp;
     }
 
-    private double fuelUsed(long milliseconds) {
-        double hours = milliseconds / 3600000.0;
-        return currentFuelRate * hours;
-    }
-
+    /**
+     * Add the current data from all data sources to a new row
+     */
     private void addDataRow(Timestamp timestamp) {
         if (timestamp == null) return;
 
@@ -106,6 +105,10 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         journeyData.addVehicleData(vehicleDataRow);
     }
 
+    /**
+     * Adds a GPS coordinate to the route along with the current MPG
+     * The MPG is used later to colour the route at that particular location
+     */
     private void addRouteCoordinate() {
         if (locationDataSource.getData() != null) {
             Map<String, Double> routeCoordinate = new HashMap<>();
@@ -126,7 +129,6 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
 
     /**
      * Collects data that is used for averages and totals
-     * @param dataSource
      */
     private void cumulativeData(DataSource<Double> dataSource) {
         if (dataSource.getData() == null) return;
@@ -152,7 +154,10 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         }
     }
 
-
+    /**
+     * Calculates average MPG, total distance, etc.
+     * It makes it easier when loading journey data to have these already calculated and stored in the database
+     */
     private void calcAverages() {
         journeyData.setAvgMpg( totalMpg / rowCountExcStops );
         journeyData.setAvgSpeed( totalSpeed / rowCountExcStops );
@@ -194,4 +199,11 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
                 }
             });
     }
+
+
+    private double fuelUsed(long milliseconds) {
+        double hours = milliseconds / 3600000.0;
+        return currentFuelRate * hours;
+    }
+
 }

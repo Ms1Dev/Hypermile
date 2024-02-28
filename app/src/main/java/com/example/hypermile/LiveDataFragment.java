@@ -53,7 +53,7 @@ public class LiveDataFragment extends Fragment implements DataManagerReadyListen
     }
 
     /**
-     * Table rows and elements are added dynamically here to give the option to add more at a later date.
+     * Table rows and elements are added programmatically here to give the option to add more at a later date.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -104,6 +104,9 @@ public class LiveDataFragment extends Fragment implements DataManagerReadyListen
         this.dataManager = dataManager;
     }
 
+    /**
+     * Gauges can only connect to data sources once DataManager is ready
+     */
     @Override
     public void dataManagerReady() {
         if (dataManager != null) {
@@ -114,8 +117,6 @@ public class LiveDataFragment extends Fragment implements DataManagerReadyListen
 
     /**
      * Creates a space equal to the size of one gauge for when the gauge number is uneven.
-     * @param context
-     * @return
      */
     private Space getSpacer(Context context) {
         Space space = new Space(context);

@@ -7,6 +7,8 @@ import com.example.hypermile.dataGathering.DataSource;
 
 /**
  * Calculates the current inclination of the vehicle using the current and previous GPS coordinates
+ * This was intended to be used for analysing fuel consumption
+ * If the car is driving uphill then the fuel use will be higher
  */
 public class CalculatedInclination extends DataSource<Double> implements DataInputObserver<Location> {
     private static final int MIN_DISTANCE = 25;

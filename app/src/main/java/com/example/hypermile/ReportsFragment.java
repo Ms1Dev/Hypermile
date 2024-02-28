@@ -36,7 +36,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * Uses a custom array adapter to display a list of Reports
+ * Reports are loaded from Firestore
+ * An event listener will add more items to the list if they are uploaded to Firestore
+ */
 public class ReportsFragment extends Fragment {
 
 

@@ -8,7 +8,7 @@ import com.example.hypermile.dataGathering.EngineSpec;
 import com.example.hypermile.dataGathering.PollCompleteListener;
 
 /**
- * Calculates the mass airflow using Intake pressure, Intake temperature, RPM, Engine capacity.
+ * Calculates the mass airflow using Intake pressure, Intake temperature, RPM, and Engine capacity.
  * This is in the event the vehicle does not have a dedicated mass airflow sensor.
  * It is less accurate than a MAF sensor and uses an estimated volumetric efficiency as the actual efficiency is unknown.
  */
@@ -26,6 +26,9 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
     boolean hasEngineSpeed;
 
 
+    /**
+     * Create listeners for Manifold pressure, Intake temperature, and RPM
+     */
     public CalculatedMaf(VehicleDataLogger manifoldAbsolutePressure, VehicleDataLogger intakeTemperature, VehicleDataLogger engineSpeed) {
         manifoldAbsolutePressure.addDataInputListener( new DataInputObserver<Double>() {
             @Override
@@ -90,28 +93,17 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
 
     /**
      * Calculates the mass flow in cubic centimetres per second
-     * @param absoluteIntakePressure
-     * @param rpm
-     * @param temperature
-     * @return cc/s
      */
     public double calculateMassFlow(double absoluteIntakePressure, double rpm, double temperature) {
-
         double intakePressure = kPaToAtm(absoluteIntakePressure);
-
         double gasDensity = gasDensity( intakePressure, (int) (temperature + 0.5) );
-
         double intakeVolumePerMinute = rpm * ( engineSpec.getEngineCapacity() * VOLUMETRIC_EFFICIENCY / 2.0 );
-
         return  intakeVolumePerMinute * gasDensity / 60;
     }
 
     /**
      * Calculates the density of air based on pressure and temperature
      * Equation taken from: https://www.first-sensor.com/cms/upload/appnotes/AN_Massflow_E_11153.pdf
-     * @param pressure
-     * @param temperature
-     * @return air density
      */
     public static double gasDensity(double pressure, int temperature) {
         return (MASS_OF_AIR * pressure) / (UNIVERSAL_GAS_CONSTANT * celsiusToKelvin(temperature));
@@ -119,8 +111,6 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
 
     /**
      * Converts celsius to kelvin
-     * @param celsius
-     * @return kelvin
      */
     public static double celsiusToKelvin(int celsius) {
         return celsius + 273.15;
@@ -128,15 +118,13 @@ public class CalculatedMaf extends DataSource<Double> implements PollCompleteLis
 
     /**
      * Pressure conversion from kPa to atmospheric
-     * @param kPa
-     * @return atm
      */
     public static double kPaToAtm(double kPa) {
         return kPa * KPA_ATM_CONVERSION;
     }
 
     /**
-     * Calculates new data if all required data has been received
+     * If all data has been received then calculate the mass air flow and notify observers
      */
     private void calculateData() {
         if (hasManifoldAbsolutePressure && hasIntakeTemperature && hasEngineSpeed) {

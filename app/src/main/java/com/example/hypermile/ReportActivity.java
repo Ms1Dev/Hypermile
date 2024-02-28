@@ -24,6 +24,10 @@ import android.widget.TextView;
 
 import com.example.hypermile.reports.Report;
 
+/**
+ * Displays details about the report that was selected
+ * If there is GPS data it will show a map fragment with the route as well
+ */
 public class ReportActivity extends AppCompatActivity {
     private static final int LOW_MPG_BOUNDARY = 25;
     private static final int MID_MPG_BOUNDARY = 40;
@@ -91,6 +95,9 @@ public class ReportActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Adds rows to the statistics table using data from the Report object
+     */
     private void addStatistics(Report report) {
         addTableRow("Average MPG",String.valueOf(report.getAvgMpg()));
         addTableRow("Average Speed",String.valueOf(report.getAvgSpeed() + " MPH"));
@@ -100,7 +107,9 @@ public class ReportActivity extends AppCompatActivity {
         addTableRow("Total distance",String.valueOf(report.getTotalDistance() + " miles"));
     }
 
-
+    /**
+     * Used by addStatistics to add rows to table
+     */
     private void addTableRow(String label, String value) {
         TableRow tableRow = new TableRow(this);
         TextView labelView = new TextView(this);
@@ -120,10 +129,7 @@ public class ReportActivity extends AppCompatActivity {
     }
 
     /**
-     * @brief handles the back button on click
-     * @param item
-     * @return true
-     *
+     * This is needed or the back button will not work
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {

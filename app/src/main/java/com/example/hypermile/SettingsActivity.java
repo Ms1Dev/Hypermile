@@ -14,6 +14,11 @@ import androidx.preference.PreferenceFragmentCompat;
 
 import com.example.hypermile.dataGathering.DataManager;
 
+
+/**
+ * Options to change fuel type and engine size
+ * The code and XML is mostly given by Android studio
+ */
 public class SettingsActivity extends AppCompatActivity {
 
     @Override

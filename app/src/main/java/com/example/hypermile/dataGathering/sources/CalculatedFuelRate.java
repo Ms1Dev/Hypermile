@@ -4,7 +4,8 @@ import com.example.hypermile.dataGathering.DataInputObserver;
 import com.example.hypermile.dataGathering.DataSource;
 
 /**
- * Datasource that observes the mass airflow datasource and calculates fuel rate using air-fuel ratio
+ * Datasource that observes a mass airflow datasource and calculates fuel rate using air-fuel ratio
+ * This can be thought of as a virtual data source since it gets its data from another data source
  */
 public class CalculatedFuelRate extends DataSource<Double> implements DataInputObserver<Double> {
     final static private double STOICHIOMETRIC_PETROL = 14.7;

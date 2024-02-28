@@ -1,6 +1,7 @@
 package com.example.hypermile.bluetooth;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,7 @@ import java.util.List;
 
 public class DiscoveredDeviceAdapter extends ArrayAdapter {
 
-    List<DiscoveredDevice> deviceList = new ArrayList<>();
+    List<DiscoveredDevice> deviceList;
 
     public DiscoveredDeviceAdapter(Context context, List<DiscoveredDevice> deviceList) {
         super(context, 0, deviceList);
@@ -41,5 +42,15 @@ public class DiscoveredDeviceAdapter extends ArrayAdapter {
         }
 
         return convertView;
+    }
+
+    @Override
+    public void add(@Nullable Object object) {
+        for (DiscoveredDevice discoveredDevice : deviceList) {
+            if (discoveredDevice.getMacAddress().equals(((DiscoveredDevice) object).getMacAddress())) {
+                return;
+            }
+        }
+        super.add(object);
     }
 }

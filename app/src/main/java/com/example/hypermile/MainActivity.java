@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentTransaction;
 
 
 import android.Manifest;
@@ -17,6 +18,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -75,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+//        getSupportActionBar().setIcon(R.mipmap.hypermile_logo);
 
         if (
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
@@ -265,27 +270,19 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     }
 
     private boolean loadFragment(int item_id) {
-        getSupportFragmentManager().beginTransaction()
-                .hide(homeFragment)
-                .hide(reportsFragment)
-                .hide(liveDataFragment)
-                .commit();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.hide(homeFragment).hide(reportsFragment).hide(liveDataFragment);
+
         if (item_id == R.id.home) {
-            getSupportFragmentManager().beginTransaction()
-                    .show(homeFragment)
-                    .commit();
+            fragmentTransaction.show(homeFragment).commit();
             return true;
         }
         else if (item_id == R.id.live_data) {
-            getSupportFragmentManager().beginTransaction()
-                    .show(liveDataFragment)
-                    .commit();
+            fragmentTransaction.show(liveDataFragment).commit();
             return true;
         }
         else if (item_id == R.id.reports) {
-            getSupportFragmentManager().beginTransaction()
-                    .show(reportsFragment)
-                    .commit();
+            fragmentTransaction.show(reportsFragment).commit();
             return true;
         }
 

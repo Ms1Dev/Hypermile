@@ -51,6 +51,9 @@ public class LiveDataLineChart extends RelativeLayout  {
         initialise(context, attrs);
     }
 
+    /**
+     * Create data listeners for timestamp (x-axis) and MPG (y-axis)
+     */
     public void setAxisSources(DataSource<Timestamp> xAxis, DataSource<Double> yAxis) {
         this.xAxis = xAxis;
         this.yAxis = yAxis;
@@ -71,11 +74,6 @@ public class LiveDataLineChart extends RelativeLayout  {
 
     }
 
-    /**
-     *
-     * @param context
-     * @param attrs
-     */
     private void initialise(Context context, AttributeSet attrs) {
         view = LayoutInflater.from(context).inflate(R.layout.live_data_line_chart, this);
         lineChart = view.findViewById(R.id.line_chart);

@@ -90,8 +90,6 @@ public class Connection {
 
     /**
      * Tries to connect to an existing MAC address if it is stored in shared preferences.
-     * Better for the user if they do not need to select the device on every session.
-     * @param context
      */
     public void connectToExisting(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);

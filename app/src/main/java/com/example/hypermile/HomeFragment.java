@@ -39,7 +39,7 @@ import java.util.Map;
  * Shows info about the latest report and some statistics on the home screen.
  */
 public class HomeFragment extends Fragment {
-    private final static String TAG = "HoneFragment";
+    private final static String TAG = "HomeFragment";
     private final static long DAY_SECONDS = 86400;
 
     Button viewLatestReportBtn;

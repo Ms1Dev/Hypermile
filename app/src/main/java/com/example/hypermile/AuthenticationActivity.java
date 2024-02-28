@@ -68,10 +68,6 @@ public class AuthenticationActivity extends AppCompatActivity {
     /**
      * Attempts to register user with credentials.
      * This is called by the sign up fragment
-     * @param email
-     * @param password
-     * @param authRequester
-     * @return
      */
     public String registerUser(String email, String password, AuthRequester authRequester) {
         firebaseAuth.createUserWithEmailAndPassword(email, password)
@@ -93,10 +89,6 @@ public class AuthenticationActivity extends AppCompatActivity {
     /**
      * Will attempt to log user in with credentials.
      * This is called by the login fragment
-     * @param email
-     * @param password
-     * @param authRequester
-     * @return
      */
     public String loginUser(String email, String password, AuthRequester authRequester) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
@@ -129,8 +121,6 @@ public class AuthenticationActivity extends AppCompatActivity {
 
     /**
      * Creates a meaningful error message to present to the user if there is a problem logging in
-     * @param exception
-     * @return
      */
     private String translateException(Exception exception) {
         try {

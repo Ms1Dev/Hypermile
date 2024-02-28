@@ -7,6 +7,9 @@ import android.widget.TextView;
 
 import com.example.hypermile.R;
 
+/**
+ * Used by the DiscoveredDeviceAdapter for the discovered device list
+ */
 public class DiscoveredDevice {
     private String name;
     private String macAddress;
@@ -36,11 +39,11 @@ public class DiscoveredDevice {
         TextView deviceMac = view.findViewById(R.id.deviceMacView);
 
         view.findViewById(R.id.reportItemLayout).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    deviceSelectedCallback.deviceSelected(DiscoveredDevice.this);
-                }
-            });
+            @Override
+            public void onClick(View view) {
+                deviceSelectedCallback.deviceSelected(DiscoveredDevice.this);
+            }
+        });
 
         deviceName.setText(getName());
         deviceMac.setText(getMacAddress());
