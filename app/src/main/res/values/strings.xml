@@ -28,4 +28,9 @@
 
     <string name="no_gps_data_info">You may have not given the app the correct location permissions. If permissions are for foreground only then ensure the app is open for the entire journey.</string>
 
+    <string name="map_key_brief">The route has been colour coded to show fuel consumption during your journey</string>
+
+    <string name="map_key_high_mpg">Efficient</string>
+    <string name="map_key_mid_mpg">OK</string>
+    <string name="map_key_low_mpg">Poor</string>
 </resources>

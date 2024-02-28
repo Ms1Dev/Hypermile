@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#2c571b</color>
+    <color name="primary_variant">#6C8E60</color>
     <color name="primary_container">#AFDC97</color>
     <color name="on_primary_container">#042100</color>
     <color name="secondary">#55624c</color>
@@ -19,4 +20,5 @@
     <color name="on_surface_variant">#CC43483E</color>
     <color name="outline">#74796d</color>
     <color name="outline_variant">#c3c8bb</color>
+    <color name="off_white">#F9F9F9</color>
 </resources>

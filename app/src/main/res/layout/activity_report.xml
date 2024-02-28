@@ -29,18 +29,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 style="@style/Card"
+                android:id="@+id/noMapInfo"
                 app:cardCornerRadius="10dp"
                 android:layout_margin="10dp"
                 android:layout_width="match_parent"
+                android:visibility="gone"
                 android:layout_height="wrap_content">
                 <LinearLayout
-                    android:id="@+id/noMapInfo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="20dp"
-                    android:visibility="gone"
                     android:orientation="vertical" >
                     <TextView
                         android:layout_width="wrap_content"
@@ -55,9 +55,10 @@
                         android:textSize="12sp"
                          />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Card"
                 android:id="@+id/mapCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -72,38 +73,113 @@
                     <FrameLayout
                         android:id="@+id/mapLayout"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"></FrameLayout>
+                        android:layout_height="300dp">
+
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
 
                         <TextView
-                            android:id="@+id/low_mpg_val"
-                            android:layout_width="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textAlignment="center" />
+                            android:text="@string/map_key_brief"/>
 
-                        <TextView
-                            android:id="@+id/mid_mpg_val"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textAlignment="center" />
+                        <LinearLayout
+                            android:background="@color/off_white"
+                            android:padding="10dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical">
 
-                        <TextView
-                            android:id="@+id/high_mpg_val"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textAlignment="center" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginHorizontal="10dp"
+                                android:gravity="center|start"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="60dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/map_key_high_mpg" />
+
+                                <ImageView
+                                    android:id="@+id/highMpgKey"
+                                    android:layout_margin="10dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    app:srcCompat="@drawable/map_key_line" />
+
+                                <TextView
+                                    android:id="@+id/highMpgDetails"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center|start"
+                                android:layout_marginHorizontal="10dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="60dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/map_key_mid_mpg" />
+
+                                <ImageView
+                                    android:id="@+id/midMpgKey"
+                                    android:layout_margin="10dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    app:srcCompat="@drawable/map_key_line" />
+
+                                <TextView
+                                    android:id="@+id/midMpgDetails"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center|start"
+                                android:layout_marginHorizontal="10dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="60dp"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/map_key_low_mpg" />
+
+                                <ImageView
+                                    android:id="@+id/lowMpgKey"
+                                    android:layout_margin="10dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    app:srcCompat="@drawable/map_key_line" />
+
+                                <TextView
+                                    android:id="@+id/lowMpgDetails"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"/>
+
+                            </LinearLayout>
+                        </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
-            <androidx.cardview.widget.CardView
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
                 style="@style/Card"
                 app:cardCornerRadius="10dp"
                 android:layout_margin="10dp"
@@ -113,25 +189,24 @@
                     android:id="@+id/statisticsLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="20dp"
                     android:orientation="vertical" >
                     <TextView
+                        style="@style/Title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Statistics"
-                        android:textSize="18sp"
-                        android:textAlignment="center" />
+                        android:padding="15dp"/>
                     <TableLayout
                         android:id="@+id/statisticsTable"
                         style="@style/TableLayout"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="10dp"
+                        android:padding="15dp"
                         android:stretchColumns="1">
 
                     </TableLayout>
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
 
         </LinearLayout>
     </ScrollView>

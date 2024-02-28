@@ -4,9 +4,11 @@
         <item name="android:colorBackground">@color/white</item>
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryVariant">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
         <item name="colorPrimaryContainer">@color/primary_container</item>
         <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+
+        <item name="colorOutline">@color/black</item>
 
         <item name="colorSurface">@color/primary</item>
         <item name="colorSurfaceVariant">@color/white</item>
@@ -46,11 +48,14 @@
         <item name="alertDialogStyle">@style/AlertDialogStyle</item>
     </style>
 
-    <style name="Card" parent="Widget.Material3.CardView.Elevated">
+    <style name="Card" parent="Widget.Material3.CardView.Outlined">
         <item name="cardBackgroundColor">@color/primary_container</item>
         <item name="android:layout_margin">10dp</item>
-        <item name="cardCornerRadius">5dp</item>
-        <item name="cardElevation">10dp</item>
+        <item name="cardCornerRadius">10dp</item>
+        <item name="strokeWidth">2dp</item>
+        <item name="strokeColor">@color/primary_variant</item>
+
+<!--        <item name="cardElevation">10dp</item>-->
     </style>
 
     <style name="InputTextOutline" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
@@ -66,7 +71,6 @@
     <style name="Title">
         <item name="android:textColor">@color/on_primary_container</item>
         <item name="android:textSize">20dp</item>
-        <item name="android:layout_marginBottom">10dp</item>
     </style>
 
     <style name="SecondaryButton">

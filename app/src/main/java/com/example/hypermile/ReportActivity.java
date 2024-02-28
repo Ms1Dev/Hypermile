@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TableLayout;
@@ -49,22 +50,26 @@ public class ReportActivity extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(Report.DATE_FORMAT.format(Double.valueOf(report.getDateOfReport())));
 
-        TextView lowMpgKey = findViewById(R.id.low_mpg_val);
-        TextView midMpgKey = findViewById(R.id.mid_mpg_val);
-        TextView highMpgKey = findViewById(R.id.high_mpg_val);
+        ImageView lowMpgKey = findViewById(R.id.lowMpgKey);
+        ImageView midMpgKey = findViewById(R.id.midMpgKey);
+        ImageView highMpgKey = findViewById(R.id.highMpgKey);
 
-        String lowMpgKeyText = " <" + LOW_MPG_BOUNDARY + " MPG";
+        TextView lowMpgDetails = findViewById(R.id.lowMpgDetails);
+        TextView midMpgDetails = findViewById(R.id.midMpgDetails);
+        TextView highMpgDetails = findViewById(R.id.highMpgDetails);
+
+        String lowMpgKeyText = "< " + LOW_MPG_BOUNDARY + " MPG";
         String midMpgKeyText = LOW_MPG_BOUNDARY + " - " + MID_MPG_BOUNDARY + " MPG";
         String highMpgKeyText = " > " + MID_MPG_BOUNDARY + " MPG";
 
-        lowMpgKey.setBackgroundColor(LOW_MPG_COLOUR);
-        lowMpgKey.setText(lowMpgKeyText);
+        lowMpgKey.setColorFilter(LOW_MPG_COLOUR);
+        lowMpgDetails.setText(lowMpgKeyText);
 
-        midMpgKey.setBackgroundColor(MID_MPG_COLOUR);
-        midMpgKey.setText(midMpgKeyText);
+        midMpgKey.setColorFilter(MID_MPG_COLOUR);
+        midMpgDetails.setText(midMpgKeyText);
 
-        highMpgKey.setBackgroundColor(HIGH_MPG_COLOUR);
-        highMpgKey.setText(highMpgKeyText);
+        highMpgKey.setColorFilter(HIGH_MPG_COLOUR);
+        highMpgDetails.setText(highMpgKeyText);
 
         statisticsLayout = findViewById(R.id.statisticsLayout);
         statisticsTable = findViewById(R.id.statisticsTable);
