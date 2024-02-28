@@ -22,11 +22,12 @@ import java.util.concurrent.TimeUnit;
  * create an instance of this fragment.
  */
 public class SignupFragment extends Fragment implements AuthRequester {
-    View view;
-    EditText usernameField;
-    EditText passwordField;
-    TextView loginLink;
-    Button signupButton;
+    private View view;
+    private EditText usernameField;
+    private EditText passwordField;
+    private EditText confirmPasswordField;
+    private TextView loginLink;
+    private Button signupButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
@@ -34,6 +35,7 @@ public class SignupFragment extends Fragment implements AuthRequester {
         signupButton = (Button) view.findViewById(R.id.signupBtn);
         usernameField = (EditText) view.findViewById(R.id.username);
         passwordField = (EditText) view.findViewById(R.id.password);
+        confirmPasswordField = (EditText) view.findViewById(R.id.confirm_password);
         loginLink = (TextView) view.findViewById(R.id.loginLink);
         loginLink.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,12 +52,16 @@ public class SignupFragment extends Fragment implements AuthRequester {
 
                 String username = usernameField.getText().toString();
                 String password = passwordField.getText().toString();
+                String confirmPassword = confirmPasswordField.getText().toString();
 
-                if (!username.isEmpty() && !password.isEmpty()) {
-                    showErrorMessage(authenticationActivity.registerUser(username,password, SignupFragment.this));
+                if (username.isEmpty() || password.isEmpty()) {
+                    showErrorMessage("Username and/or password cannot be empty");
+                }
+                else if (!password.equals(confirmPassword)) {
+                    showErrorMessage("Passwords do not match");
                 }
                 else {
-                    showErrorMessage("Username and password cannot be empty");
+                    showErrorMessage(authenticationActivity.registerUser(username,password, SignupFragment.this));
                 }
             }
         });
