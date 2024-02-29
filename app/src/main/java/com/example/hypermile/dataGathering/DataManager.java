@@ -118,18 +118,12 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
                 );
                 engineSpeed.setMaxValue(8000);
             }
-            else {
-                // TODO: warn user no RPM data
-            }
 
             massAirFlow = getMassAirFlowSource(poller);
 
             if (massAirFlow != null) {
                 fuelRate = new CalculatedFuelRate(massAirFlow);
                 massAirFlow.setDecimalPoints(2);
-            }
-            else {
-                // TODO: warn user no fuel statistics
             }
 
             if (fuelRate != null){
@@ -139,9 +133,6 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
                 }
                 if(speed != null) {
                     calculatedMpg = new CalculatedMpg(speed, fuelRate);
-                }
-                else {
-                    // TODO: warn user no MPG
                 }
             }
 
