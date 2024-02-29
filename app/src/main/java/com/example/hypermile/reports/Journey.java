@@ -181,7 +181,15 @@ public class Journey implements DataInputObserver<Timestamp>, ConnectionEventLis
         journeyData.setCreatedWhen(createdWhen);
         calcAverages();
 
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String userId;
+
+        try {
+            userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        }
+        catch (NullPointerException e) {
+            return;
+        }
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection(userId).document(String.valueOf(timestampSource.getData().getTime()))
