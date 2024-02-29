@@ -12,6 +12,7 @@ import com.example.hypermile.dataGathering.DataSource;
  */
 public class CalculatedInclination extends DataSource<Double> implements DataInputObserver<Location> {
     private static final int MIN_DISTANCE = 25;
+    private static final int MAX_ANGLE = 20;
     private Location prevLocation;
 
     public CalculatedInclination() {}
@@ -24,7 +25,9 @@ public class CalculatedInclination extends DataSource<Double> implements DataInp
                 double verticalDistance = data.getAltitude() - prevLocation.getAltitude();
                 double angleRadians = Math.atan(verticalDistance / horizontalDistance);
                 double angleDegrees = Math.toDegrees(angleRadians);
-                notifyObservers(angleDegrees);
+                if (angleDegrees < MAX_ANGLE && angleDegrees > -MAX_ANGLE) {
+                    notifyObservers(angleDegrees);
+                }
                 prevLocation = data;
             }
         }
