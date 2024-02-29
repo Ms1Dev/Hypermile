@@ -35,11 +35,7 @@ import java.util.Objects;
  * Handles logging in and registering users
  */
 public class AuthenticationActivity extends AppCompatActivity {
-
     private FirebaseAuth firebaseAuth;
-    TextView loginLink;
-    TextView signupLink;
-
     String errorMessage;
 
     @Override
