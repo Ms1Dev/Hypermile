@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 /**
  * Shows a simple login form to the user to enter credentials.
+ * When the details are submitted they are passed to methods in the AuthenticationActivity
  */
 public class LoginFragment extends android.app.Fragment implements AuthRequester {
     private View view;

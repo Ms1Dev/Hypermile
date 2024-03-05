@@ -21,7 +21,11 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 /**
- * Spawns threads for connecting to bluetooth and maintaining connection.
+ * Class for creating and maintaining a Bluetooth connection.
+ * Spawns an InitConnThread object for initialising the connection and getting the Bluetooth socket.
+ * When a bluetooth socket is created a ConnectionThread object is created.
+ * The ConnectionThread creates input and output streams connected to the bluetooth socket to allow communication with the device.
+ * A timer object also monitors the connection and attempts to reconnect if it becomes disconnected.
  */
 public class Connection {
     private static final int CONNECTION_ATTEMPTS = 3;
@@ -109,7 +113,6 @@ public class Connection {
     /**
      * Returns the latest frame of data received by the OBD device.
      * Clears the frame so it can only be retrieved once.
-     * @return
      */
     public ObdFrame getLatestFrame() {
         ObdFrame obdFrame = latestFrame;
@@ -120,7 +123,6 @@ public class Connection {
 
     /**
      * Sends the byte array to the bluetooth device
-     * @param command
      */
     public void send(byte[] command) {
         if (hasConnection()) {
@@ -130,7 +132,6 @@ public class Connection {
 
     /**
      * This is called when a device is selected from the bluetooth device list.
-     * @param bluetoothDevice
      */
     public void manuallySelectedConnection(BluetoothDevice bluetoothDevice) {
         autoConnectAttempts = 0;
@@ -139,16 +140,15 @@ public class Connection {
 
     /**
      * Attempts to create connection with a bluetooth device
-     * @param bluetoothDevice
      */
     private void createConnection(BluetoothDevice bluetoothDevice) {
         if (bluetoothDevice == null) return;
         this.bluetoothDevice = bluetoothDevice;
 
+        // cancel any existing threads to prevent conflicts
         if (initConnThread != null) {
             initConnThread.cancel();
         }
-
         if (connectionThread != null) {
             connectionThread.interrupt();
         }
@@ -165,7 +165,6 @@ public class Connection {
     /**
      * Spawns a ConnectionThread which manages communication with the device
      * Updates connection event listeners to CONNECTED
-     * @param bluetoothSocket
      */
     private void manageConnection(BluetoothSocket bluetoothSocket) {
         connectionThread = new ConnectionThread(bluetoothSocket);
@@ -200,10 +199,6 @@ public class Connection {
 
     /**
      * Send a command using the connection thread.
-     * @param command
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
      */
     public boolean sendCommand(String command) throws IOException, InterruptedException {
         byte[] cmdAsBytes = command.getBytes();
@@ -333,7 +328,6 @@ public class Connection {
          * Write data out over bluetooth.
          * This clears the latest received frame because the outbound message always expects a response
          * so anything that's left in there from before is irrelevant and may confuse things
-         * @param bytes
          */
         public void write(byte[] bytes) {
             try {

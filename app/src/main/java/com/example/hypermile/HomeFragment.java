@@ -146,7 +146,6 @@ public class HomeFragment extends Fragment {
     /**
      * Called when the latest document is retrieved from firestore.
      * Updates the homepage to show info and a link to this report.
-     * @param report
      */
     private void latestReportRetrieved(Report report) {
         // enable the button and add onclick listener that will launch the report activity

@@ -29,8 +29,6 @@ public class Obd implements ConnectionEventListener {
 
     /**
      * Initialise the communication with the vehicle
-     * @param connection
-     * @return boolean
      */
     public void initialise(Connection connection) {
         this.connection = connection;
@@ -63,9 +61,6 @@ public class Obd implements ConnectionEventListener {
      * Resets the connection and configures scanner
      * Various AT commands are used to configure the scanner
      * See elm327 documentation page 9 onwards for more information on commands: https://www.elmelectronics.com/DSheets/ELM327DSH.pdf
-     * @return boolean
-     * @throws IOException
-     * @throws InterruptedException
      */
     private boolean reset() throws IOException, InterruptedException {
         updateEventListeners(ConnectionState.CONNECTING);
@@ -99,8 +94,6 @@ public class Obd implements ConnectionEventListener {
     /**
      * Uses the elm327 built in auto scan function to detect the vehicles CANBUS protocol
      * @return boolean
-     * @throws IOException
-     * @throws InterruptedException
      */
     private boolean findProtocol() throws IOException, InterruptedException {
 
@@ -130,24 +123,22 @@ public class Obd implements ConnectionEventListener {
 
     /**
      * Get the IDs of supported parameters from the vehicle
-     * @throws InterruptedException
      */
     private void getSupportedPids() throws InterruptedException {
         /*
          * This nested FOR loop is quite ugly so I'll explain...
-         * To know which sensors AKA parameter IDs (PIDs) a vehicle supports it will respond with binary data representing those PIDs
-         * The number of bits from the left (MSB) is the number of the PID that is supported
-         * For example, from the following byte 00001001 the 5th and 8th bits are set
-         * This would mean PID 0x05 and 0x08 are supported.
+         * To know which sensors AKA parameters a vehicle supports it will respond with binary data representing their parameter IDs (PIDs)
+         * The number of bits from the left (MSB) is the ID of the parameter that is supported
+         * For example, from the following byte 00001001 the 5th and 8th bits are set. This would mean PID 0x05 and 0x08 are supported.
          *
-         * Each response covers 4 bytes containing 32 PIDs
-         *
+         * Each response covers 4 bytes containing 32 PIDs.
+         * Therefore, the FOR loop variable names represent the following:
          * i: the start offset of each 4 byte response
          * j: each byte of that response
          * k: each bit of that byte
          *
          * Adding up all the offsets to get the value of the PID: i + j * 8 + (8 - k)
-         * then AND it with the response to check whether it is available
+         * then bitwise AND it with the response to check whether it is available
          *
          * For more info visit: https://en.wikipedia.org/wiki/OBD-II_PIDs#Service_01_PID_00_-_Show_PIDs_supported
          */
@@ -178,7 +169,6 @@ public class Obd implements ConnectionEventListener {
 
     /**
      * Request the VIN of the vehicle
-     * @return
      */
     public String getVin() {
         byte[] vin = requestData("0902\r".getBytes());

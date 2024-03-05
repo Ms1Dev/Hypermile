@@ -6,7 +6,6 @@ import java.util.ArrayList;
  * Abstract template class for all data sources.
  * Implements the main functionality of a datasource without knowing the type.
  * Stores a list of observers that should be notified when the data is updated.
- * @param <T>
  */
 abstract public class DataSource<T> {
     protected String units;

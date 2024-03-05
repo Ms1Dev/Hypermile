@@ -15,9 +15,12 @@ import com.example.hypermile.R;
 import java.util.ArrayList;
 import java.util.List;
 
-// SOURCE: lab 5
 
-public class DiscoveredDeviceAdapter extends ArrayAdapter {
+/**
+ * Array adapter used to show a list of discovered devices.
+ * SOURCE: lab 5
+ */
+public class DiscoveredDeviceAdapter extends ArrayAdapter<DiscoveredDevice> {
 
     List<DiscoveredDevice> deviceList;
 
@@ -45,12 +48,12 @@ public class DiscoveredDeviceAdapter extends ArrayAdapter {
     }
 
     @Override
-    public void add(@Nullable Object object) {
+    public void add(@Nullable DiscoveredDevice device) {
         for (DiscoveredDevice discoveredDevice : deviceList) {
-            if (discoveredDevice.getMacAddress().equals(((DiscoveredDevice) object).getMacAddress())) {
+            if (discoveredDevice.getMacAddress().equals(((DiscoveredDevice) device).getMacAddress())) {
                 return;
             }
         }
-        super.add(object);
+        super.add(device);
     }
 }

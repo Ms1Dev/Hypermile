@@ -34,8 +34,11 @@ import com.example.hypermile.bluetooth.DiscoveredDeviceAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Uses a custom array adapter to create a list of discovered bluetooth devices.
+ * When discovery is started a broadcast receiver append devices to the list when they are discovered.
+ */
 public class SelectBluetoothDeviceActivity extends AppCompatActivity implements DeviceSelectedCallback, ConnectionEventListener {
-    private DiscoveredDevice selectedDevice;
     List<DiscoveredDevice> discoveredDevices = new ArrayList<>();
     DiscoveredDeviceAdapter discoveredDeviceAdapter;
     BluetoothAdapter bluetoothAdapter;
@@ -164,9 +167,7 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
 
 
     /**
-     * @brief handles the back button on click
-     * @param item
-     * @return true
+     * handles the back button on click
      */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -204,9 +205,8 @@ public class SelectBluetoothDeviceActivity extends AppCompatActivity implements 
 
     @Override
     public void deviceSelected(DiscoveredDevice discoveredDevice) {
-        selectedDevice = discoveredDevice;
         Intent intent = new Intent();
-        intent.putExtra("device", selectedDevice.getBluetoothDevice());
+        intent.putExtra("device", discoveredDevice.getBluetoothDevice());
         setResult(Activity.RESULT_OK, intent);
         finish();
     }

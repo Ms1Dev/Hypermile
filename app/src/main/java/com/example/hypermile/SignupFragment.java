@@ -17,7 +17,8 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- *
+ * Shows a simple sign up form to the user to enter credentials.
+ * When the details are submitted they are passed to methods in the AuthenticationActivity
  */
 public class SignupFragment extends Fragment implements AuthRequester {
     private View view;

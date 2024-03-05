@@ -27,8 +27,11 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
- * Initialises all data sources and connects them to the polling object.
- * Provides getters for accessing data sources.
+ * This class acts like a central access point for all data sources. In more detail it does the following:
+ * - Creates an instance of Poller, which requests data from data sources at regular intervals
+ * - Initialises all data sources and connects them to the polling object.
+ * - Provides getters for accessing data sources.
+ * - If required, it will also try to load vehicle details from shared preferences
  */
 public class DataManager implements EngineSpec, ConnectionEventListener {
     private static final String FUELTYPE_PREFERENCE = "fuelType";
@@ -61,7 +64,6 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
             dataManagerReadyListener.dataManagerReady();
         }
     }
-
 
     public DataManager(Context context, Obd obd){
         this.context = context;
@@ -119,8 +121,10 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
                 engineSpeed.setMaxValue(8000);
             }
 
+            // the mass air flow data can come from various sources depending on what sensors the vehicle has
             massAirFlow = getMassAirFlowSource(poller);
 
+            // fuel rate is calculated from mass air flow
             if (massAirFlow != null) {
                 fuelRate = new CalculatedFuelRate(massAirFlow);
                 massAirFlow.setDecimalPoints(2);
@@ -172,7 +176,6 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
     /**
      * This will try to get fuel type and engine size from shared preferences.
      * Engine size and fuel type are need for some calculations.
-     * @param sharedPreferences
      */
     private void getVehicleSpecs(SharedPreferences sharedPreferences) {
 
@@ -198,8 +201,6 @@ public class DataManager implements EngineSpec, ConnectionEventListener {
     /**
      * Mass airflow can come from 3 possible sources. Either directly from 2 mass airflow sensors
      * OR by calculating it from various other sensors (see ./sources/CalculatedMaf.java class)
-     * @param poller
-     * @return DataSource<Double>
      */
     private DataSource<Double> getMassAirFlowSource(Poller poller) {
 

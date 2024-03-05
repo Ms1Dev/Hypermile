@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * Data frame that is received from the OBD scanner
+ * String data received by the OBD will try to be converted into this OBDFrame object
+ * It contains a static method for creating an OBD frame or will return null if the string is invalid
  */
 public class ObdFrame {
     final static String CAN_ID = "7E8";
@@ -22,8 +23,6 @@ public class ObdFrame {
     /**
      * Attempts to create a valid OBD frame from the given data
      * Will return null if data is invalid
-     * @param data
-     * @return
      */
     public static ObdFrame createFrame(String data) {
         int idPos = data.indexOf(CAN_ID);
@@ -46,8 +45,6 @@ public class ObdFrame {
      * Create frame from data
      * If data is made up of multiple frames then the additional data
      * is appended to the payload to maintain a single frame object
-     * @param frames
-     * @throws InvalidFrameException
      */
     public ObdFrame(String[] frames) throws InvalidFrameException {
         this.frameData = frames;

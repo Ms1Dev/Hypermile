@@ -50,10 +50,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     private ReportsFragment reportsFragment;
     private ConnectionStatusBar connectionStatusBar;
     private BottomNavigationView bottomNavigationView;
-    private Toolbar toolbar;
-    private Obd obd;
     private Connection connection;
-    private DataManager dataManager;
     private JourneyMonitor journeyMonitor;
     private Snackbar alertSnackBar;
 
@@ -76,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.home);
 
-        toolbar = findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         if (
@@ -115,49 +112,35 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
             ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED ||
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // TODO: warn user of GPS and internet needed for maps
-        }
+        ) {}
         else {
             begin();
         }
     }
 
+    /**
+     * Heavily commented but a lot happens here
+     */
     private void begin() {
-        // create a bluetooth connection instance
-        connection = new Connection();
-        // create an obd connection instance (connection of device to car ECU)
-        obd = new Obd();
-        // obd can only start once a bluetooth connection is established so listen for connection
-        connection.addConnectionEventListener(obd);
-        // pass the connection to the OBD object to allow it to communicate with the device
-        obd.initialise(connection);
+        connection = new Connection(); // create a bluetooth connection instance
+        Obd obd = new Obd(); // create an obd connection instance (connection between the device and car ECU)
+        connection.addConnectionEventListener(obd); // obd can only start once a bluetooth connection is established so listen for connection
+        obd.initialise(connection); // pass the connection to the OBD object to allow it to communicate with the device
 
-        // status bar for showing status of bluetooth and obd
-        connectionStatusBar = findViewById(R.id.connectionStatusBar);
-        // connection status bar listen to bluetooth connection status
-        connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() );
-        // status bar must also listen for changes in obd connection
-        obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() );
-        // the main activity will store the MAC address on successful connection so it must listen to connection changes as well
-        connection.addConnectionEventListener(this);
-        // attempt to automatically connect to a bluetooth device if MAC address is stored
-        connection.connectToExisting(this);
+        connectionStatusBar = findViewById(R.id.connectionStatusBar); // status bar for showing status of bluetooth and obd
+        connection.addConnectionEventListener( connectionStatusBar.getBlueToothConnectionListener() ); // connection status bar needs to listen to the bluetooth connection status
+        obd.addConnectionEventListener( connectionStatusBar.getObdConnectionListener() ); // status bar must also listen for changes in obd connection
+        connection.addConnectionEventListener(this); // the main activity will store the MAC address on successful connection so it must listen to connection changes as well
+        connection.connectToExisting(this); // attempt to automatically connect to a bluetooth device if MAC address is stored
 
-        // create a data manager for all data sources
-        dataManager = new DataManager(this, obd);
-        // data manager requires an OBD connection
-        obd.addConnectionEventListener(dataManager);
+        DataManager dataManager = new DataManager(this, obd); // create a data manager for all data sources
+        obd.addConnectionEventListener(dataManager); // data manager requires an OBD connection
 
-        // live data fragment uses the data manager to access data sources
-        liveDataFragment.setDataManager(dataManager);
-        // it can only begin when the data manager is ready so it listens for ready state
-        dataManager.addDataManagerReadyListener(liveDataFragment);
+        liveDataFragment.setDataManager(dataManager); // live data fragment uses the data manager to access data sources
+        dataManager.addDataManagerReadyListener(liveDataFragment); // it can only begin when the data manager is ready so it listens for ready state
 
-        // journey monitor will create instances of journeys when it detects start/stop conditions
-        JourneyMonitor journeyMonitor = new JourneyMonitor(dataManager);
-        // the journey monitor needs RPM and connection status to recognise start and end of journeys
-        obd.addConnectionEventListener(journeyMonitor);
+        JourneyMonitor journeyMonitor = new JourneyMonitor(dataManager); // journey monitor will create instances of journeys when it detects start/stop conditions
+        obd.addConnectionEventListener(journeyMonitor); // the journey monitor needs RPM and connection status to recognise start and end of journeys
         dataManager.addDataManagerReadyListener(journeyMonitor);
     }
 
@@ -221,7 +204,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
     /**
      * Shows a snack bar with alert message for the user
-     * @param userAlert
      */
     public void alertUser(UserAlert userAlert) {
         Snackbar snackbar = null;
@@ -307,7 +289,6 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
     /**
      * Called when the bluetooth connection changes.
      * If connection is successful then the MAC address of the device is stored in shared preferences
-     * @param connectionState
      */
     @Override
     public void onStateChange(ConnectionState connectionState) {
