@@ -1,5 +1,3 @@
-app/src/main/AndroidManifest.xml
-app/src/main/java/com/example/hypermile/api/VinDecode.java
 
 *.iml
 .gradle
